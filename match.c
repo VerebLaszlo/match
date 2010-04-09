@@ -29,12 +29,31 @@ void multi_Free(detector det) {
 	fftw_destroy_plan(det.pn);
 }
 
-void calculator(detector det[], size_t length) {
+void calculate_After(size_t index, detector det[], size_t length) {
 	size_t i;
 	for (i = 1; i <= length; i++) {
 		fftw_execute(det[i]->pt);
 		fftw_execute(det[i]->ps);
 		fftw_execute(det[i]->pn);
 	}
-	det[length + 1] = 
+	i++;
+	det[i].length = det[length].length;
+	det[i].ct = fftw_malloc(det[i].length * sizeof(fftw_complex));
+	det[i].cs = fftw_malloc(det[i].length * sizeof(fftw_complex));
+	det[i].cn = fftw_malloc(det[i].length * sizeof(fftw_complex));
+	det[i].n = fftw_malloc(det[i].length * sizeof(double));
+	det[i].ipn = fftw_plan_dft_r2c_1d(det.length, cn, n, FFTW_ESTIMATE);
+	if(!index) {
+		printf("Correlation: ");
+		fflush(stdout);
+		calc_Time_Corr(det[i].t, det[i].t, det[i].t, det[i].length);
+		printf("h ");
+		fflush(stdout);
+		calc_Time_Corr(det[i].s, det[i].s, det[i].s, det[i].length);
+		printf("s ");
+		fflush(stdout);
+		calc_Time_Corr(det[i].n, det[i].n, det[i].n, det[i].length);
+		printf("n\n");
+		fflush(stdout);
+	}
 }
