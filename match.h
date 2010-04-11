@@ -31,7 +31,7 @@ typedef struct detector_Tag {
  * @param[in,out]	det		: pointer to the detector structure
  * @return	pointer to the detector structure
  */
-void multi_Malloc(size_t len, detector_Struct *det);
+void multi_Malloc(size_t length, detector_Struct *det);
 
 /**
  *		The function deallocates the memory of the detector structure.

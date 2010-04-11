@@ -83,9 +83,7 @@ int main(int argc, char *argv[]) {
 	//	fill the detector structures
 	for (i = 0; i < num_Detectors; i++) {
 		multi_Malloc(length, &det[i]);												// deallocated line: 221
-		//*********************************************
-		//	MEGADNI, HOGY MELYIK DETEKTOR IS AZ AMIT HASZNÁLUNK
-		//*********************************************
+		det[i].det = con_Det_Str_Enum(d_names[i]);
 		for (j = 0; j < length; j++) {
 			det[i].t[j] = templates[i].data[j];
 			det[i].s[j] = signals[i].data[j];
