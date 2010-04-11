@@ -11,6 +11,7 @@
  */
 typedef detector_Tag {
 	size_t length;
+	//detector_type det;
 	double *t;			///< template vector
 	double *s;			///< signal vector
 	double *n;			///< noise vector
@@ -20,9 +21,6 @@ typedef detector_Tag {
 	fftw_plan pt;		///< fftw-plan of the template vector
 	fftw_plan ps;		///< fftw-plan of the signal vector
 	fftw_plan pn;		///< fftw-plan of the noise vector
-	fftw_plan ipt;		///< invert fftw-plan of the template vector
-	fftw_plan ips;		///< invert fftw-plan of the signal vector
-	fftw_plan ipn;		///< invert fftw-plan of the noise vector
 } detector;
 
 /**
@@ -41,8 +39,9 @@ void multi_Free(detector * det);
 
 /**
  *		The function calculates the time-correlated match afterwards.
+ *	The detector's vector is dynamically allocated.
  * @param[in]	index	: how many times is the function called
  * @param[in]	det		: vector of detector structures
  * @param[in]	length	: the length of the vector containing the detectors
  */
-void calculate_After(size_t index, detector * det, size_t length);
+void calculate_After(size_t index, detector * det, size_t *length);
