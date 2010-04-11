@@ -1,0 +1,5 @@
+# Ignore objects and archives.
+*.[oa]
+
+# Ignore the doc folder
+doc

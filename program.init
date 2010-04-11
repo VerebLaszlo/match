@@ -1,0 +1,7 @@
+numOfGoodMatch		10000
+numOfBestMatch		5
+deviation			0.1
+min_time			2.
+max_time			4.
+delta_time			0.1
+precision			10
