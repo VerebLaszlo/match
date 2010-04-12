@@ -7,6 +7,8 @@ doc
 # Ignore the exec file and everything created by the program
 match
 own.match
+parameters.data
+to_Plot.data
 
 # Ignore everything starting with dot, exept .gitignore
 .*
