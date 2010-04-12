@@ -38,7 +38,7 @@ void multi_Malloc(long length, detector_Struct *det);
  *		The function deallocates the memory of the detector structure.
  * @param[in]	det	: pointer to the detector
  */
-void multi_Free(detector_Struct det);
+void multi_Free(detector_Struct *det);
 
 /**
  *		The function calculates the time-correlated match afterwards.

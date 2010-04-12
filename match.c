@@ -55,6 +55,18 @@ void calc_Time_Corr(double h1[], double h2[], double dest[], long length) {
 	}
 	for (i = 0; i < length; i++) {
 		for (j = 0; j < length - i; j++) {
+/*if (i < 5 && j < 5) {
+	printf("%ld %ld %ld %ld %ld\n", length,j, j + 1, x, i+length);
+	fflush(stdout);
+	printf("%lg\n",h1[j + 1]);
+	fflush(stdout);
+	printf("%lg\n",h2[j]);
+	fflush(stdout);
+	printf("%lg\n",dest[x]);
+	fflush(stdout);
+	printf("%lg\n",dest[i + length]);
+	fflush(stdout);
+}*/
 			dest[i+length] = (dest[x] += (h2[j] * h1[j + i]));
 		}
 		x--;
@@ -74,16 +86,16 @@ void multi_Malloc(long len, detector_Struct * det) {
 	det->pn = fftw_plan_dft_r2c_1d(det->length, det->n, det->cn, FFTW_ESTIMATE);
 }
 
-void multi_Free(detector_Struct det) {
-	fftw_free(det.t);
-	fftw_free(det.s);
-	fftw_free(det.n);
-	fftw_free(det.ct);
-	fftw_free(det.cs);
-	fftw_free(det.cn);
-	fftw_destroy_plan(det.pt);
-	fftw_destroy_plan(det.ps);
-	fftw_destroy_plan(det.pn);
+void multi_Free(detector_Struct *det) {
+	fftw_free(det->t);
+	fftw_free(det->s);
+	fftw_free(det->n);
+	fftw_free(det->ct);
+	fftw_free(det->cs);
+	fftw_free(det->cn);
+	fftw_destroy_plan(det->pt);
+	fftw_destroy_plan(det->ps);
+	fftw_destroy_plan(det->pn);
 }
 
 void copy_Detector(detector_Struct source, detector_Struct *dest) {
@@ -135,13 +147,13 @@ void calculate_After(long index, detector_Struct *det[], long *len) {
 		multi_Malloc(data_length * 2, &temp[*len]);								// deallocated line: 221
 		printf("Correlation: ");
 		fflush(stdout);
-///		calc_Time_Corr(temp[p2].t, temp[p1].t, temp[*len].t, temp[*len].length / 2);
+		calc_Time_Corr(temp[p2].t, temp[p1].t, temp[*len].t, temp[*len].length / 2);
 		printf("h ");
 		fflush(stdout);
-///		calc_Time_Corr(temp[p2].s, temp[p1].s, temp[*len].s, temp[*len].length / 2);
+		calc_Time_Corr(temp[p2].s, temp[p1].s, temp[*len].s, temp[*len].length / 2);
 		printf("s ");
 		fflush(stdout);
-///		calc_Time_Corr(temp[p2].n, temp[p1].n, temp[*len].n, temp[*len].length / 2);
+		calc_Time_Corr(temp[p2].n, temp[p1].n, temp[*len].n, temp[*len].length / 2);
 		printf("n\n");
 		fflush(stdout);
 		fftw_execute(temp[*len].pt);
