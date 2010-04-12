@@ -3,3 +3,10 @@
 
 # Ignore the doc folder
 doc
+
+# Ignore the exec file
+match
+
+# Ignore everything starting with dot, exept .gitignore
+.*
+!.gitignore
