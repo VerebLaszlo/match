@@ -23,9 +23,8 @@ ioHandling.o: ioHandling.c ioHandling.h generator.o util.c util.h
 match.o: match.c match.h generator.o detector.o ioHandling.o
 	gcc -c match.c generator.c detector.c ioHandling.c -Wall
 
-clean: clear main.o match.o ioHandling.o generator.o detector.o util.o
+clean: main.o match.o ioHandling.o generator.o detector.o util.o
 	rm main.o match.o ioHandling.o generator.o detector.o util.o
-	clear
 .PHONY: clean
 
 clear: parameters.data to_Plot.data own_match.data
