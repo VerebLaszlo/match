@@ -24,9 +24,9 @@ match.o: match.c match.h generator.o detector.o ioHandling.o
 	gcc -c match.c generator.c detector.c ioHandling.c -Wall
 
 clean: main.o match.o ioHandling.o generator.o detector.o util.o
-	rm main.o match.o ioHandling.o generator.o detector.o util.o
+	rm match main.o match.o ioHandling.o generator.o detector.o util.o
 .PHONY: clean
 
-clear: parameters.data to_Plot.data own_match.data
+clean_other: own.match parameters.data to_Plot.data
 	rm own.match parameters.data to_Plot.data
 .PHONY: clear
