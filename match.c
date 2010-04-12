@@ -4,12 +4,7 @@
  * @date 2010.04.09.
  */
 
-#include <time.h>
-#include "util.h"
 #include "match.h"
-#include "generator.h"
-#include "detector.h"
-#include "ioHandling.h"
 
 extern double pi;
 
@@ -51,9 +46,7 @@ double* psd(double n[], long length, double dt, void(*winf)(double array[], long
 	fftw_free(cn);
 	return wn;
 }
-/**
- *	Időbeli korrelációt végrehajtó függvény.
- */
+
 void calc_Time_Corr(double h1[], double h2[], double dest[], long length) {
 	long i, j;
 	long x=length-1;
@@ -68,8 +61,8 @@ void calc_Time_Corr(double h1[], double h2[], double dest[], long length) {
 	}
 }
 
-void multi_Malloc(size_t len, detector_Struct * det) {
-	det->length = len; 
+void multi_Malloc(long len, detector_Struct * det) {
+	det->length = len;
 	det->t = fftw_malloc(det->length * sizeof(double));
 	det->s = fftw_malloc(det->length * sizeof(double));
 	det->n = fftw_malloc(det->length * sizeof(double));
@@ -93,40 +86,62 @@ void multi_Free(detector_Struct det) {
 	fftw_destroy_plan(det.pn);
 }
 
-void calculate_After(size_t index, detector_Struct det[], size_t *len) {
-	size_t p1 = *len - 1, p2 = *len - 2;
-	size_t i, j;
-	size_t length = (++*len) + 1;
-	det = realloc(det, length);
+void copy_Detector(detector_Struct source, detector_Struct *dest) {
+	dest->length = source.length;
+	dest->det = source.det;
+	dest->t = source.t;
+	dest->s = source.s;
+	dest->n = source.n;
+	dest->ct = source.ct;
+	dest->cs = source.cs;
+	dest->cn = source.cn;
+	dest->pt = source.pt;
+	dest->ps = source.ps;
+	dest->pn = source.pn;
+}
+
+void calculate_After(long index, detector_Struct *det[], long *len) {
+	long p1 = *len - 1, p2 = *len - 2;
+	long i;
+	long data_length = (*det)[p1].length;
+	long length = *len + 2;
+//	det = realloc(det, length);
+	detector_Struct *temp = malloc(length * sizeof(detector_Struct));
+	for (i = 0; i < *len; i++) {
+		copy_Detector((*det)[i], &temp[i]);
+	}
+	free(*det);
+	*det = temp;
 	// kivenni a függvény elé
-	multi_Malloc(det[p1].length, &det[*len]);										// deallocated line: 221
-	fftw_plan ipn = fftw_plan_dft_c2r_1d(det[*len].length, det[*len].cn, det[*len].n, FFTW_ESTIMATE);	// deallocated line: 71
-	for(j = 0; j < det[*len].length; j++) {
-		det[*len].ct[j][0] = det[p2].ct[j][0] * det[p1].ct[j][0] + det[p2].ct[j][1] * det[p1].ct[j][1];
-		det[*len].ct[j][1] = det[p2].ct[j][0] * det[p1].ct[j][1] - det[p2].ct[j][1] * det[p1].ct[j][0];
-		det[*len].cs[j][0] = det[p2].cs[j][0] * det[p1].cs[j][0] + det[p2].cs[j][1] * det[p1].cs[j][1];
-		det[*len].cs[j][1] = det[p2].cs[j][0] * det[p1].cs[j][1] - det[p2].cs[j][1] * det[p1].cs[j][0];
-		det[*len].cn[j][0] = det[p2].cn[j][0] * det[p1].cn[j][0] + det[p2].cn[j][1] * det[p1].cn[j][1];
-		det[*len].cn[j][1] = det[p2].cn[j][0] * det[p1].cn[j][1] - det[p2].cn[j][1] * det[p1].cn[j][0];
+	multi_Malloc(data_length, &temp[*len]);										// deallocated line: 221
+	fftw_plan ipn = fftw_plan_dft_c2r_1d(temp[*len].length, temp[*len].cn, temp[*len].n, FFTW_ESTIMATE);	// deallocated line: 71
+	for(i = 0; i < temp[*len].length; i++) {
+		temp[*len].ct[i][0] = temp[p2].ct[i][0] * temp[p1].ct[i][0] + temp[p2].ct[i][1] * temp[p1].ct[i][1];
+		temp[*len].ct[i][1] = temp[p2].ct[i][0] * temp[p1].ct[i][1] - temp[p2].ct[i][1] * temp[p1].ct[i][0];
+		temp[*len].cs[i][0] = temp[p2].cs[i][0] * temp[p1].cs[i][0] + temp[p2].cs[i][1] * temp[p1].cs[i][1];
+		temp[*len].cs[i][1] = temp[p2].cs[i][0] * temp[p1].cs[i][1] - temp[p2].cs[i][1] * temp[p1].cs[i][0];
+		temp[*len].cn[i][0] = temp[p2].cn[i][0] * temp[p1].cn[i][0] + temp[p2].cn[i][1] * temp[p1].cn[i][1];
+		temp[*len].cn[i][1] = temp[p2].cn[i][0] * temp[p1].cn[i][1] - temp[p2].cn[i][1] * temp[p1].cn[i][0];
 	}
 	fftw_execute(ipn);
 	fftw_destroy_plan(ipn);
+	++*len;
 	if(!index) {
-		++*len;
-		multi_Malloc(det[p1].length * 2, &det[*len]);								// deallocated line: 221
+		multi_Malloc(data_length * 2, &temp[*len]);								// deallocated line: 221
 		printf("Correlation: ");
 		fflush(stdout);
-		calc_Time_Corr(det[p2].t, det[p1].t, det[*len].t, det[*len].length / 2);
+///		calc_Time_Corr(temp[p2].t, temp[p1].t, temp[*len].t, temp[*len].length / 2);
 		printf("h ");
 		fflush(stdout);
-		calc_Time_Corr(det[p2].s, det[p1].s, det[*len].s, det[*len].length / 2);
+///		calc_Time_Corr(temp[p2].s, temp[p1].s, temp[*len].s, temp[*len].length / 2);
 		printf("s ");
 		fflush(stdout);
-		calc_Time_Corr(det[p2].n, det[p1].n, det[*len].n, det[*len].length / 2);
+///		calc_Time_Corr(temp[p2].n, temp[p1].n, temp[*len].n, temp[*len].length / 2);
 		printf("n\n");
 		fflush(stdout);
-		fftw_execute(det[*len].pt);
-		fftw_execute(det[*len].ps);
+		fftw_execute(temp[*len].pt);
+		fftw_execute(temp[*len].ps);
+		++*len;
 	}
 }
 

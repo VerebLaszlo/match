@@ -2,6 +2,7 @@
 #include "util.h"
 #include "generator.h"
 #include "ioHandling.h"
+#include <time.h>
 
 double pi = M_PI;
 
@@ -9,11 +10,11 @@ extern char * program_invocation_short_name;
 extern char * program_invocation_name;
 
 typedef struct waves_Tag{
-	size_t length;
+	long length;
 	double *data;
 } waves;
 
-void malloc_Waves(size_t len, waves * wave) {
+void malloc_Waves(long len, waves * wave) {
 	wave->length = len;
 	wave->data = malloc(wave->length * sizeof(double));
 }
@@ -21,17 +22,20 @@ void malloc_Waves(size_t len, waves * wave) {
 int main(int argc, char *argv[]) {
 	char mode[30];
 	double dt, freq_Min, freq_Max;
-	extern binary_system min, max;
-	size_t i;
+//	extern binary_system min, max;
+	long i;
 	int j, k, num_Detectors = 0;
-	if (argc != 3) {
-		printf("The first parameter is the signals maximal length. The second is a file (the file name is max 20 character) with the number of the detectors in the first line, and after that for each detector the next line:\n"
-		"detector_name template_file signal_file noise_file");
+	if (argc != 2) {
+		printf("The first parameter is a file (the file name is max 20 character)\n"
+		"with the number of the detectors in the first line,\n"
+		"and after that for each detector the next line:\n"
+		"detector_name template_file signal_file noise_file\n");
 		fflush(stdout);
+		exit(-1);
 	}
 	// preinicialization
-	size_t max_Length = atoi(argv[1]);
-	FILE *file = sfopen_read(argv[2]);												// deallocated line: 124
+//	long max_Length = atoi(argv[1]);
+	FILE *file = sfopen_read(argv[1]);												// deallocated line: 124
 	fscanf(file, "%d\n", &num_Detectors);
 	typedef char type_name[20];
 	type_name *t_names = malloc(num_Detectors * sizeof(type_name));					// deallocated line: 153
@@ -44,31 +48,32 @@ int main(int argc, char *argv[]) {
 	fclose(file);
 	init_generator(mode, &dt, &freq_Min, &freq_Max);
 	program_params params = init_program();
+	long max_Length = (long) (params.max_time / dt);
+	long template_Length[num_Detectors];
+	long signal_Length[num_Detectors];
+	long noise_Length[num_Detectors];
+	double templates[num_Detectors][max_Length];
+	double signals[num_Detectors][max_Length];
+	double noises[num_Detectors][max_Length];
 	// allocating memory for data and reading it from files
-	waves *templates = malloc(num_Detectors * sizeof(waves));						// deallocated line: end
-	waves *signals = malloc(num_Detectors * sizeof(waves));							// deallocated line: end
-	waves *noises = malloc(num_Detectors * sizeof(waves));							// deallocated line: end
 	for (i = 0; i < num_Detectors; i++) {
-		malloc_Waves(max_Length, &templates[i]);									// deallocated line: end
 		file = sfopen_read(t_names[i]);												// deallocated line: 137
 		for (j = 0; !feof(file); j++) {
-			fscanf(file, "%*g %lg\n", &templates[i].data[j]);
+			fscanf(file, "%*g %lg\n", &templates[i][j]);
 		}
-		templates[i].length = j;
+		template_Length[i] = j;
 		fclose(file);
-		malloc_Waves(max_Length, &signals[i]);										// deallocated line: end
 		file = sfopen_read(s_names[i]);												// deallocated line: 144
 		for (j = 0; !feof(file); j++) {
-			fscanf(file, "%*g %lg\n", &signals[i].data[j]);
+			fscanf(file, "%*g %lg\n", &signals[i][j]);
 		}
-		signals[i].length = j;
+		signal_Length[i] = j;
 		fclose(file);
-		malloc_Waves(max_Length, &noises[i]);										// deallocated line: end
 		file = sfopen_read(n_names[i]);												// deallocated line: 151
 		for (j = 0; !feof(file); j++) {
-			fscanf(file, "%*g %lg\n", &noises[i].data[j]);
+			fscanf(file, "%*g %lg\n", &noises[i][j]);
 		}
-		noises[i].length = j;
+		noise_Length[i] = j;
 		fclose(file);
 	}
 	free(t_names);
@@ -76,34 +81,34 @@ int main(int argc, char *argv[]) {
 	free(n_names);
 	// find the shortest length
 	detector_Struct *det = malloc(num_Detectors * sizeof(detector_Struct));						// deallocated line: end
-	size_t length = fmin(fmin(templates[0].length, signals[0].length),noises[0].length);
+	long length = fmin(fmin(template_Length[0], signal_Length[0]),noise_Length[0]);
 	for (i = 1; i < num_Detectors; i++) {
-		length = fmin(fmin(templates[i].length, signals[i].length), fmin(noises[i].length, length));
+		length = fmin(fmin(template_Length[i], signal_Length[i]), fmin(noise_Length[i], length));
 	}
 	//	fill the detector structures
 	for (i = 0; i < num_Detectors; i++) {
 		multi_Malloc(length, &det[i]);												// deallocated line: 221
 		det[i].det = con_Det_Str_Enum(d_names[i]);
 		for (j = 0; j < length; j++) {
-			det[i].t[j] = templates[i].data[j];
-			det[i].s[j] = signals[i].data[j];
-			det[i].n[j] = noises[i].data[j];
+			det[i].t[j] = templates[i][j];
+			det[i].s[j] = signals[i][j];
+			det[i].n[j] = noises[i][j];
 		}
 	}
 	free(d_names);
 	// execute the Fourier algorithm
-	for (i = 1; i <= num_Detectors; i++) {
+	for (i = 0; i < num_Detectors; i++) {
 		fftw_execute(det[i].pt);
 		fftw_execute(det[i].ps);
 		fftw_execute(det[i].pn);
 	}
 	// calulates the others
-	size_t num_Match = num_Detectors;
-	calculate_After(0, det, &num_Match);
+	long num_Match = num_Detectors;
+	calculate_After(0, &det, &num_Match);
 	// find the frequency band
 	double freq_Step, fr = 0.;
 	freq_Step = 1. / (dt * length);
-	size_t minfr = 0, maxfr = 0;
+	long minfr = 0, maxfr = 0;
 	while (fr < freq_Min) {
 		fr += freq_Step;
 		maxfr = ++minfr;
@@ -143,6 +148,7 @@ int main(int argc, char *argv[]) {
 	file = sfopen_write("own.match");												// deallocated line: 231
 	for (i = 0; i < num_Match; i++) {
 		fprintf(file, "%15.10lg ", own_Match[i]);
+		printf("%15.10lg ", own_Match[i]);
 	}
 	printf("\n");
 	fclose(file);
@@ -173,10 +179,11 @@ int main(int argc, char *argv[]) {
 	}
 	srand(time(NULL));
 	// starting the loop
-	size_t gen, all_m, bad_m, good_m;
+	long gen, all_m, bad_m, good_m;
+	exit(-1);
 	for (i = 0, gen = 0, all_m = 0, bad_m = 0, good_m; ; i++) {
 		if (i % 10 == 0) {
-			printf("[%d %d]", i, gen);
+			printf("[%ld %ld]", i, gen);
 			fflush(stdout);
 		}
 		binary_system now = gen_Params();
@@ -206,7 +213,7 @@ int main(int argc, char *argv[]) {
 			double p, c;
 			fscanf(file, "%*g %lg %lg", &p, &c);
 			for (j = 0; j <= num_Detectors; j++) {
-				templates[j].data[length] = fp[j] * p + fc[j] * c;
+				templates[j][length] = fp[j] * p + fc[j] * c;
 			}
 			length++;
 		}
@@ -217,18 +224,18 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 		all_m++;
-		length = fmin(fmin(templates[0].length, signals[0].length),noises[0].length);
+		length = fmin(fmin(template_Length[0], signal_Length[0]),noise_Length[0]);
 		for (j = 1; j <= num_Detectors; j++) {
-			length = fmin(fmin(templates[j].length, signals[j].length), fmin(noises[j].length, length));
+			length = fmin(fmin(template_Length[j], signal_Length[j]), fmin(noise_Length[j], length));
 		}
 		//	fill the detector structures
 		for (j = 0; j < num_Detectors; j++) {
 			multi_Malloc(length, &det[j]);												// deallocated line: 353
 			//	Már meg van adva, melyik detektor
 			for (k = 0; k < length; k++) {
-				det[j].t[k] = templates[j].data[k];
-				det[j].s[k] = signals[j].data[k];
-				det[j].n[k] = noises[j].data[k];
+				det[j].t[k] = templates[j][k];
+				det[j].s[k] = signals[j][k];
+				det[j].n[k] = noises[j][k];
 			}
 		}
 		// execute the Fourier algorithm
@@ -239,11 +246,11 @@ int main(int argc, char *argv[]) {
 		}
 		// calulates the others
 		num_Match = num_Detectors;
-		calculate_After(i, det, &num_Match);
+		calculate_After(i, &det, &num_Match);
 		// find the frequency band
 		fr = 0.;
 		freq_Step = 1. / (dt * length);
-		size_t minfr = 0, maxfr = 0;
+		long minfr = 0, maxfr = 0;
 		while (fr < freq_Min) {
 			fr += freq_Step;
 			maxfr = ++minfr;
@@ -338,18 +345,18 @@ int main(int argc, char *argv[]) {
 		}
 		if (all_good == 1) {
 			good_m++;
-			write_Waveh(i, templates[0].data, length, dt);
-			write_Wavel(i, templates[1].data, length, dt);
-			write_Gen_Data(i, freq_Min, freq_Max, match, diff, good, &now, dt);
-			write_Data_to_Plot(i, match, diff, good, &now);
+			write_Waveh(i, templates[0], length, dt);
+			write_Wavel(i, templates[1], length, dt);
+			write_Gen_Data(i, freq_Min, freq_Max, match, diff, good, num_Match, &now, dt);
+			write_Data_to_Plot(i, match, diff, good, num_Match, &now);
 		} else {
 			bad_m++;
-			write_Waveh(bad_m, templates[0].data, length, dt);
-			write_Wavel(bad_m, templates[1].data, length, dt);
-			write_Gen_Datax(bad_m, freq_Min, freq_Max, match, diff, good, &now, dt);
-			write_Data_to_Plotx(bad_m, match, diff, good, &now);
+			write_Waveh(bad_m, templates[0], length, dt);
+			write_Wavel(bad_m, templates[1], length, dt);
+			write_Gen_Datax(bad_m, freq_Min, freq_Max, match, diff, good, num_Match, &now, dt);
+			write_Data_to_Plotx(bad_m, match, diff, good, num_Match, &now);
 		}
-		printf("\nindex: %d, gen: %d, all_m: %d, bad_m: %d, good_m: %d\n", i, gen, all_m, bad_m, good_m);
+		printf("\nindex: %ld, gen: %ld, all_m: %ld, bad_m: %ld, good_m: %ld\n", i, gen, all_m, bad_m, good_m);
 		printf("sum, detecotrs, fft_corr, time_corr: ");
 		for (j = 0; j < num_Match; j++) {
 			printf("%d ", count[j]);
@@ -358,11 +365,6 @@ int main(int argc, char *argv[]) {
 		fflush(stdout);
 	}
 	// freeing things
-	for (i = 0; i < num_Detectors; i++) {
-		free(templates[i].data);
-		free(signals[i].data);
-		free(noises[i].data);
-	}
 	free(templates);
 	free(signals);
 	free(noises);

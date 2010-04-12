@@ -5,14 +5,15 @@
  */
 
 #include <fftw3.h>
-#include <math.h>
+#include "generator.h"
 #include "detector.h"
+#include "ioHandling.h"
 
 /**
  *		The structure contains everything corresponding to one detector.
  */
 typedef struct detector_Tag {
-	size_t length;
+	long length;
 	detector det;
 	double *t;			///< template vector
 	double *s;			///< signal vector
@@ -31,7 +32,7 @@ typedef struct detector_Tag {
  * @param[in,out]	det		: pointer to the detector structure
  * @return	pointer to the detector structure
  */
-void multi_Malloc(size_t length, detector_Struct *det);
+void multi_Malloc(long length, detector_Struct *det);
 
 /**
  *		The function deallocates the memory of the detector structure.
@@ -46,7 +47,7 @@ void multi_Free(detector_Struct det);
  * @param[in]	det		: vector of detector structures
  * @param[in]	length	: the length of the vector containing the detectors
  */
-void calculate_After(size_t index, detector_Struct * det, size_t *length);
+void calculate_After(long index, detector_Struct *det[], long *length);
 
 /**
  *		The function calculates the normalized scalar product in frequency domain.
@@ -76,3 +77,12 @@ void blackman(double array[], long length, double wn[]);
  * @return	the signal's psd
  */
 double * psd(double n[], long length, double dt, void(*winf)(double array[], long length, double wn[]));
+
+/**
+ *		The function calculates the cross-correlation in time-domain.
+ * @param[in]	h1		: the first vector
+ * @param[in]	h2		: the second vector
+ * @param[out]	dest	: the cross-correlated vector, twice the original length
+ * @param[in]	length	: the input vector's length
+ */
+void calc_Time_Corr(double h1[], double h2[], double dest[], long length);
