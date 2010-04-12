@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 	printf("\n");
 	fclose(file);
 	// Initialize output files
-	{
+/*	{
 		file = sfopen_write("parameters.data");										// deallocated line: 248
 		fprintf(file, "#%7s %13s %13s ", "index", "m1", "m2");
 		fprintf(file, "%13s %13s %13s ", "s1x", "s1y", "s1z" );
@@ -176,16 +176,11 @@ int main(int argc, char *argv[]) {
 		fprintf(file, "%12s %12s ", "ph1", "th1");
 		fprintf(file, "%12s %12s\n", "ph2", "th2");
 		fclose(file);
-	}
+	}*/
 	srand(time(NULL));
 	// starting the loop
 	long gen, all_m, bad_m, good_m;
-	exit(-1);
-	for (i = 0, gen = 0, all_m = 0, bad_m = 0, good_m; ; i++) {
-		if (i % 10 == 0) {
-			printf("[%ld %ld]", i, gen);
-			fflush(stdout);
-		}
+	for (i = 1, gen = 0, all_m = 0, bad_m = 0, good_m = 0; ; i++) {
 		binary_system now = gen_Params();
 		//paraméterek száma * számhossz + üreshelyek + módsztring + (fájlnév = 20)
 		int string_length = 6 + 12 * 30 + 15 + strlen(mode) + 20;
@@ -193,9 +188,9 @@ int main(int argc, char *argv[]) {
 		sprintf(LALparams, "./lal %30.20lg %30.20lg %30.20lg %30.20lg %30.20lg %30.20lg %30.20lg\
 			%30.20lg %30.20lg %3lg %3lg %3lg %30.20lg %s gen.out", now.bh1.m, now.bh2.m,
 			now.bh1.sx, now.bh1.sy, now.bh1.sz, now.bh2.sx, now.bh2.sy, now.bh2.sz, now.incl, freq_Min, freq_Max, now.dist, dt, mode);
-		system(LALparams);
+//		system(LALparams);
 		errno = 0;
-		file = fopen ("gen.out", "r");												// deallocated line: 294
+		file = fopen ("noise.wave", "r");												// deallocated line: 294
 		if (file == NULL) {
 			fprintf (stderr, "%s: Couldn't open file for reading %s; %s\n", program_invocation_short_name, "gen.out", strerror (errno));
 			fprintf (stderr, "Skipping!\n");
@@ -205,14 +200,15 @@ int main(int argc, char *argv[]) {
 		double * fp, * fc;
 		fp = malloc(num_Detectors * sizeof(double));											// deallocated line: 295
 		fc = malloc(num_Detectors * sizeof(double));											// deallocated line: 296
-		for (i = 0; i < num_Detectors; i++) {
-			calc_Response_For_Detector(det[i].det, now.dec, now.phi, now.pol, &fp[i], &fc[i]);
+		for (j = 0; j < num_Detectors; j++) {
+			calc_Response_For_Detector(det[j].det, now.dec, now.phi, now.pol, &fp[j], &fc[j]);
 		}
 		length = 0;
 		while (!(feof(file)) && length < max_Length) {
 			double p, c;
-			fscanf(file, "%*g %lg %lg", &p, &c);
-			for (j = 0; j <= num_Detectors; j++) {
+//			fscanf(file, "%*g %lg %lg", &p, &c);
+			fscanf(file, "%lg %lg", &p, &c);
+			for (j = 0; j < num_Detectors; j++) {
 				templates[j][length] = fp[j] * p + fc[j] * c;
 			}
 			length++;
@@ -225,7 +221,7 @@ int main(int argc, char *argv[]) {
 		}
 		all_m++;
 		length = fmin(fmin(template_Length[0], signal_Length[0]),noise_Length[0]);
-		for (j = 1; j <= num_Detectors; j++) {
+		for (j = 0; j < num_Detectors; j++) {
 			length = fmin(fmin(template_Length[j], signal_Length[j]), fmin(noise_Length[j], length));
 		}
 		//	fill the detector structures
@@ -239,14 +235,16 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		// execute the Fourier algorithm
-		for (j = 1; j <= num_Detectors; j++) {
+		for (j = 0; j < num_Detectors; j++) {
 			fftw_execute(det[j].pt);
 			fftw_execute(det[j].ps);
 			fftw_execute(det[j].pn);
 		}
 		// calulates the others
 		num_Match = num_Detectors;
+//printf("calc %ld\n", num_Match);
 		calculate_After(i, &det, &num_Match);
+//printf("calc %ld\n", num_Match);
 		// find the frequency band
 		fr = 0.;
 		freq_Step = 1. / (dt * length);
@@ -297,32 +295,34 @@ int main(int argc, char *argv[]) {
 		for (j = 0; j < num_Detectors; j++) {
 			all_good += good[j];
 		}
-		if (all_good == 0) {
+//		if (all_good == 0) {
+		if (false) {
 			//	FELSZABADíTANI MEMÓRIÁT	XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 			continue;
 		}
-		multi_Malloc(det[0].length * 2, &det[num_Match]);								// deallocated line: 399
-		printf("Correlation: ");
-		fflush(stdout);
-		calc_Time_Corr(det[1].t, det[0].t, det[num_Match].t, det[num_Match].length / 2);
-		printf("h ");
-		fflush(stdout);
-		calc_Time_Corr(det[1].s, det[0].s, det[num_Match].s, det[num_Match].length / 2);
-		printf("s ");
-		fflush(stdout);
-		calc_Time_Corr(det[1].n, det[0].n, det[num_Match].n, det[num_Match].length / 2);
-		printf("n\n");
-		fflush(stdout);
-		fftw_execute(det[num_Match].pt);
-		fftw_execute(det[num_Match].ps);
-		double *norm = psd(det[num_Match].n, det[num_Match].length, dt, blackman);					// deallocated line: 396
-		double ts = scalar_freq(det[num_Match].ct, det[num_Match].cs, norm, minfr, maxfr);
-		double tt = scalar_freq(det[num_Match].ct, det[num_Match].ct, norm, minfr, maxfr);
-		double ss = scalar_freq(det[num_Match].cs, det[num_Match].cs, norm, minfr, maxfr);
+		multi_Malloc(det[0].length * 2, &det[num_Match - 1]);								// deallocated line: 399
+//		printf("Correlation: ");
+//		fflush(stdout);
+//		calc_Time_Corr(det[1].t, det[0].t, det[num_Match].t, det[num_Match].length / 2);
+//		printf("h ");
+//		fflush(stdout);
+//		calc_Time_Corr(det[1].s, det[0].s, det[num_Match].s, det[num_Match].length / 2);
+//		printf("s ");
+//		fflush(stdout);
+//		calc_Time_Corr(det[1].n, det[0].n, det[num_Match].n, det[num_Match].length / 2);
+//		printf("n\n");
+//		fflush(stdout);
+//		fftw_execute(det[num_Match].pt);
+//		fftw_execute(det[num_Match].ps);
+		double *norm = psd(det[num_Match - 1].n, det[num_Match - 1].length, dt, blackman);					// deallocated line: 396
+//		double ts = scalar_freq(det[num_Match].ct, det[num_Match].cs, norm, minfr, maxfr);
+//		double tt = scalar_freq(det[num_Match].ct, det[num_Match].ct, norm, minfr, maxfr);
+//		double ss = scalar_freq(det[num_Match].cs, det[num_Match].cs, norm, minfr, maxfr);
+		double ts = 1., tt = 1., ss = 1.;	//segéd
 		fftw_free(norm);
+		multi_Free(det[num_Match - 1]);
 		num_Match++;
 		match[num_Match] = ts / sqrt(tt * ss);
-		multi_Free(det[num_Match]);
 		double temp1 = own_Match[num_Match] * (1. - params.deviation);
 		double temp2 = own_Match[num_Match] * (1. + params.deviation);
 		if (temp1 < match[num_Match] && match[num_Match] < temp2) {
@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
 			diff[num_Match] = 1. - (match[num_Match] / own_Match[num_Match]);
 		}
 		all_good = 0;
-		for (j = 0; j < num_Match; j++) {
+		for (j = 0; j <= num_Match; j++) {
 			if ( good[j] == 1) {
 				all_good = 1;
 				break;
@@ -345,24 +345,30 @@ int main(int argc, char *argv[]) {
 		}
 		if (all_good == 1) {
 			good_m++;
-			write_Waveh(i, templates[0], length, dt);
+/*			write_Waveh(i, templates[0], length, dt);
 			write_Wavel(i, templates[1], length, dt);
 			write_Gen_Data(i, freq_Min, freq_Max, match, diff, good, num_Match, &now, dt);
-			write_Data_to_Plot(i, match, diff, good, num_Match, &now);
+			write_Data_to_Plot(i, match, diff, good, num_Match, &now);*/
 		} else {
 			bad_m++;
-			write_Waveh(bad_m, templates[0], length, dt);
+/*			write_Waveh(bad_m, templates[0], length, dt);
 			write_Wavel(bad_m, templates[1], length, dt);
 			write_Gen_Datax(bad_m, freq_Min, freq_Max, match, diff, good, num_Match, &now, dt);
-			write_Data_to_Plotx(bad_m, match, diff, good, num_Match, &now);
+			write_Data_to_Plotx(bad_m, match, diff, good, num_Match, &now);*/
 		}
-		printf("\nindex: %ld, gen: %ld, all_m: %ld, bad_m: %ld, good_m: %ld\n", i, gen, all_m, bad_m, good_m);
-		printf("sum, detecotrs, fft_corr, time_corr: ");
-		for (j = 0; j < num_Match; j++) {
-			printf("%d ", count[j]);
+		if (i % 100 == 0) {
+			printf("\nindex: %ld, gen: %ld, all_m: %ld, bad_m: %ld, good_m: %ld\n", i, gen, all_m, bad_m, good_m);
+			printf("sum, detecotrs, fft_corr, time_corr: ");
+			for (j = 0; j <= num_Match; j++) {
+				printf("%d ", count[j]);
+			}
+			printf("\n");
+			fflush(stdout);
 		}
-		printf("\n");
-		fflush(stdout);
+		if (i - 1> 0 && i % 10 == 0) {
+			printf("[%ld %ld]", i, gen);
+			fflush(stdout);
+		}
 	}
 	// freeing things
 	free(templates);

@@ -104,14 +104,19 @@ void calculate_After(long index, detector_Struct *det[], long *len) {
 	long p1 = *len - 1, p2 = *len - 2;
 	long i;
 	long data_length = (*det)[p1].length;
-	long length = *len + 2;
-//	det = realloc(det, length);
-	detector_Struct *temp = malloc(length * sizeof(detector_Struct));
-	for (i = 0; i < *len; i++) {
-		copy_Detector((*det)[i], &temp[i]);
+	detector_Struct *temp;
+	if (!index) {
+		long length = *len + 2;
+	//	det = realloc(det, length);
+		temp = malloc(length * sizeof(detector_Struct));
+		for (i = 0; i < *len; i++) {
+			copy_Detector((*det)[i], &temp[i]);
+		}
+		free(*det);
+		*det = temp;
+	} else {
+		temp = *det;
 	}
-	free(*det);
-	*det = temp;
 	// kivenni a függvény elé
 	multi_Malloc(data_length, &temp[*len]);										// deallocated line: 221
 	fftw_plan ipn = fftw_plan_dft_c2r_1d(temp[*len].length, temp[*len].cn, temp[*len].n, FFTW_ESTIMATE);	// deallocated line: 71

@@ -4,8 +4,9 @@
 # Ignore the doc folder
 doc
 
-# Ignore the exec file
+# Ignore the exec file and everything created by the program
 match
+own.match
 
 # Ignore everything starting with dot, exept .gitignore
 .*
