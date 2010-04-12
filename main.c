@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
 	printf("\n");
 	fclose(file);
 	// Initialize output files
-	{
+/*	{
 		file = sfopen_write("parameters.data");										// deallocated line: 248
 		fprintf(file, "#%7s %13s %13s ", "index", "m1", "m2");
 		fprintf(file, "%13s %13s %13s ", "s1x", "s1y", "s1z" );
@@ -176,11 +176,10 @@ int main(int argc, char *argv[]) {
 		fprintf(file, "%12s %12s ", "ph1", "th1");
 		fprintf(file, "%12s %12s\n", "ph2", "th2");
 		fclose(file);
-	}
+	}*/
 	srand(time(NULL));
 	// starting the loop
 	long gen, all_m, bad_m, good_m;
-	exit(-1);
 	for (i = 0, gen = 0, all_m = 0, bad_m = 0, good_m; ; i++) {
 		if (i % 10 == 0) {
 			printf("[%ld %ld]", i, gen);
@@ -193,9 +192,9 @@ int main(int argc, char *argv[]) {
 		sprintf(LALparams, "./lal %30.20lg %30.20lg %30.20lg %30.20lg %30.20lg %30.20lg %30.20lg\
 			%30.20lg %30.20lg %3lg %3lg %3lg %30.20lg %s gen.out", now.bh1.m, now.bh2.m,
 			now.bh1.sx, now.bh1.sy, now.bh1.sz, now.bh2.sx, now.bh2.sy, now.bh2.sz, now.incl, freq_Min, freq_Max, now.dist, dt, mode);
-		system(LALparams);
+//		system(LALparams);
 		errno = 0;
-		file = fopen ("gen.out", "r");												// deallocated line: 294
+		file = fopen ("noise.wave", "r");												// deallocated line: 294
 		if (file == NULL) {
 			fprintf (stderr, "%s: Couldn't open file for reading %s; %s\n", program_invocation_short_name, "gen.out", strerror (errno));
 			fprintf (stderr, "Skipping!\n");
@@ -211,8 +210,9 @@ int main(int argc, char *argv[]) {
 		length = 0;
 		while (!(feof(file)) && length < max_Length) {
 			double p, c;
-			fscanf(file, "%*g %lg %lg", &p, &c);
-			for (j = 0; j <= num_Detectors; j++) {
+//			fscanf(file, "%*g %lg %lg", &p, &c);
+			fscanf(file, "%lg %lg", &p, &c);
+			for (j = 0; j < num_Detectors; j++) {
 				templates[j][length] = fp[j] * p + fc[j] * c;
 			}
 			length++;
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 		}
 		all_m++;
 		length = fmin(fmin(template_Length[0], signal_Length[0]),noise_Length[0]);
-		for (j = 1; j <= num_Detectors; j++) {
+		for (j = 0; j < num_Detectors; j++) {
 			length = fmin(fmin(template_Length[j], signal_Length[j]), fmin(noise_Length[j], length));
 		}
 		//	fill the detector structures
@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		// execute the Fourier algorithm
-		for (j = 1; j <= num_Detectors; j++) {
+		for (j = 0; j < num_Detectors; j++) {
 			fftw_execute(det[j].pt);
 			fftw_execute(det[j].ps);
 			fftw_execute(det[j].pn);
@@ -304,13 +304,13 @@ int main(int argc, char *argv[]) {
 		multi_Malloc(det[0].length * 2, &det[num_Match]);								// deallocated line: 399
 		printf("Correlation: ");
 		fflush(stdout);
-		calc_Time_Corr(det[1].t, det[0].t, det[num_Match].t, det[num_Match].length / 2);
+//		calc_Time_Corr(det[1].t, det[0].t, det[num_Match].t, det[num_Match].length / 2);
 		printf("h ");
 		fflush(stdout);
-		calc_Time_Corr(det[1].s, det[0].s, det[num_Match].s, det[num_Match].length / 2);
+//		calc_Time_Corr(det[1].s, det[0].s, det[num_Match].s, det[num_Match].length / 2);
 		printf("s ");
 		fflush(stdout);
-		calc_Time_Corr(det[1].n, det[0].n, det[num_Match].n, det[num_Match].length / 2);
+//		calc_Time_Corr(det[1].n, det[0].n, det[num_Match].n, det[num_Match].length / 2);
 		printf("n\n");
 		fflush(stdout);
 		fftw_execute(det[num_Match].pt);
@@ -345,16 +345,16 @@ int main(int argc, char *argv[]) {
 		}
 		if (all_good == 1) {
 			good_m++;
-			write_Waveh(i, templates[0], length, dt);
+/*			write_Waveh(i, templates[0], length, dt);
 			write_Wavel(i, templates[1], length, dt);
 			write_Gen_Data(i, freq_Min, freq_Max, match, diff, good, num_Match, &now, dt);
-			write_Data_to_Plot(i, match, diff, good, num_Match, &now);
+			write_Data_to_Plot(i, match, diff, good, num_Match, &now);*/
 		} else {
 			bad_m++;
-			write_Waveh(bad_m, templates[0], length, dt);
+/*			write_Waveh(bad_m, templates[0], length, dt);
 			write_Wavel(bad_m, templates[1], length, dt);
 			write_Gen_Datax(bad_m, freq_Min, freq_Max, match, diff, good, num_Match, &now, dt);
-			write_Data_to_Plotx(bad_m, match, diff, good, num_Match, &now);
+			write_Data_to_Plotx(bad_m, match, diff, good, num_Match, &now);*/
 		}
 		printf("\nindex: %ld, gen: %ld, all_m: %ld, bad_m: %ld, good_m: %ld\n", i, gen, all_m, bad_m, good_m);
 		printf("sum, detecotrs, fft_corr, time_corr: ");
