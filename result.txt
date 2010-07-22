@@ -1,0 +1,27 @@
+2.0PNSO ~ 2.0PNSS
+old: 0.878668, new: -0.996546
+old: 0.863569, new: 0.939956
+
+2.0PNSO ~ 2.0PNQM
+old: 0.175272, new: -0.993135
+old: 0.482009, new: 0.759079
+
+2.0PNSO ~ 2.0PNSSself
+old: 0.983759, new: -1.00039
+old: 0.994009, new: 0.999684
+
+2.0PNSO ~ 2.0PNAll
+old: 1, new: -1
+old: 1, new: 1
+
+2.0PNSS ~ 2.0PNQM
+old: 0.509034, new: -1.148
+old: 0.865821, new: 0.921067
+
+2.0PNSS ~ 2.0PNSSself
+old: 0.790955, new: -1.00229
+old: 0.809162, new: 0.889597
+
+2.0PNSS ~ 2.0PNAll
+old: 0.878668, new: -0.996546
+old: 0.863569, new: 0.939956
