@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 	double time[max_length];
 	static RandomInspiralSignalIn randIn;
 	short j;
-	size_t noise_length, min_Length;
+	size_t noise_length, max_Length;
 	size_t diff1, diff2, diffn;
 	FILE *file = fopen("noise.wave", "r");
 	for (noise_length = 0; !feof(file) && noise_length < max_length; noise_length++) {
@@ -88,41 +88,57 @@ int main(int argc, char *argv[]) {
 		return status.statusCode;
 	}
 
-	min_Length = thewaveform1.f->data->length < thewaveform2.f->data->length ? thewaveform1.f->data->length : thewaveform2.f->data->length;
-	min_Length = min_Length < noise_length ? min_Length : noise_length;
-	randIn.psd.length = min_Length;
+	max_Length = thewaveform1.f->data->length > thewaveform2.f->data->length ? thewaveform1.f->data->length : thewaveform2.f->data->length;
+	randIn.psd.length = max_Length;
 	double df = 1. / dt / randIn.psd.length;
 	randIn.psd.data = (REAL8*) LALMalloc(sizeof(REAL8)*randIn.psd.length);
 	detector_Struct det_old, det_new;
-	multi_Malloc(min_Length, &det_old);
-	multi_Malloc(min_Length, &det_new);
+	multi_Malloc(max_Length, &det_old);
+	multi_Malloc(max_Length, &det_new);
 	double hp, hc, a1, a2, phi, shift;
 	double fp = 0.5*(1 + t*t)*cos(p)*cos(s) - t*sin(p)*sin(s);
     double fc = 0.5*(1 + t*t)*cos(p)*sin(s) + t*sin(p)*cos(s);
 	double *norm;
 	double *wn;
+	short k;
 	for (j = 0; j < 2; j++) {
-		diff1 = j*(thewaveform1.f->data->length - min_Length);
-		diff2 = j*(thewaveform2.f->data->length - min_Length);
-		diffn = j*(noise_length - min_Length);
-		for (i = 0; i < min_Length; i++) {
-			a1  = thewaveform1.a->data->data[2*(i+diff1)];
-			a2  = thewaveform1.a->data->data[2*(i+diff1)+1];
-			phi     = thewaveform1.phi->data->data[i + diff1] - thewaveform1.phi->data->data[0];
-			shift   = thewaveform1.shift->data->data[i + diff1];
+		k = (j + 1) % 2;
+		diff1 = (max_Length - thewaveform1.f->data->length);
+		diff2 = (max_Length - thewaveform2.f->data->length);
+		for (i = 0; i < max_Length; i++) {
+			det_old.n[i] = det_new.n[i] = noise[noise_length - i];
+		}
+		for (i = 0; i < j * diff1; i++) {
+			det_old.t[i] = det_new.t[i] = 0.;
+		}
+		for (; i < max_Length - k * diff1; i++) {
+			a1  = thewaveform1.a->data->data[2*i];
+			a2  = thewaveform1.a->data->data[2*i+1];
+			phi     = thewaveform1.phi->data->data[i] - thewaveform1.phi->data->data[0];
+			shift   = thewaveform1.shift->data->data[i];
 			hp = a1*cos(shift)*cos(phi) - a2*sin(shift)*sin(phi);
 			hc = a1*sin(shift)*cos(phi) + a2*cos(shift)*sin(phi);
 			det_new.t[i] = fp * hp + fc * hc;
 			det_old.t[i] = det_new.t[i];
-			a1  = thewaveform2.a->data->data[2*(i+diff2)];
-			a2  = thewaveform2.a->data->data[2*(i+diff2)+1];
-			phi     = thewaveform2.phi->data->data[i+diff2] - thewaveform2.phi->data->data[0];
-			shift   = thewaveform2.shift->data->data[i+diff2];
+		}
+		for (; i < max_Length; i++) {
+			det_old.t[i] = det_new.t[i] = 0.;
+		}
+		for (i = 0; i < j * diff2; i++) {
+			det_old.s[i] = det_new.s[i] = 0.;
+		}
+		for (; i < max_Length - k * diff2; i++) {
+			a1  = thewaveform1.a->data->data[2*i];
+			a2  = thewaveform1.a->data->data[2*i+1];
+			phi     = thewaveform1.phi->data->data[i] - thewaveform1.phi->data->data[0];
+			shift   = thewaveform1.shift->data->data[i];
 			hp = a1*cos(shift)*cos(phi) - a2*sin(shift)*sin(phi);
 			hc = a1*sin(shift)*cos(phi) + a2*cos(shift)*sin(phi);
-			det_old.s[i] = det_new.s[i] = fp * hp + fc * hc;
-			det_old.n[i] = det_new.n[i] = noise[i+diff2];
-
+			det_new.s[i] = fp * hp + fc * hc;
+			det_old.s[i] = det_new.s[i];
+		}
+		for (; i < max_Length; i++) {
+			det_old.s[i] = det_new.s[i] = 0.;
 		}
 		fftw_execute(det_old.pt);
 		fftw_execute(det_old.ps);
@@ -130,12 +146,12 @@ int main(int argc, char *argv[]) {
 		fftw_execute(det_new.ps);
 		norm = psd(det_old.n, det_old.length, dt, blackman);
 		LALNoiseSpectralDensity (&status, &randIn.psd, &LALLIGOIPsd, df);
-		wn = fftw_malloc(min_Length * sizeof(double));
-		for (i = 0; i < min_Length; i++) {
+		wn = fftw_malloc(max_Length * sizeof(double));
+		for (i = 0; i < max_Length; i++) {
 			wn[i] = randIn.psd.data[i];
 		}
 		double freq_Step, fr = 0.;
-		freq_Step = 1. / (dt * min_Length);
+		freq_Step = 1. / (dt * max_Length);
 		long minfr = 0, maxfr = 0;
 		while (fr < freq_Min) {
 			fr += freq_Step;
