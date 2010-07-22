@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
 			hp = a1*cos(shift)*cos(phi) - a2*sin(shift)*sin(phi);
 			hc = a1*sin(shift)*cos(phi) + a2*cos(shift)*sin(phi);
 			det_old.s[i] = det_new.s[i] = fp * hp + fc * hc;
-			det_old.n[i] = det_new.n[i] = noise[i+diffn];
+			det_old.n[i] = det_new.n[i] = noise[i+diff2];
 
 		}
 		fftw_execute(det_old.pt);
@@ -131,6 +131,9 @@ int main(int argc, char *argv[]) {
 		norm = psd(det_old.n, det_old.length, dt, blackman);
 		LALNoiseSpectralDensity (&status, &randIn.psd, &LALLIGOIPsd, df);
 		wn = fftw_malloc(min_Length * sizeof(double));
+		for (i = 0; i < min_Length; i++) {
+			wn[i] = randIn.psd.data[i];
+		}
 		double freq_Step, fr = 0.;
 		freq_Step = 1. / (dt * min_Length);
 		long minfr = 0, maxfr = 0;
@@ -148,7 +151,6 @@ int main(int argc, char *argv[]) {
 		double ts_new = scalar_freq(det_new.ct, det_new.cs, wn, minfr, maxfr);
 		double tt_new = scalar_freq(det_new.ct, det_new.ct, wn, minfr, maxfr);
 		double ss_new = scalar_freq(det_new.cs, det_new.cs, wn, minfr, maxfr);
-		printf("%lg %lg %lg\n", ts_new, tt_new, ss_new);
 		printf("old: %lg, new: %lg\n", ts_old / sqrt(tt_old * ss_old), ts_new / sqrt(tt_new * ss_new));
 		fftw_free(wn);
 		fftw_free(norm);

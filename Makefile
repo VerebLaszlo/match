@@ -46,8 +46,8 @@ LAL_INC=-I/opt/lscsoft/develop/lal/include -I/opt/lscsoft/develop/lalmetaio/incl
 LAL_LIB=-L/opt/lscsoft/develop/lal/lib/ -L/opt/lscsoft/develop/lalinspiral/lib/ -llal -llalinspiral
 OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
 
-main: main.c match.c
-	gcc -o main main.c match.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
+main: main.c match.c detector.c
+	gcc -o main main.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
 
 mainRun: main
 	./main `head -n 1 input.data`
