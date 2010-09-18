@@ -8,6 +8,7 @@ LAL EXE
 
 # Ignore the exec file and everything created by the program
 match
+new
 main
 own.match
 parameters.data

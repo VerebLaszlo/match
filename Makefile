@@ -45,16 +45,20 @@ LAL_INC=$(shell pkg-config --cflags lalinspiral)
 LAL_LIB=$(shell pkg-config --libs lalinspiral)
 OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
 
+all: new
+
 main: main.c match.c detector.c
 	gcc -o main main.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
 
 mainRun: main
 	./main `head -n 1 input.data`
 
-all: match
+new: new_match.c match.h match.c
+	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o new new_match.c match.c
 
 match: sqt_match.c match.h match.c
 	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match sqt_match.c match.c
+
 
 lal: LALSTPNWaveformTestMod.c
 	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
