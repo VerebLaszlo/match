@@ -51,6 +51,9 @@ main: main.c match.c detector.c
 mainRun: main
 	./main `head -n 1 input.data`
 
+matchRun: match
+	./match $(shell head -n 1 input.data)
+
 all: match
 
 match: sqt_match.c match.h match.c
