@@ -16,6 +16,12 @@ typedef enum detector_Enum {
 	LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT
 } detector;
 
+typedef struct detector_table {
+    enum detector_Enum id;
+    char* name;
+    double nx[3],ny[3],x[3];
+} detector_table;
+
 /**
  *		The function converts the detector-string to detector-enum value.
  * @param[in]	: detector string

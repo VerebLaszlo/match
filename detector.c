@@ -47,31 +47,73 @@ const double CITnx[] = { -0.2648, -0.4953, -0.8274 };
 const double CITny[] = { 0.8819, -0.4715, 0.0000 };
 const double CITx[] = { -2.490650, -4.658700, 3.562064 };
 
+#define DETECTOR_NUMBER 10
+const detector_table Detectors[] = {
+    {LL,"LL",
+        { -0.9546, -0.1416, -0.2622 },
+        { 0.2977, -0.4879, -0.8205 },
+        { -0.074276, -5.496284, 3.224257 }
+    },
+    {LH,"LH",
+        { -0.2239, 0.7998, 0.5569 },
+        { -0.9140, 0.0261, -0.4049 },
+        { -2.161415, -3.834695, 4.600350 }
+    },
+    {VIRGO,"VIRGO",
+        { -0.7005, 0.2085, 0.6826 },
+        { -0.0538, -0.9691, 0.2408 },
+        { 4.546374, 0.842990, 4.378577 }
+    },
+    {GEO600,"GEO600",
+	{ -0.6261, -0.5522, 0.5506 },
+	{ -0.4453, 0.8665, 0.2255 },
+	{ 3.856310, 0.666599, 5.019641 }
+    },
+    {TAMA20,"TAMA20",
+	{ 0.7727, 0.2704, 0.5744 },
+	{ -0.1451, -0.8056, 0.5744 },
+	{ -3.946416, 3.365795, 3.699409 }
+    },
+    {TAMA300,"TAMA300",
+	{ 0.6490, 0.7608, 0.0000 },
+	{ -0.4437, 0.3785, -0.8123 },
+	{ -3.946409, 3.366259, 3.699151 }
+    },
+    {GLASGOW,"GLASGOW",
+	{ -0.4534, -0.8515, 0.2634 },
+	{ 0.6938, -0.5227, -0.4954 },
+	{ 3.576830, -0.267688, 5.256335 }
+    },
+    {ISAS100,"ISAS100",
+	{ 0.7634, 0.2277, 0.6045 },
+	{ 0.1469, 0.8047, -0.5752 },
+	{ -3.947704, 3.375234, 3.689488 }
+    },
+    {MPQ,"MPQ",
+	{ -0.7304, 0.3749, 0.5709 },
+	{ 0.2027, 0.9172, -0.3430 },
+	{ 4.167725, 0.861577, 4.734691 }
+    },
+    {CIT,"CIT",
+	{ -0.2648, -0.4953, -0.8274 },
+	{ 0.8819, -0.4715, 0.0000 },
+	{ -2.490650, -4.658700, 3.562064 }
+    }
+};
+
 detector con_Det_Str_Enum(char *str) {
-	if (strcmp(str, "LL")) {
-		return LL;
-	} else if (strcmp(str, "LH")) {
-		return LH;
-	} else if (strcmp(str, "VIRGO")) {
-		return VIRGO;
-	} else if (strcmp(str, "GEO600")) {
-		return GEO600;
-	} else if (strcmp(str, "TAMA20")) {
-		return TAMA20;
-	} else if (strcmp(str, "TAMA300")) {
-		return TAMA300;
-	} else if (strcmp(str, "GLASGOW")) {
-		return GLASGOW;
-	} else if (strcmp(str, "ISAS100")) {
-		return ISAS100;
-	} else if (strcmp(str, "MPQ")) {
-		return MPQ;
-	} else if (strcmp(str, "CIT")) {
-		return CIT;
-	} else {
-		fprintf(stderr, "There is not such detector as: %s!", str);
-		exit(-1);
-	}
+    int i;
+    
+    for (i=0; i<DETECTOR_NUMBER; i++) {
+        if (strcmp(str,Detectors[i].name)) {
+            return i;
+        }
+    }
+    // szerintem valami -1 -et kéne inkább visszaadni, nem abortálni a
+    // programot
+    fprintf(stderr, "There is not such detector as: %s!", str);
+    exit(-1);
+
 }
 
 void calc_Response_Matrix(const double nx[], const double ny[], double rm[3][3]) {
