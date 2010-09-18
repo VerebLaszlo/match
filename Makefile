@@ -56,6 +56,12 @@ mainRun: main
 new: new_match.c match.h match.c
 	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o new new_match.c match.c
 
+newRun: new
+	./new $(shell head -n 1 input.data)
+
+matchRun: match
+	./match $(shell head -n 1 input.data)
+
 match: sqt_match.c match.h match.c
 	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match sqt_match.c match.c
 
@@ -76,7 +82,7 @@ clean:
 	@echo ''
 
 cleanrun:
-	rm -rf lal own overlap lal.out own.out
+	rm -rf lal own overlap lal.out own.out main match
 	@echo ''
 
 cleanall:
