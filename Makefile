@@ -41,9 +41,8 @@ endif
 endif
 
 CC=colorgcc -c
-GSL_LIB=-lgsl -lgslcblas
-LAL_INC=-I/opt/lscsoft/develop/lal/include -I/opt/lscsoft/develop/lalmetaio/include -I/opt/lscsoft/develop/lalinspiral/include
-LAL_LIB=-L/opt/lscsoft/develop/lal/lib/ -L/opt/lscsoft/develop/lalinspiral/lib/ -llal -llalinspiral
+LAL_INC=$(shell pkg-config --cflags lalinspiral)
+LAL_LIB=$(shell pkg-config --libs lalinspiral)
 OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
 
 main: main.c match.c detector.c
@@ -52,7 +51,10 @@ main: main.c match.c detector.c
 mainRun: main
 	./main `head -n 1 input.data`
 
-all: own lal
+all: match
+
+match: sqt_match.c match.h match.c
+	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match sqt_match.c match.c
 
 lal: LALSTPNWaveformTestMod.c
 	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
