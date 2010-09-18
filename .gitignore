@@ -6,6 +6,7 @@ doc
 
 # Ignore the exec file and everything created by the program
 match
+main
 own.match
 parameters.data
 to_Plot.data
