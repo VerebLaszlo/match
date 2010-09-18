@@ -1,46 +1,22 @@
 # Makefile
 #############################################################################
-#		LALInspiral instalálása												#
-#	1. instalálld fel a lal csomagot követve a képernyő és a				#
-#	https://www.lsc-group.phys.uwm.edu/daswg/docs/howto/lal-install.html	#
-#	oldalon lévő utasításokat.												#
-#	2. tölts le és instalálld fel a metaio csomagot
-#	3. instalálld fel a lalmetaio csomagot hasonlóan						#
-#	4. végül a lalinspiral csomagot											#
-#	5. ha nem találja a könyvtárakat, add hozzá az útvonalakat, az			#
-#	/etc/ld.so.conf fájlhoz, és hajtsd végra a ldconfig parancsot.			#
 #############################################################################
 
-##
-#	Módosított fájlok
-#	LALSQTPN*
-#	GenerateInspiral.*
-#	LALInspiralWave.c
-#	LALInspiral.h
-#	LALRandomInspiralSignal.c
-#	LALInspiralWaveOverlap.c
-#	LIGOMetadataTables.h
-#	GenerateInspiral.c
-#	GenerateInspiral.h
-###
-
-RENORM=0 # 0,1
-BUILD_TYPE=prod# debug, normal, prod
-CFLAGS=-std=gnu99
-ifeq (${BUILD_TYPE},debug)
-	CFLAGS+=-Wall -W -g3
-	DEBUG=1
+CC=gcc
+include config.mk
+ifdef BUILD
+	ifeq (${BUILD}, prod)
+		CFLAGS+=-O3
+	else
+		CFLAGS+=-Wall -Wextra -g3
+		ifeq (${BUILD}, dev)
+			RUN=valgrind --leak-check=full
+		endif	
+	endif
 else
-ifeq (${BUILD_TYPE},prod)
-	CFLAGS+=-O3
-	DEBUG=0
-else
-	CFLAGS+=-Wall -W -g3
-	DEBUG=0
-endif
+	CFLAGS+=-O3 -Wall -Wextra -g3 -ggdb3
 endif
 
-CC=colorgcc -c
 LAL_INC=$(shell pkg-config --cflags lalinspiral)
 LAL_LIB=$(shell pkg-config --libs lalinspiral)
 OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
@@ -48,41 +24,41 @@ OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
 all: new
 
 main: main.c match.c detector.c
-	gcc -o main main.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
+	${CC} -o main main.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
 
 mainRun: main
 	./main `head -n 1 input.data`
 
 new: new_match.c match.h match.c
-	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o new new_match.c match.c
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o new new_match.c match.c
 
 newRun: new
-	./new $(shell head -n 1 input.data)
+	${RUN} ./new $(shell head -n 1 input.data)
 
 matchRun: match
 	./match $(shell head -n 1 input.data)
 
 match: sqt_match.c match.h match.c
-	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match sqt_match.c match.c
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match sqt_match.c match.c
 
 
 lal: LALSTPNWaveformTestMod.c
-	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
 	@echo ''
  
 own: LALSQTPNWaveformTest.c
-	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o own LALSQTPNWaveformTest.c -lm
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o own LALSQTPNWaveformTest.c -lm
 	@echo ''
 
 overlap: RandomInspiralSignalTest.c
-	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o overlap RandomInspiralSignalTest.c
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o overlap RandomInspiralSignalTest.c
 
 clean:
 	rm -rf *.o *.out *.b
 	@echo ''
 
 cleanrun:
-	rm -rf lal own overlap lal.out own.out main match
+	rm -rf lal own overlap lal.out own.out main match new
 	@echo ''
 
 cleanall:

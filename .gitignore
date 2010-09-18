@@ -1,5 +1,6 @@
 # Ignore objects and archives.
 *.[oa]
+config.mk
 
 # Ignore the folders
 doc
@@ -13,6 +14,7 @@ main
 own.match
 parameters.data
 to_Plot.data
+wave.out
 
 # Ignore everything starting with dot, exept .gitignore
 .*
