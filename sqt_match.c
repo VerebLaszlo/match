@@ -11,6 +11,8 @@
 
 double pi = M_PI;
 
+#define SQR(a) ((a)*(a))
+
 long max_length = 60000;
 
 int main(int argc, char *argv[]) {
