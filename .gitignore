@@ -1,8 +1,10 @@
 # Ignore objects and archives.
 *.[oa]
 
-# Ignore the doc folder
+# Ignore the folders
 doc
+Debug
+LAL EXE
 
 # Ignore the exec file and everything created by the program
 match

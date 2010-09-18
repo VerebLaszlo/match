@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 	double fc = 0.5 * (1 + t * t) * cos(p) * sin(s) + t * sin(p) * cos(s);
 short j;
 detector_Struct max_Det;
-	for (j = 0; j < 2; j++) {
+	for (j = 0; j < 12; j++) {
 		injParams.spin1x = chi[0] * where[j][0][0];
 		injParams.spin1y = chi[0] * where[j][0][1];
 		injParams.spin1z = chi[0] * where[j][0][2];
@@ -152,9 +152,9 @@ detector_Struct max_Det;
 		}
 		fftw_execute(max_Det.pt);
 		fftw_execute(max_Det.ps);
-		for (i = 0; i < 10/*thewaveform2.f->data->length*/; i++) {
-			printf("X% -15.5lg % -15.5lg % -15.5lg % -15.5lg % -15.5lg\n", max_Det.s[i], max_Det.cs[0][i], max_Det.cs[1][i], max_Det.ct[0][i], max_Det.ct[1][i]);
-		}
+		//for (i = 0; i < 10/*thewaveform2.f->data->length*/; i++) {
+		//	printf("X% -15.5lg % -15.5lg % -15.5lg % -15.5lg % -15.5lg\n", max_Det.s[i], max_Det.cs[0][i], max_Det.cs[1][i], max_Det.ct[0][i], max_Det.ct[1][i]);
+		//}
 		XLALSQTPNDestroyCoherentGW(&thewaveform1);
 		XLALSQTPNDestroyCoherentGW(&thewaveform2);
 		double freq_Step, fr = 0.;
