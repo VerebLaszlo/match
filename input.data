@@ -1,0 +1,7 @@
+34	3.4 0.0790765695  0.1589679868 0.9820794649 0.118388124  -0.1715059157 0.9759989616 1.429888	50	1	6.1035156e-05	twoPointFivePN		QM
+m1	m2	s1x           s1y          s1z          s2x          s2y           s2z          incl		fI	d	dt				pnorder		spin-inter
+######
+#best		dt=7.6035156e-05
+#error		dt=2.0035156e-05
+#error		dt=6.1035156e-005
+######
