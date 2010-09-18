@@ -116,6 +116,19 @@ detector con_Det_Str_Enum(char *str) {
 
 }
 
+detector_table GetDetectorTable(enum detector_Enum id) {
+    int i;
+
+    for (i=0; i<DETECTOR_NUMBER; i++) {
+        if (Detectors[i].id == id) {
+            return Detectors[i];
+        }
+    }
+    // default
+    return Detectors[DETECTOR_NUMBER-1];
+}
+
+// megcsinálni normálisabbra!
 void calc_Response_Matrix(const double nx[], const double ny[], double rm[3][3]) {
 	long i, j;
 	for (i = 0; i < 3; i++) {
@@ -155,19 +168,9 @@ void calc_Response(double D[3][3], double dec, double phi, double pol, double *f
 void calc_Response_For_Detector(detector det, double dec, double phi, double pol,
 		double *fp, double *fc) {
 	double rm[3][3];
-	switch (det) {
-		case LL:
-			calc_Response_Matrix(LLnx, LLny, rm);
-			break;
-		case LH:
-			calc_Response_Matrix(LHnx, LHny, rm);
-			break;
-		case VIRGO:
-			calc_Response_Matrix(VIRGOnx, VIRGOny, rm);
-			break;
-		default:
-			calc_Response_Matrix(GEO600nx, GEO600ny, rm);
-			break;
-	}
+        detector_table dettable;
+
+        dettable = GetDetectorTable(det);
+        calc_Response_Matrix(dettable.nx,dettable.ny,rm);
 	calc_Response(rm, dec, phi, pol, fp, fc);
 }
