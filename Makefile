@@ -1,58 +1,105 @@
-#Makefile
+# Makefile
+#############################################################################
+#		LALInspiral instalálása												#
+#	1. instalálld fel a lal csomagot követve a képernyő és a				#
+#	https://www.lsc-group.phys.uwm.edu/daswg/docs/howto/lal-install.html	#
+#	oldalon lévő utasításokat.												#
+#	2. tölts le és instalálld fel a metaio csomagot
+#	3. instalálld fel a lalmetaio csomagot hasonlóan						#
+#	4. végül a lalinspiral csomagot											#
+#	5. ha nem találja a könyvtárakat, add hozzá az útvonalakat, az			#
+#	/etc/ld.so.conf fájlhoz, és hajtsd végra a ldconfig parancsot.			#
+#############################################################################
 
-INCL_LAL= $(env pkg-config --cflags lal)
-LIBS_LAL= $(env pkg-config --libs lal)
+##
+#	Módosított fájlok
+#	LALSQTPN*
+#	GenerateInspiral.*
+#	LALInspiralWave.c
+#	LALInspiral.h
+#	LALRandomInspiralSignal.c
+#	LALInspiralWaveOverlap.c
+#	LIGOMetadataTables.h
+#	GenerateInspiral.c
+#	GenerateInspiral.h
+###
+
+RENORM=0 # 0,1
+BUILD_TYPE=prod# debug, normal, prod
+CFLAGS=-std=gnu99
+ifeq (${BUILD_TYPE},debug)
+	CFLAGS+=-Wall -W -g3
+	DEBUG=1
+else
+ifeq (${BUILD_TYPE},prod)
+	CFLAGS+=-O3
+	DEBUG=0
+else
+	CFLAGS+=-Wall -W -g3
+	DEBUG=0
+endif
+endif
+
+CC=colorgcc -c
+LAL_INC=$(shell pkg-config --cflags lalinspiral)
+LAL_LIB=$(shell pkg-config --libs lalinspiral)
+OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
+
+main: main.c match.c detector.c
+	gcc -o main main.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
+
+mainRun: main
+	./main `head -n 1 input.data`
 
 all: match
-.PHONY: all
 
-# lal: LALSTPNWaveformTestMod.c
-#	gcc -o lal LALSTPNWaveformTestMod.c $(INCL_LAL) $(LIBS_LAL)
+match: sqt_match.c match.h match.c
+	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match sqt_match.c match.c
 
-match: main.o match.o ioHandling.o generator.o detector.o util.o
-	gcc -o match main.o match.o ioHandling.o generator.o detector.o util.o -lm -lfftw3 -Wall
+lal: LALSTPNWaveformTestMod.c
+	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
+	@echo ''
+ 
+own: LALSQTPNWaveformTest.c
+	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o own LALSQTPNWaveformTest.c -lm
+	@echo ''
 
-main.o: main.c match.o generator.o ioHandling.o util.c util.h
-	gcc -c main.c match.c generator.c ioHandling.c util.c -Wall
+overlap: RandomInspiralSignalTest.c
+	colorgcc ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o overlap RandomInspiralSignalTest.c
 
-util.o: util.c util.h
-	gcc -c util.c util.h -Wall
+clean:
+	rm -rf *.o *.out *.b
+	@echo ''
 
-detector.o: detector.c detector.h util.c util.h
-	gcc -c detector.c util.c -Wall
+cleanrun:
+	rm -rf lal own overlap lal.out own.out
+	@echo ''
 
-generator.o: generator.c generator.h util.c util.h
-	gcc -c generator.c util.c -Wall
+cleanall:
+	make clean
+	make cleanrun
+	@echo ''
 
-ioHandling.o: ioHandling.c ioHandling.h generator.o util.c util.h
-	gcc -c ioHandling.c generator.c util.c -Wall
+run: own lal
+	@echo "`head -n 1 input.data` own.out `tail -n 1 input.data`"
+	./own `head -n 1 input.data` own.out `tail -n 1 input.data`
+	@echo "`head -n 1 input.data` lal.out"
+	./lal `head -n 1 input.data` lal.out
 
-match.o: match.c match.h generator.o detector.o ioHandling.o
-	gcc -c match.c generator.c detector.c ioHandling.c -Wall
+val: own lal
+	@echo "valgrind `head -n 1 input.data` own.out `tail -n 1 input.data`"
+	valgrind ./own `head -n 1 input.data` own.out `tail -n 1 input.data`
+	@echo "valgrind `head -n 1 input.data` lal.out"
+	valgrind ./lal `head -n 1 input.data` lal.out
+help :
+	@echo 'all       : makes everything'
+	@echo 'lal       : makes just the LALSTPNWaveform.c part'
+	@echo 'own       : makes the whole own code'
+	@echo 'clean     : deletes the object files'
+	@echo 'cleanrun : deletes the exe files'
+	@echo 'cleanall : invokes the "clean" and "cleanrun" commands'
+	@echo 'run       : runs the two programs'
+	@echo 'help      : prints this message'
+	@echo ''
 
-clean_all: clean_gcc clean_run
-
-clean_gcc: clean
-	rm -f match lal
-
-clean: 
-	rm -f main.o match.o ioHandling.o generator.o detector.o util.o
-
-clean_run:
-	rm -f own.match parameters.data to_Plot.data gen.out [0-9]* xparameters.data xto_Plot.data x[0-9]*
-
-run: all
-	time ./match data.init
-
-.PHONY: clean clean_gcc clean_all clean_run run
-
-#help:
-#	echo all: make match and lal
-#	echo match: make match
-#	echo lal: make lal
-#	echo clean_run: to clean after run
-#	echo clean: to clean object files
-#	echo clean_gcc: like clean and also delete match and lal
-#	echo clean_all: all previus clean options
-#	echo run: starts the program with data.init and watches the time
-#.PHONY: help
+.PHONY: all clean cleanall cleanrun run help
