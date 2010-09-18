@@ -30,6 +30,12 @@ typedef struct detector_table {
 detector con_Det_Str_Enum(char *str);
 
 /**
+ * @param[in]   : detector id
+ * @return  the detector-table
+ */
+detector_table GetDetectorTable(enum detector_Enum id);
+
+/**
  *		The function calculates the response-matrix of the detector given by teh nx, ny vectors.
  * @param[in]	nx : unity-vector of the detectors x-arm
  * @param[in]	ny : unity-vector of the detectors y-arm
