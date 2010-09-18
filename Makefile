@@ -1,13 +1,13 @@
 #Makefile
 
-INCL_LAL= -I/opt/lscsoft/lal/include/
-LIBS_LAL= -lm -L/opt/lscsoft/lal/lib/ -llal
+INCL_LAL= $(env pkg-config --cflags lal)
+LIBS_LAL= $(env pkg-config --libs lal)
 
-all: match lal
+all: match
 .PHONY: all
 
-lal: LALSTPNWaveformTestMod.c
-	gcc -o lal LALSTPNWaveformTestMod.c $(INCL_LAL) $(LIBS_LAL)
+# lal: LALSTPNWaveformTestMod.c
+#	gcc -o lal LALSTPNWaveformTestMod.c $(INCL_LAL) $(LIBS_LAL)
 
 match: main.o match.o ioHandling.o generator.o detector.o util.o
 	gcc -o match main.o match.o ioHandling.o generator.o detector.o util.o -lm -lfftw3 -Wall
@@ -31,23 +31,20 @@ match.o: match.c match.h generator.o detector.o ioHandling.o
 	gcc -c match.c generator.c detector.c ioHandling.c -Wall
 
 clean_all: clean_gcc clean_run
-.PHONY: clean_all
 
 clean_gcc: clean
-	rm match lal
-.PHONY: clean_gcc
+	rm -f match lal
 
 clean: 
-	rm main.o match.o ioHandling.o generator.o detector.o util.o
-.PHONY: clean
+	rm -f main.o match.o ioHandling.o generator.o detector.o util.o
 
 clean_run:
-	rm own.match parameters.data to_Plot.data gen.out [0-9]* xparameters.data xto_Plot.data x[0-9]*
-.PHONY: clear
+	rm -f own.match parameters.data to_Plot.data gen.out [0-9]* xparameters.data xto_Plot.data x[0-9]*
 
 run: all
 	time ./match data.init
-.PHONY: run
+
+.PHONY: clean clean_gcc clean_all clean_run run
 
 #help:
 #	echo all: make match and lal
