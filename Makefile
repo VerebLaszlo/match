@@ -72,7 +72,7 @@ clean:
 	@echo ''
 
 cleanrun:
-	rm -rf lal own overlap lal.out own.out
+	rm -rf lal own overlap lal.out own.out main match
 	@echo ''
 
 cleanall:
