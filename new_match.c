@@ -11,6 +11,7 @@
 #include <lal/SimulateCoherentGW.h>	// CoherentGW
 #include <lal/LIGOMetadataTables.h>		// SimInspiralTable
 #include <lal/GeneratePPNInspiral.h>	// PPNParamStruc
+#include <lal/LALNoiseModelsInspiral.h>	// RandomInspiralSignalIn
 #include <lal/LALSQTPNWaveformInterface.h>	// XLALSQTPNDestroyCoherentGW()
 #include "match.h"
 
@@ -52,6 +53,7 @@ int main(int argc, char *argv[]) {
 	CoherentGW waveform[2];
 	SimInspiralTable injParams;
 	PPNParamStruc ppnParams;
+	static RandomInspiralSignalIn rand;
 	matchStruct match;
 	char *PNString[] = {"SpinQuadTaylortwoPointFivePNALL", "SpinQuadTaylortwoPointFivePNSS"};
 	short num = 1;//12;	// number of the predefined configurations
@@ -76,7 +78,7 @@ int main(int argc, char *argv[]) {
 	injParams.polarization = 0;
 
 
-	double freq_i, freq_f, freq_step, fr, dt;
+	double freq_i, freq_f, freq_step, fr, df, dt, *psd;
 	long index_i, index_f;
 	freq_i = injParams.f_lower;
 	dt = ppnParams.deltaT;
@@ -86,7 +88,7 @@ int main(int argc, char *argv[]) {
 	fp = 0.5 * (1 + t * t) * cos(p) * cos(s) - t * sin(p) * sin(s);
 	fc = 0.5 * (1 + t * t) * cos(p) * sin(s) + t * sin(p) * cos(s);
 	double hp, hc, a1, a2, phi, shift;
-	int i, length;
+	unsigned i, length;
 	short index, second, longer;
 	for (index = 0; index < num; index++) {
 		// hullámformák gyártása
@@ -124,6 +126,14 @@ int main(int argc, char *argv[]) {
 			XLALSQTPNDestroyCoherentGW(&waveform[second]);
 			fftw_execute(match.plan[second]);
 		}
+		rand.psd.length = length = waveform[longer].f->data->length;
+		df  = 1. / dt / rand.psd.length;
+		rand.psd.data = (REAL8*) XLALMalloc(sizeof(REAL8) * rand.psd.length);
+		LALNoiseSpectralDensity(&status, &rand.psd, &LALLIGOIPsd, df);
+		psd = fftw_malloc(rand.psd.length * sizeof(double));
+		for (i = 0; i < rand.psd.length; i++) {
+			psd[i] = rand.psd.data[i];
+		}
 		//****  PRÓBA  ****//
 		fclose(file);
 		//****  PRÓBA  ****//
@@ -140,6 +150,8 @@ int main(int argc, char *argv[]) {
 			index_f++;
 		}
 		freeMatchStruct(&match);
+		XLALFree(rand.psd.data);
+		fftw_free(psd);
 	}
 	puts("Done.");
 	return 0;
