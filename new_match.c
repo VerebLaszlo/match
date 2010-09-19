@@ -78,7 +78,8 @@ int main(int argc, char *argv[]) {
 	injParams.polarization = 0;
 
 
-	double freq_i, freq_f, freq_step, fr, df, dt, *psd;
+	double freq_i, freq_f, freq_step, fr, df, dt;
+	double ts, tt, ss, *psd;
 	long index_i, index_f;
 	freq_i = injParams.f_lower;
 	dt = ppnParams.deltaT;
@@ -102,8 +103,10 @@ int main(int argc, char *argv[]) {
 				return status.statusCode;
 			}
 		}
+
+		// hullámformák átírása kezelhetőbb formába
 		longer = waveform[0].f->data->length > waveform[1].f->data->length ? 0 : 1;
-		length = waveform[longer].f->data->length;
+		rand.psd.length = length = waveform[longer].f->data->length;
 		freq_f = waveform[longer].f->data->data[length - 1];
 		mallocMatchStruct(&match, length);
 		//****  PRÓBA  ****//
@@ -126,17 +129,20 @@ int main(int argc, char *argv[]) {
 			XLALSQTPNDestroyCoherentGW(&waveform[second]);
 			fftw_execute(match.plan[second]);
 		}
-		rand.psd.length = length = waveform[longer].f->data->length;
+
+		// karakterisztikus psd előállítása
 		df  = 1. / dt / rand.psd.length;
 		rand.psd.data = (REAL8*) XLALMalloc(sizeof(REAL8) * rand.psd.length);
 		LALNoiseSpectralDensity(&status, &rand.psd, &LALLIGOIPsd, df);
-		psd = fftw_malloc(rand.psd.length * sizeof(double));
-		for (i = 0; i < rand.psd.length; i++) {
+		psd = fftw_malloc(length * sizeof(double));
+		for (i = 0; i < length; i++) {
 			psd[i] = rand.psd.data[i];
 		}
 		//****  PRÓBA  ****//
 		fclose(file);
 		//****  PRÓBA  ****//
+
+		// overlap kiszámolása
 		fr = 0.;
 		freq_step = 1. / (dt * length);
 		index_i = 0;
@@ -149,6 +155,10 @@ int main(int argc, char *argv[]) {
 			fr += freq_step;
 			index_f++;
 		}
+		ts = scalar_freq(match.csignal[0], match.csignal[1], psd, freq_i, freq_f);
+		tt = scalar_freq(match.csignal[0], match.csignal[0], psd, freq_i, freq_f);
+		ss = scalar_freq(match.csignal[1], match.csignal[1], psd, freq_i, freq_f);
+		printf("see: "PREC PREC PREC ", overlap: "PREC"\n", ts, tt, ss, ts / sqrt(tt*ss));
 		freeMatchStruct(&match);
 		XLALFree(rand.psd.data);
 		fftw_free(psd);

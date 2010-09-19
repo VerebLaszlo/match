@@ -11,11 +11,13 @@ LAL EXE
 match
 new
 main
-own.match
-parameters.data
-to_Plot.data
 wave.out
 
 # Ignore everything starting with dot, exept .gitignore
 .*
 !.gitignore
+
+# Other thins
+parameters.data
+to_Plot.data
+*.dia
