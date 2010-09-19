@@ -28,12 +28,14 @@ typedef struct tagMatchStruct {
 
 void mallocMatchStruct(matchStruct* m, int length) {
 	m->length = length;
-	m->signal[0] = fftw_malloc(m->length *sizeof(double));
-	m->csignal[0] = fftw_malloc(m->length *sizeof(fftw_complex));
-	m->plan[0] = fftw_plan_dft_r2c_1d(m->length, m->signal[0], m->csignal[0], FFTW_ESTIMATE);
-	m->signal[1] = fftw_malloc(m->length *sizeof(double));
-	m->csignal[1] = fftw_malloc(m->length *sizeof(fftw_complex));
-	m->plan[1] = fftw_plan_dft_r2c_1d(m->length, m->signal[1], m->csignal[1], FFTW_ESTIMATE);
+	m->signal[0] = fftw_malloc(m->length * sizeof(double));
+	m->csignal[0] = fftw_malloc(m->length * sizeof(fftw_complex));
+	m->plan[0] = fftw_plan_dft_r2c_1d(m->length, m->signal[0], m->csignal[0],
+			FFTW_ESTIMATE);
+	m->signal[1] = fftw_malloc(m->length * sizeof(double));
+	m->csignal[1] = fftw_malloc(m->length * sizeof(fftw_complex));
+	m->plan[1] = fftw_plan_dft_r2c_1d(m->length, m->signal[1], m->csignal[1],
+			FFTW_ESTIMATE);
 }
 
 void freeMatchStruct(matchStruct *m) {
@@ -48,6 +50,8 @@ void freeMatchStruct(matchStruct *m) {
 //****  PRÓBA  ****//
 //****  PRÓBA  ****//
 
+#define NUM 12	// number of the predefined configurations
+
 int main(int argc, char *argv[]) {
 	static LALStatus status;
 	CoherentGW waveform[2];
@@ -55,8 +59,8 @@ int main(int argc, char *argv[]) {
 	PPNParamStruc ppnParams;
 	static RandomInspiralSignalIn rand;
 	matchStruct match;
-	char *PNString[] = {"SpinQuadTaylortwoPointFivePNALL", "SpinQuadTaylortwoPointFivePNSS"};
-	short num = 1;//12;	// number of the predefined configurations
+	char *PNString[] = { "SpinQuadTaylortwoPointFivePNALL",
+			"SpinQuadTaylortwoPointFivePNSS" };
 	memset(&injParams, 0, sizeof(SimInspiralTable));
 	memset(&ppnParams, 0, sizeof(PPNParamStruc));
 
@@ -76,7 +80,24 @@ int main(int argc, char *argv[]) {
 	injParams.distance = atof(argv[11]);
 	ppnParams.deltaT = atof(argv[12]);
 	injParams.polarization = 0;
-
+	double incl = injParams.inclination;
+	double chi[2] = { sqrt(SQR(injParams.spin1x) + SQR(injParams.spin1y) + SQR(
+			injParams.spin1z)), sqrt(SQR(injParams.spin2x) + SQR(
+			injParams.spin2y) + SQR(injParams.spin2z)) };
+	double where[NUM][2][3] = { { { injParams.spin1x / chi[0], injParams.spin1y
+			/ chi[0], injParams.spin1z / chi[0] }, { injParams.spin2x / chi[1],
+			injParams.spin2y / chi[1], injParams.spin2z / chi[1] } },
+			{ { sin(incl), 0., cos(incl) }, { sin(incl), 0., cos(incl) } }, //1  L_N ~  S_1 ~  S_2
+			{ { -sin(incl), 0., -cos(incl) }, { -sin(incl), 0., -cos(incl) } }, //2 -L_N ~  S_1 ~  S_2
+			{ { sin(incl), 0., cos(incl) }, { -sin(incl), 0., -cos(incl) } }, //3  L_N ~  S_1 ~ -S_2
+			{ { -sin(incl), 0., -cos(incl) }, { sin(incl), 0., cos(incl) } }, //4  L_N ~ -S_1 ~  S_2
+			{ { cos(incl), 0., -sin(incl) }, { cos(incl), 0., -sin(incl) } }, //5         S_1 ~  S_2
+			{ { cos(incl), 0., -sin(incl) }, { -cos(incl), 0., sin(incl) } }, //6         S_1 ~ -S_2
+			{ { 0., 1., 0. }, { 0., 1., 0. } }, // pályasíkos párhuzamos, egyező irány, 	VERY GOOD
+			{ { 0., 1., 0. }, { 0., -1., 0. } }, // pályasíkos párhuzamos, különböző irány
+			{ { cos(incl), 0., sin(incl) }, { 0., 1., 0. } }, // pályasíkos merőleges						GOOD
+			{ { sin(incl), 0., cos(incl) }, { cos(incl), 0., -sin(incl) } },
+			{ { cos(incl), 0., -sin(incl) }, { sin(incl), 0., cos(incl) } }, };
 
 	double freq_i, freq_f, freq_step, fr, df, dt;
 	double ts, tt, ss, *psd;
@@ -91,21 +112,31 @@ int main(int argc, char *argv[]) {
 	double hp, hc, a1, a2, phi, shift;
 	unsigned i, length;
 	short index, second, longer;
-	for (index = 0; index < num; index++) {
+	for (index = 0; index < NUM; index++) {
+		injParams.spin1x = chi[0] * where[index][0][0];
+		injParams.spin1y = chi[0] * where[index][0][1];
+		injParams.spin1z = chi[0] * where[index][0][2];
+		injParams.spin2x = chi[1] * where[index][1][0];
+		injParams.spin2y = chi[1] * where[index][1][1];
+		injParams.spin2z = chi[1] * where[index][1][2];
 		// hullámformák gyártása
 		for (second = 0; second < 2; second++) {
 			memset(&status, 0, sizeof(LALStatus));
 			memset(&waveform[second], 0, sizeof(CoherentGW));
-			LALSnprintf(injParams.waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), PNString[second]);
-			LALGenerateInspiral(&status, &waveform[second], &injParams, &ppnParams);
+			LALSnprintf(injParams.waveform, LIGOMETA_WAVEFORM_MAX
+					* sizeof(CHAR), PNString[second]);
+			LALGenerateInspiral(&status, &waveform[second], &injParams,
+					&ppnParams);
 			if (status.statusCode) {
-				fprintf(stderr, "LALSQTPNWaveformTest: error generating waveform\n");
+				fprintf(stderr,
+						"LALSQTPNWaveformTest: error generating waveform\n");
 				return status.statusCode;
 			}
 		}
 
 		// hullámformák átírása kezelhetőbb formába
-		longer = waveform[0].f->data->length > waveform[1].f->data->length ? 0 : 1;
+		longer = waveform[0].f->data->length > waveform[1].f->data->length ? 0
+				: 1;
 		rand.psd.length = length = waveform[longer].f->data->length;
 		freq_f = waveform[longer].f->data->data[length - 1];
 		mallocMatchStruct(&match, length);
@@ -117,13 +148,15 @@ int main(int argc, char *argv[]) {
 			for (i = 0; i < waveform[second].f->data->length; i++) {
 				a1 = waveform[second].a->data->data[2 * i];
 				a2 = waveform[second].a->data->data[2 * i + 1];
-				phi = waveform[second].phi->data->data[i] - waveform[second].phi->data->data[0];
+				phi = waveform[second].phi->data->data[i]
+						- waveform[second].phi->data->data[0];
 				shift = waveform[second].shift->data->data[i];
 				hp = a1 * cos(shift) * cos(phi) - a2 * sin(shift) * sin(phi);
 				hc = a1 * sin(shift) * cos(phi) + a2 * cos(shift) * sin(phi);
 				match.signal[second][i] = fp * hp + fc * hc;
 				//****  PRÓBA  ****//
-				fprintf(file, PREC PREC"\n", i*dt, match.signal[second][i]);fflush(file);
+				fprintf(file, PREC PREC"\n", i * dt, match.signal[second][i]);
+				fflush(file);
 				//****  PRÓBA  ****//
 			}
 			XLALSQTPNDestroyCoherentGW(&waveform[second]);
@@ -131,7 +164,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		// karakterisztikus psd előállítása
-		df  = 1. / dt / rand.psd.length;
+		df = 1. / dt / rand.psd.length;
 		rand.psd.data = (REAL8*) XLALMalloc(sizeof(REAL8) * rand.psd.length);
 		LALNoiseSpectralDensity(&status, &rand.psd, &LALLIGOIPsd, df);
 		psd = fftw_malloc(length * sizeof(double));
@@ -155,10 +188,14 @@ int main(int argc, char *argv[]) {
 			fr += freq_step;
 			index_f++;
 		}
-		ts = scalar_freq(match.csignal[0], match.csignal[1], psd, freq_i, freq_f);
-		tt = scalar_freq(match.csignal[0], match.csignal[0], psd, freq_i, freq_f);
-		ss = scalar_freq(match.csignal[1], match.csignal[1], psd, freq_i, freq_f);
-		printf("see: "PREC PREC PREC ", overlap: "PREC"\n", ts, tt, ss, ts / sqrt(tt*ss));
+		ts = scalar_freq(match.csignal[0], match.csignal[1], psd, freq_i,
+				freq_f);
+		tt = scalar_freq(match.csignal[0], match.csignal[0], psd, freq_i,
+				freq_f);
+		ss = scalar_freq(match.csignal[1], match.csignal[1], psd, freq_i,
+				freq_f);
+		printf("see: "PREC PREC PREC ", overlap: "PREC"\n", ts, tt, ss, ts
+				/ sqrt(tt * ss));
 		freeMatchStruct(&match);
 		XLALFree(rand.psd.data);
 		fftw_free(psd);
