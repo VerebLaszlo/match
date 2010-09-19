@@ -11,7 +11,7 @@ LAL EXE
 match
 new
 main
-wave.out
+*.out
 
 # Ignore everything starting with dot, exept .gitignore
 .*

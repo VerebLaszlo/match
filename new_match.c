@@ -59,8 +59,10 @@ int main(int argc, char *argv[]) {
 	PPNParamStruc ppnParams;
 	static RandomInspiralSignalIn rand;
 	matchStruct match;
-	char *PNString[] = { "SpinQuadTaylortwoPointFivePNALL",
-			"SpinQuadTaylortwoPointFivePNSS" };
+	FILE *file;
+	char filename[50];
+	char *PNString[] = { "SpinQuadTaylortwoPointFivePNSS",
+			"SpinQuadTaylortwoPointFivePNALL" };
 	memset(&injParams, 0, sizeof(SimInspiralTable));
 	memset(&ppnParams, 0, sizeof(PPNParamStruc));
 
@@ -140,10 +142,15 @@ int main(int argc, char *argv[]) {
 		rand.psd.length = length = waveform[longer].f->data->length;
 		freq_f = waveform[longer].f->data->data[length - 1];
 		mallocMatchStruct(&match, length);
-		//****  PRÓBA  ****//
-		FILE *file = fopen("wave.out", "w");
-		//****  PRÓBA  ****//
 		for (second = 0; second < 2; second++) {
+			//****  PRÓBA  ****//
+			if (!second) {
+				sprintf(filename, "wave%s%d.out", "ALL", index);
+			} else {
+				sprintf(filename, "wave%s%d.out", "SS", index);
+			}
+			file = fopen(filename, "w");
+			//****  PRÓBA  ****//
 			memset(match.signal[second], 0, match.length * sizeof(double));
 			for (i = 0; i < waveform[second].f->data->length; i++) {
 				a1 = waveform[second].a->data->data[2 * i];
@@ -162,6 +169,10 @@ int main(int argc, char *argv[]) {
 			XLALSQTPNDestroyCoherentGW(&waveform[second]);
 			fftw_execute(match.plan[second]);
 		}
+		//****  PRÓBA  ****//
+		fclose(file);
+		file =fopen("psd.out", "w");
+		//****  PRÓBA  ****//
 
 		// karakterisztikus psd előállítása
 		df = 1. / dt / rand.psd.length;
@@ -170,6 +181,7 @@ int main(int argc, char *argv[]) {
 		psd = fftw_malloc(length * sizeof(double));
 		for (i = 0; i < length; i++) {
 			psd[i] = rand.psd.data[i];
+			fprintf(file, PREC PREC"\n", i*dt, psd[i]);fflush(file);
 		}
 		//****  PRÓBA  ****//
 		fclose(file);
@@ -194,8 +206,9 @@ int main(int argc, char *argv[]) {
 				freq_f);
 		ss = scalar_freq(match.csignal[1], match.csignal[1], psd, freq_i,
 				freq_f);
-		printf("see: "PREC PREC PREC ", overlap: "PREC"\n", ts, tt, ss, ts
-				/ sqrt(tt * ss));
+//		printf("see: "PREC PREC PREC ", overlap: "PREC"\n", ts, tt, ss, ts
+//				/ sqrt(tt * ss));
+		printf("overlap: "PREC"\n", ts / sqrt(tt * ss));
 		freeMatchStruct(&match);
 		XLALFree(rand.psd.data);
 		fftw_free(psd);
