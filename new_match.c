@@ -48,6 +48,62 @@ void freeMatchStruct(matchStruct *m) {
 	fftw_destroy_plan(m->plan[1]);
 }
 
+int FillSimInspiralTable(SimInspiralTable *injParams, PPNParamStruc *ppnParams, char **argv) {
+	injParams->mass1 = atof(argv[1]);
+	injParams->mass2 = atof(argv[2]);
+	injParams->spin1x = atof(argv[3]);
+	injParams->spin1y = atof(argv[4]);
+	injParams->spin1z = atof(argv[5]);
+	injParams->spin2x = atof(argv[6]);
+	injParams->spin2y = atof(argv[7]);
+	injParams->spin2z = atof(argv[8]);
+	injParams->qmParameter1 = 1.;
+	injParams->qmParameter2 = 1.;
+	injParams->inclination = atof(argv[9]);
+	injParams->f_lower = atof(argv[10]);
+	injParams->distance = atof(argv[11]);
+	injParams->polarization = 0;
+
+	ppnParams->deltaT = atof(argv[12]);
+
+        return 0;
+}
+
+#define PARAMETER_NUMBER 14
+
+int ParseCommandLine(int argc, char **argv, SimInspiralTable *injParams, PPNParamStruc *ppnParams) {
+    if (argc<2) {
+        printf("Not enough parameter.\n");
+        return -1;
+    }
+    if (!strcmp(argv[1],"--file")) {
+        FILE *datafile;
+        char *tmp_argv[PARAMETER_NUMBER];
+        short int i;
+        if (argc<3) {
+            printf("Please select a file:\n%s --file `filename`\n",argv[0]);
+            return -1;
+        }
+        datafile = fopen(argv[2],"r");
+        // argv[0] is the filename (./new), so we begin fill at tmp_argv[1]
+        for (i=1; i<PARAMETER_NUMBER; i++) {
+            tmp_argv[i] = malloc(sizeof(char)*15);
+            fscanf(datafile,"%s",tmp_argv[i]);
+        }
+        i = FillSimInspiralTable(injParams, ppnParams, tmp_argv);
+        fclose(datafile);
+    } else {
+        if (argc<PARAMETER_NUMBER+1) {
+            printf("Not enough parameter.\n");
+            return -1;
+        } else {
+            return FillSimInspiralTable(injParams, ppnParams, argv);
+        }
+    }
+
+    return 0;
+}
+
 //****  PRÓBA  ****//
 //****  PRÓBA  ****//
 
@@ -68,21 +124,9 @@ int main(int argc, char *argv[]) {
 	memset(&ppnParams, 0, sizeof(PPNParamStruc));
 
 	// kezdeti adatok beolvasása
-	injParams.mass1 = atof(argv[1]);
-	injParams.mass2 = atof(argv[2]);
-	injParams.spin1x = atof(argv[3]);
-	injParams.spin1y = atof(argv[4]);
-	injParams.spin1z = atof(argv[5]);
-	injParams.spin2x = atof(argv[6]);
-	injParams.spin2y = atof(argv[7]);
-	injParams.spin2z = atof(argv[8]);
-	injParams.qmParameter1 = 1.;
-	injParams.qmParameter2 = 1.;
-	injParams.inclination = atof(argv[9]);
-	injParams.f_lower = atof(argv[10]);
-	injParams.distance = atof(argv[11]);
-	ppnParams.deltaT = atof(argv[12]);
-	injParams.polarization = 0;
+        if (ParseCommandLine(argc,argv,&injParams, &ppnParams)<0) {
+            return -1;
+        }
 	double incl = injParams.inclination;
 	double chi[2] = { sqrt(SQR(injParams.spin1x) + SQR(injParams.spin1y) + SQR(
 			injParams.spin1z)), sqrt(SQR(injParams.spin2x) + SQR(
