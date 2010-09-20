@@ -9,6 +9,7 @@
 #include "detector.h"
 #include "ioHandling.h"
 
+#define SQR(a) ( (a)*(a) )
 /**
  *		The structure contains everything corresponding to one detector.
  */
