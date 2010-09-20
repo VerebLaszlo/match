@@ -5,6 +5,7 @@
  *      Author: vereb
  */
 
+#define restrict __restrict__
 #include <stdio.h>
 #include <lal/LALDatatypes.h>		// LALStatus
 #include <lal/GenerateInspiral.h>	// LALGenerateInspiral()
