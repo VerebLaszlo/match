@@ -1,6 +1,5 @@
 # Ignore objects and archives.
 *.[oa]
-config.mk
 
 # Ignore the folders
 doc
