@@ -1,0 +1,59 @@
+params {
+  m1=34
+  m2=3.4
+  spin1x=0.0790765695
+  spin1y=0.1589679868
+  spin1z=0.9820794649
+  spin2x=0.118388124
+  spin2y=-0.1715059157
+  spin2z=0.9759989616
+  qm1=1
+  qm2=1
+  incl=1.429888
+  fI=50
+  fL=2000
+  d=1
+  dt=6.1035156e-05
+  pnorder="twoPointFivePN"
+  spin="QM"
+}
+
+params {
+  m1=34
+  m2=3.4
+  spin1x=0.0790765695
+  spin1y=0.1589679868
+  spin1z=0.9820794649
+  spin2x=0.118388124
+  spin2y=-0.1715059157
+  spin2z=0.9759989616
+  qm1=1
+  qm2=1
+  incl=1.429888
+  fI=50
+  fL=2000
+  d=1
+  dt=6.1035156e-05
+  pnorder="twoPointFivePN"
+  spin="QM"
+}
+
+params {
+  m1=34
+  m2=3.4
+  spin1x=0.0790765695
+  spin1y=0.1589679868
+  spin1z=0.9820794649
+  spin2x=0.118388124
+  spin2y=-0.1715059157
+  spin2z=0.9759989616
+  qm1=1
+  qm2=1
+  incl=1.429888
+  fI=50
+  fL=2000
+  d=1
+  dt=6.1035156e-05
+  pnorder="twoPointFivePN"
+  spin="QM"
+}
