@@ -16,6 +16,10 @@
 #include <lal/LALSQTPNWaveformInterface.h>	// XLALSQTPNDestroyCoherentGW()
 #include "match.h"
 
+#ifdef CONFUSE
+#include "confuse-parser.h"
+#endif
+
 #define PREC "% -15.10lg "
 #define PARAMETER_NUMBER 14
 #define LINE_MAX 200
@@ -30,12 +34,6 @@ typedef struct tagMatchStruct {
 	fftw_plan plan[2];
 	int length;
 } matchStruct;
-
-typedef struct Parameters {
-    int count;
-    SimInspiralTable *injParams;
-    PPNParamStruc *ppnParams;
-} Parameters;
 
 void mallocMatchStruct(matchStruct* m, int length) {
 	m->length = length;
@@ -139,6 +137,14 @@ int ParseCommandLine(int argc, char **argv, Parameters *params) {
             return -1;
         }
         ReadFromFile(argv[2],params);
+#ifdef CONFUSE
+    } else if (!strcmp(argv[1],"--cfile")) {
+        if (argc<3) {
+            printf("Please select a file:\n%s --cfile `filename`\n",argv[0]);
+            return -1;
+        }
+        parse_confuse(argv[2],params);
+#endif
     } else { // read from command line
         if (argc<PARAMETER_NUMBER+1) {
             printf("Not enough parameter.\n");
