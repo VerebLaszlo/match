@@ -3,8 +3,12 @@
  * @author László Veréb
  * @date 2010.04.08.
  */
+#ifndef MATCH_H
+#define MATCH_H
 
 #include <fftw3.h>
+#include <lal/LIGOMetadataTables.h>
+#include <lal/GeneratePPNInspiral.h>
 #include "generator.h"
 #include "detector.h"
 #include "ioHandling.h"
@@ -26,6 +30,12 @@ typedef struct detector_Tag {
 	fftw_plan ps;		///< fftw-plan of the signal vector
 	fftw_plan pn;		///< fftw-plan of the noise vector
 } detector_Struct;
+
+typedef struct Parameters {
+    int count;
+    SimInspiralTable *injParams;
+    PPNParamStruc *ppnParams;
+} Parameters;
 
 /**
  *		The function allocates memory for the detector.
@@ -87,3 +97,6 @@ double * psd(double n[], long length, double dt, void(*winf)(double array[], lon
  * @param[in]	length	: the input vector's length
  */
 void calc_Time_Corr(double h1[], double h2[], double dest[], long length);
+
+
+#endif
