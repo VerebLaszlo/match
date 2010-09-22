@@ -33,6 +33,7 @@ typedef struct detector_Tag {
 
 typedef struct Parameters {
     int count;
+    char **title;
     SimInspiralTable *injParams;
     PPNParamStruc *ppnParams;
 } Parameters;
