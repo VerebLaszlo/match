@@ -1,4 +1,8 @@
-params {
+waveDefault {
+  dt=6e-05
+}
+
+waveParams first {
   m1=34
   m2=3.4
   spin1x=0.0790765695
@@ -13,12 +17,12 @@ params {
   fI=50
   fL=2000
   d=1
-  dt=6.1035156e-05
+  dt=6e-6
   pnorder="twoPointFivePN"
   spin="QM"
 }
 
-params {
+waveParams second {
   m1=34
   m2=3.4
   spin1x=0.0790765695
@@ -33,12 +37,11 @@ params {
   fI=50
   fL=2000
   d=1
-  dt=6.1035156e-05
   pnorder="twoPointFivePN"
   spin="QM"
 }
 
-params {
+waveParams third {
   m1=34
   m2=3.4
   spin1x=0.0790765695
@@ -53,7 +56,6 @@ params {
   fI=50
   fL=2000
   d=1
-  dt=6.1035156e-05
   pnorder="twoPointFivePN"
   spin="QM"
 }
