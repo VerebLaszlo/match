@@ -1,5 +1,51 @@
 #include "confuse-parser.h"
 
+void write_simple(FILE *file, char *title, SimInspiralTable sim, PPNParamStruc ppn) {
+#define FORMAT "%f"
+        fprintf(file,"waveParams %s {\n",title);
+        fprintf(file,"\tm1="FORMAT"\n\tm2="FORMAT"\n",
+                sim.mass1,sim.mass2);
+        fprintf(file,"\tspin1x="FORMAT"\n\tspin1y="FORMAT"\n\tspin1z="FORMAT"\n",
+                sim.spin1x,
+                sim.spin1y,
+                sim.spin1z);
+        fprintf(file,"\tspin2x="FORMAT"\n\tspin2y="FORMAT"\n\tspin1z="FORMAT"\n",
+                sim.spin2x,
+                sim.spin2y,
+                sim.spin2z);
+        fprintf(file,"\tqm="FORMAT"\n\tqm="FORMAT"\n",
+                sim.qmParameter1,
+                sim.qmParameter2);
+        fprintf(file,"\tfL="FORMAT"\n\tfF="FORMAT"\n",
+                sim.f_lower,
+                sim.f_final);
+        fprintf(file,"\td="FORMAT"\n\tdt="FORMAT"\n",
+                sim.distance,
+                ppn.deltaT);
+        fprintf(file,"}\n\n");
+}
+
+int write_confuse(char const *filename, 
+        Parameters *what,
+        SimInspiralTable default_siminsp,
+        PPNParamStruc default_ppn) {
+    FILE *file;
+    int i;
+
+    file = fopen(filename,"w");
+    if (!file) {
+        return -1;
+    }
+
+    write_simple(file,"default",default_siminsp,default_ppn);
+    for (i=0; i<what->count; i++) {
+        write_simple(file,what->title[i],what->injParams[i],what->ppnParams[i]);
+    }
+    fclose(file);
+
+    return 0;
+}
+
 void FillFromConfuse(cfg_t *tmp, SimInspiralTable *injParams, PPNParamStruc *ppnParams) {
         injParams->mass1 = cfg_getfloat(tmp,"m1");
         injParams->mass2 = cfg_getfloat(tmp,"m2");
@@ -126,6 +172,7 @@ int parse_confuse(char const *filename,Parameters *out) {
         out->title[i] = strdup(cfg_title(tmp));
     }
 
+    write_confuse("proba.tmp",out,default_siminsp,default_ppn);
     cfg_free(cfg);
 
     return 0;
