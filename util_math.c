@@ -28,6 +28,14 @@ long ceil_po2(double num) {
 	return (long) exp(ceil(temp) * M_LN2);
 }
 
+double deg_To_Rad(double deg) {
+	return deg * M_PI / 180.;
+}
+
+double rad_To_Deg(double rad) {
+	return rad * 180. / M_PI;
+}
+
 //	vector functions
 
 double scalar_Product(double vec1[], double vec2[]) {

@@ -3,7 +3,7 @@
 #############################################################################
 
 CC=gcc
-CONFUSE=1
+CONFUSE=0
 include config.mk
 ifdef BUILD
 	ifeq (${BUILD}, prod)
@@ -18,17 +18,22 @@ else
 	CFLAGS+=-O3 -Wall -Wextra -g3 -ggdb3
 endif
 
-NEWDEPS=main_Match.c match.o
-
-LAL_INC=$(shell pkg-config --cflags lalinspiral)
-LAL_LIB=$(shell pkg-config --libs lalinspiral)
-OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
-
 ifeq (${CONFUSE},1)
     CFLAGS+=-DCONFUSE $(shell pkg-config --cflags --libs libconfuse)
 	NEWDEPS+=confuse-parser.o
 endif
 
+LAL_INC=$(shell pkg-config --cflags lalinspiral)
+LAL_LIB=$(shell pkg-config --libs lalinspiral)
+
+test: main_Test.c generator.o util_math.o
+	${CC} -o test main_Test.c generator.o util_math.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
+
+testRun: test
+	${RUN} ./test
+
+OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
+NEWDEPS=main_Match.c match.o
 all: new
 
 gen: main_Generator.c confuse-parser.c

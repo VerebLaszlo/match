@@ -15,6 +15,7 @@ main
 gen
 sqt
 lal
+test
 *.out
 *dat
 
