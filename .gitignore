@@ -5,12 +5,18 @@
 doc
 Debug
 LAL EXE
+generator
+own
 
 # Ignore the exec file and everything created by the program
 match
 new
 main
+gen
+sqt
+lal
 *.out
+*dat
 
 # Ignore everything starting with dot, exept .gitignore
 .*

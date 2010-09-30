@@ -24,11 +24,12 @@ int main(int argc, char *argv[]) {
 	INT4 i;
 	char PNString[50];
 
-	if (argc != 15) {
+	if (argc != 16) {
+		printf("%d\n", argc);
 		printf(
-				"                         1  2  3   4   5   6   7   8   9    10		 11		  12 13      14\n");
+				"                         1  2  3   4   5   6   7   8   9    10		 11		 12       13 14      15\n");
 		printf(
-				"Correct parameter order: m1 m2 S1x S1y S1z S2x S2y S2z incl f_lower distance dt PNorder SpinInter1\n");
+				"Correct parameter order: m1 m2 S1x S1y S1z S2x S2y S2z incl f_lower f_final distance dt PNorder SpinInter1\n");
 		return (1);
 	}
 
@@ -51,8 +52,8 @@ int main(int argc, char *argv[]) {
 	injParams.qmParameter2 = 1.;//atof(argv[10]);
 	double incl = injParams.inclination = atof(argv[9]);
 	double freq_Min = injParams.f_lower = atof(argv[10]);
-	injParams.distance = atof(argv[11]);
-	double dt = ppnParams.deltaT = atof(argv[12]);
+	injParams.distance = atof(argv[12]);
+	double dt = ppnParams.deltaT = atof(argv[13]);
 	injParams.polarization = 0;
 	double freq_Max = 600.;
 	// változó paraméterek
@@ -97,7 +98,7 @@ detector_Struct max_Det;
 			fprintf(stderr, "LALSQTPNWaveformTest: error generating waveform\n");
 			return status.statusCode;
 		}
-		sprintf(PNString, "SpinQuadTaylor%s%s", "twoPointFivePN", "SS");
+		sprintf(PNString, "SpinQuadTaylor%s%s", "twoPointFivePN", "NO");
 		LALSnprintf(injParams.waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
 				PNString);
 		//interface(&mystatus, &thewaveform, &injParams, &ppnParams);
@@ -168,11 +169,11 @@ detector_Struct max_Det;
 			fr += freq_Step;
 			max_Final_Fr++;
 		}
-		double max_ts = scalar_freq(max_Det.ct, max_Det.cs, max_PSD,
+		double max_ts = inner_Product(max_Det.ct, max_Det.cs, max_PSD,
 				max_Init_Fr, max_Final_Fr);
-		double max_tt = scalar_freq(max_Det.ct, max_Det.ct, max_PSD,
+		double max_tt = inner_Product(max_Det.ct, max_Det.ct, max_PSD,
 				max_Init_Fr, max_Final_Fr);
-		double max_ss = scalar_freq(max_Det.cs, max_Det.cs, max_PSD,
+		double max_ss = inner_Product(max_Det.cs, max_Det.cs, max_PSD,
 				max_Init_Fr, max_Final_Fr);
 		printf("filling: % -15.5lg % -15.5lg % -15.5lg: % -15.5lg\n", max_ts, max_tt, max_ss, max_ts / sqrt(max_tt * max_ss));
 		fftw_free(max_PSD);

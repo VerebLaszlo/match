@@ -28,34 +28,6 @@
 
 double pi = LAL_PI;
 
-typedef struct tagMatchStruct {
-	double *signal[2];
-	fftw_complex *csignal[2];
-	fftw_plan plan[2];
-	int length;
-} matchStruct;
-
-void mallocMatchStruct(matchStruct* m, int length) {
-	m->length = length;
-	m->signal[0] = fftw_malloc(m->length * sizeof(double));
-	m->csignal[0] = fftw_malloc(m->length * sizeof(fftw_complex));
-	m->plan[0] = fftw_plan_dft_r2c_1d(m->length, m->signal[0], m->csignal[0],
-			FFTW_ESTIMATE);
-	m->signal[1] = fftw_malloc(m->length * sizeof(double));
-	m->csignal[1] = fftw_malloc(m->length * sizeof(fftw_complex));
-	m->plan[1] = fftw_plan_dft_r2c_1d(m->length, m->signal[1], m->csignal[1],
-			FFTW_ESTIMATE);
-}
-
-void freeMatchStruct(matchStruct *m) {
-	fftw_free(m->signal[0]);
-	fftw_free(m->csignal[0]);
-	fftw_destroy_plan(m->plan[0]);
-	fftw_free(m->signal[1]);
-	fftw_free(m->csignal[1]);
-	fftw_destroy_plan(m->plan[1]);
-}
-
 int FillSimInspiralTable(SimInspiralTable *injParams, PPNParamStruc *ppnParams, char **argv) {
 
         memset(injParams, 0, sizeof(SimInspiralTable));
@@ -291,11 +263,11 @@ int Calculate( SimInspiralTable injParams, PPNParamStruc ppnParams) {
                     fr += freq_step;
                     index_f++;
             }
-            ts = scalar_freq(match.csignal[0], match.csignal[1], psd, freq_i,
+            ts = inner_Product(match.csignal[0], match.csignal[1], psd, freq_i,
                             freq_f);
-            tt = scalar_freq(match.csignal[0], match.csignal[0], psd, freq_i,
+            tt = inner_Product(match.csignal[0], match.csignal[0], psd, freq_i,
                             freq_f);
-            ss = scalar_freq(match.csignal[1], match.csignal[1], psd, freq_i,
+            ss = inner_Product(match.csignal[1], match.csignal[1], psd, freq_i,
                             freq_f);
 //		printf("see: "PREC PREC PREC ", overlap: "PREC"\n", ts, tt, ss, ts
 //				/ sqrt(tt * ss));
@@ -315,7 +287,7 @@ int main(int argc, char *argv[]) {
 
         Parameters *params = malloc(sizeof(Parameters));
         int i;
-        
+
 	// kezdeti adatok beolvasása
         if (ParseCommandLine(argc,argv,params)<0) {
             return -1;

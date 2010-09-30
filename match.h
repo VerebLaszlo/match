@@ -11,9 +11,71 @@
 #include <lal/GeneratePPNInspiral.h>
 #include "generator.h"
 #include "detector.h"
-#include "ioHandling.h"
 
-#define SQR(a) ( (a)*(a) )
+/**	sonstants for error reporting
+ */
+typedef enum {
+	MATCH_SUCCES = 0,	///< the code for succes
+} errorCodes;
+
+/**	An enum to contains the integer type constatns.
+ */
+typedef enum {
+	H1 = 0, H1P = 0, H1C = 1, H2 = 2, H2P = 2, H2C = 3, NUM_OF_SIGNALS = 4,	///< the number of the signals
+} constantValues;
+
+/**	Structure containing the signals.
+ */
+typedef struct {
+	double *signal[NUM_OF_SIGNALS];	///< the signals in time domain with the following order: $h_{1+}$, $h_{1\times}$, $h_{2+}$, $h_{2\times}$.
+	double *psd;	///< the psd
+	fftw_complex *csignal[NUM_OF_SIGNALS];	///< the signals in frequency domain with the following order: $\tilde h_{1+}$, $\tilde h_{1\times}$, $\tilde h_{2+}$, $\tilde h_{2\times}$.
+	fftw_plan plan[NUM_OF_SIGNALS];	///< FFT plans to calculate $\tilde h_{ij}=F\left(h_{ij}\right)
+	long length[NUM_OF_SIGNALS];	///< the length of the signals
+	long size;	///< the allocated memory for the signals
+} signalStruct;
+
+/**	Allocates memory for the signals.
+ * @param[in] s		: pointer to the structure containing the signals
+ * @param[in] size	: the size of the allocated memory
+ * @return : the succes of the memory allocation
+ */
+int create_Signal_Struct(signalStruct *s, long size);
+
+/**	Deallocates the memory of the signals.
+ * @param[in] s	: pointer to the structure containing the signals
+ */
+void destroy_Signal_Struct(signalStruct *s);
+
+/**
+ *
+ */
+signalStruct orthonormalise(signalStruct *s);
+
+/**
+ *		The function calculates the normalized scalar product in frequency domain.
+ * @param[in]	left	: left vector
+ * @param[in]	right	: right vector
+ * @param[in]	norm	: normalizing vector
+ * @param[in]	min		: starting index
+ * @param[in]	max		: ending index
+ * @return	the scalar product
+ */
+double inner_Product(fftw_complex left[], fftw_complex right[], double norm[], long min, long max);
+
+// Old Version Starts
+
+typedef struct tagMatchStruct {
+	double *signal[2];
+	fftw_complex *csignal[2];
+	fftw_plan plan[2];
+	int length;
+} matchStruct;
+
+void mallocMatchStruct(matchStruct* m, int length);
+
+void freeMatchStruct(matchStruct *m);
+
 /**
  *		The structure contains everything corresponding to one detector.
  */
@@ -99,5 +161,6 @@ double * psd(double n[], long length, double dt, void(*winf)(double array[], lon
  */
 void calc_Time_Corr(double h1[], double h2[], double dest[], long length);
 
+// Old Version Ends
 
 #endif

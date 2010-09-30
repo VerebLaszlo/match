@@ -4,8 +4,8 @@
  * @date 2010.03.27
  */
 
-#ifndef UTIL_H_
-#define UTIL_H_
+#ifndef UTIL_H
+#define UTIL_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -42,19 +42,4 @@ FILE * sfopen_read(char *name);
  */
 FILE * sfopen_write(char *name);
 
-//	egyéb
-
-/**
- *		The function generates random number in the [0,1) intervall.
- * @return	a random number
- */
-double rand1(void);
-
-/**
- *		The function rounds the number to the closest power of two.
- * @param[in]	num	: number to round
- * @return	rounded value
- */
-long round_po2(double num);
-
-#endif /* UTIL_H_ */
+#endif // UTIL_H

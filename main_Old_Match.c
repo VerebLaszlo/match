@@ -14,6 +14,9 @@ double pi = M_PI;
 long max_length = 60000;
 
 int main(int argc, char *argv[]) {
+
+	puts("Valami oknál fogva nem generálja le a 2. hullámformát!!!!!!!!!\nMeg kell nézni miért!!!!!!!!!!!!!!!!!!!!!!!!");
+	exit(-1);
 	static LALStatus status;
 	CoherentGW thewaveform1;
 	CoherentGW thewaveform2;
@@ -26,14 +29,15 @@ int main(int argc, char *argv[]) {
 	char SpinInter[50];
 
 	if (argc != 18) {
+		printf("%d\n", argc);
 			printf(
 					"                         1  2  3   4   5   6   7   8   9    10		 11		 12		  13 14      	15			16			17\n");
 			printf(
-					"Correct parameter order: m1 m2 S1x S1y S1z S2x S2y S2z incl f_lower f_final distance dt PNorder1	PNorder2	SpinInter1	SpinInter2\n");
+					"Correct parameter order: m1 m2 S1x S1y S1z S2x S2y S2z incl f_lower f_final distance dt PNorder1	SpinInter1	PNorder2	SpinInter2\n");
 			return (1);
 	}
-	
-	sprintf(PNString, "SpinQuadTaylor%s%s", argv[14], argv[16]);
+
+	sprintf(PNString, "SpinQuadTaylor%s%s", argv[14], argv[15]);
 	memset(&status, 0, sizeof(LALStatus));
 	memset(&thewaveform1, 0, sizeof(CoherentGW));
 	memset(&thewaveform2, 0, sizeof(CoherentGW));
@@ -79,7 +83,8 @@ int main(int argc, char *argv[]) {
 		fprintf( stderr, "LALSQTPNWaveformTest: error generating waveform\n" );
 		return status.statusCode;
 	}
-	sprintf(PNString, "SpinQuadTaylor%s%s", argv[15], argv[17]);
+	puts("FF");fflush(stdout);
+	sprintf(PNString, "SpinQuadTaylor%s%s", argv[16], argv[17]);
 	LALSnprintf(injParams.waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), PNString);
 	//interface(&mystatus, &thewaveform, &injParams, &ppnParams);
 	LALGenerateInspiral(&status, &thewaveform2, &injParams, &ppnParams);
@@ -161,12 +166,12 @@ int main(int argc, char *argv[]) {
 			fr += freq_Step;
 			maxfr++;
 		}
-		double ts_old = scalar_freq(det_old.ct, det_old.cs, norm, minfr, maxfr);
-		double tt_old = scalar_freq(det_old.ct, det_old.ct, norm, minfr, maxfr);
-		double ss_old = scalar_freq(det_old.cs, det_old.cs, norm, minfr, maxfr);
-		double ts_new = scalar_freq(det_new.ct, det_new.cs, wn, minfr, maxfr);
-		double tt_new = scalar_freq(det_new.ct, det_new.ct, wn, minfr, maxfr);
-		double ss_new = scalar_freq(det_new.cs, det_new.cs, wn, minfr, maxfr);
+		double ts_old = inner_Product(det_old.ct, det_old.cs, norm, minfr, maxfr);
+		double tt_old = inner_Product(det_old.ct, det_old.ct, norm, minfr, maxfr);
+		double ss_old = inner_Product(det_old.cs, det_old.cs, norm, minfr, maxfr);
+		double ts_new = inner_Product(det_new.ct, det_new.cs, wn, minfr, maxfr);
+		double tt_new = inner_Product(det_new.ct, det_new.ct, wn, minfr, maxfr);
+		double ss_new = inner_Product(det_new.cs, det_new.cs, wn, minfr, maxfr);
 		printf("old: %lg, new: %lg\n", ts_old / sqrt(tt_old * ss_old), ts_new / sqrt(tt_new * ss_new));
 		fftw_free(wn);
 		fftw_free(norm);

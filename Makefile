@@ -18,7 +18,7 @@ else
 	CFLAGS+=-O3 -Wall -Wextra -g3 -ggdb3
 endif
 
-NEWDEPS=new_match.c match.o
+NEWDEPS=main_Match.c match.o
 
 LAL_INC=$(shell pkg-config --cflags lalinspiral)
 LAL_LIB=$(shell pkg-config --libs lalinspiral)
@@ -31,11 +31,14 @@ endif
 
 all: new
 
-main: main.c match.c detector.c
-	${CC} -o main main.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
+gen: main_Generator.c confuse-parser.c
+	${CC} -o gen main_Generator.c confuse-parser.c ${CFLAGS} ${LAL_INC} ${LAL_LIB}
+
+main: main_Old_Match.c match.c detector.c
+	${CC} -o main main_Old_Match.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
 
 mainRun: main
-	./main `head -n 1 input.data`
+	./main `head -n 1 input.data` twoPointFivePN ALL
 
 new: $(NEWDEPS)
 	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o new $(NEWDEPS)
@@ -49,27 +52,24 @@ newRun: new
 matchRun: match
 	./match $(shell head -n 1 input.data)
 
-match: sqt_match.c match.h match.c
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match sqt_match.c match.c
+match: main_Spin_Match.c match.h match.c
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match main_Spin_Match.c match.c
 
 
 lal: LALSTPNWaveformTestMod.c
 	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
 	@echo ''
  
-own: LALSQTPNWaveformTest.c
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o own LALSQTPNWaveformTest.c -lm
+sqt: LALSQTPNWaveformTest.c
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o sqt LALSQTPNWaveformTest.c -lm
 	@echo ''
-
-overlap: RandomInspiralSignalTest.c
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o overlap RandomInspiralSignalTest.c
 
 clean:
 	rm -rf *.o *.out *.b
 	@echo ''
 
 cleanrun:
-	rm -rf lal own overlap lal.out own.out main match new
+	rm -rf lal sqt overlap lal.out sqt.out main match new gen
 	@echo ''
 
 cleanall:
@@ -77,21 +77,21 @@ cleanall:
 	make cleanrun
 	@echo ''
 
-run: own lal
-	@echo "`head -n 1 input.data` own.out `tail -n 1 input.data`"
-	./own `head -n 1 input.data` own.out `tail -n 1 input.data`
-	@echo "`head -n 1 input.data` lal.out"
-	./lal `head -n 1 input.data` lal.out
+run: sqt lal
+	@echo "`head -n 1 input.data`"
+	./sqt `head -n 1 input.data`
+	@echo "`tail -n 1 input.data`"
+	./lal `tail -n 1 input.data`
 
-val: own lal
-	@echo "valgrind `head -n 1 input.data` own.out `tail -n 1 input.data`"
-	valgrind ./own `head -n 1 input.data` own.out `tail -n 1 input.data`
+val: sqt lal
+	@echo "valgrind `head -n 1 input.data` sqt.out `tail -n 1 input.data`"
+	valgrind ./sqt `head -n 1 input.data` sqt.out `tail -n 1 input.data`
 	@echo "valgrind `head -n 1 input.data` lal.out"
 	valgrind ./lal `head -n 1 input.data` lal.out
 help :
 	@echo 'all       : makes everything'
 	@echo 'lal       : makes just the LALSTPNWaveform.c part'
-	@echo 'own       : makes the whole own code'
+	@echo 'sqt       : makes the whole sqt code'
 	@echo 'clean     : deletes the object files'
 	@echo 'cleanrun : deletes the exe files'
 	@echo 'cleanall : invokes the "clean" and "cleanrun" commands'
