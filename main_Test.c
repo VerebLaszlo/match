@@ -18,7 +18,50 @@ int lalDebugLevel = 0; ///< the debug level
 
 #define PREC "% -15.10lg "
 
-int main() {
+#define DIR "test_Dir/"
+int test(void);
+
+int generate(long count);
+
+int main(int argc, char *argv[]) {
+	generate(atoi(argv[1]));
+	puts("Done.");
+	return 0;
+}
+
+int generate(long length) {
+	long i;
+	binary_System sys, min, max;
+	min.bh[0].m = min.bh[1].m = 3.;
+	max.bh[0].m = 2 * (max.bh[1].m = 15.);
+	min.M = 6.;
+	max.M = 40.;
+	min.eta = 0.01;
+	max.eta = 0.25;
+	min.bh[0].chi_Amp = min.bh[1].chi_Amp = 0.5;
+	max.bh[0].chi_Amp = max.bh[1].chi_Amp = 1.;
+	min.bh[0].cth = min.bh[1].cth = -(max.bh[0].cth = max.bh[1].cth = 1.);
+	min.bh[0].phi = min.bh[1].phi = 0.;
+	max.bh[0].phi = max.bh[1].phi = 2. * M_PI;
+	max.dist = 10. * (min.dist = 1.);
+	min.incl = 0.; max.incl = 2. * M_PI;
+	min.F.dec = min.F.pol = min.F.phi = 0.;
+	max.F.dec = max.F.pol = max.F.phi = 1.;
+	srand(10);
+	FILE *file = fopen(DIR"params.data", "w");
+	for (i = 0; i < length; i++) {
+		gen_Parameters(&sys, &min, &max, ETAM);
+		fprintf(file, PREC PREC PREC PREC PREC, DBL_MIN, sys.M, sys.eta, sys.bh[0].m, sys.bh[1].m);
+		fprintf(file, PREC PREC PREC, sys.bh[0].chi_Amp, sys.bh[0].cth, sys.bh[0].phi);
+		fprintf(file, PREC PREC PREC, sys.bh[1].chi_Amp, sys.bh[1].cth, sys.bh[1].phi);
+		fprintf(file, PREC PREC PREC PREC PREC, sys.dist, sys.incl, sys.F.dec, sys.F.pol, sys.F.phi);
+		fprintf(file, "\n");fflush(file);
+	}
+	fclose(file);
+	return 0;
+}
+
+int test(void) {
 	static LALStatus status;
 	CoherentGW waveform[2];
 	SimInspiralTable injParams[2];

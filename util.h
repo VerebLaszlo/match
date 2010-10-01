@@ -13,7 +13,7 @@
 #include <string.h>
 #include <math.h>
 
-typedef double * const dpc;
+//typedef double * const dpc;
 
 //	logikai változótípus definiálása ismeretlen értékkel is
 typedef enum {

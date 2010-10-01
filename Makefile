@@ -30,7 +30,7 @@ test: main_Test.c generator.o util_math.o
 	${CC} -o test main_Test.c generator.o util_math.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
 
 testRun: test
-	${RUN} ./test
+	${RUN} ./test ${PAR}
 
 OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
 NEWDEPS=main_Match.c match.o

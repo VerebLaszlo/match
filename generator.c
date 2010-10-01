@@ -8,126 +8,110 @@
 
 void convert_Angles_Components(binary_System *sys, conversion_Mode mode) {
 	switch (mode) {
-		case ANGLE_TO_COMP :
-			sys->bh[0].chi[0] = sys->bh[0].chi_Amp * sqrt(1. - SQR(sys->bh[0].cth)) * cos(sys->bh[0].phi);
-			sys->bh[0].chi[1] = sys->bh[0].chi_Amp * sqrt(1. - SQR(sys->bh[0].cth)) * sin(sys->bh[0].phi);
+		case ANGLE_TO_COMP:
+			// first spin
+			sys->bh[0].chi[0] = sys->bh[0].chi_Amp * sqrt(1.
+					- SQR(sys->bh[0].cth)) * cos(sys->bh[0].phi);
+			sys->bh[0].chi[1] = sys->bh[0].chi_Amp * sqrt(1.
+					- SQR(sys->bh[0].cth)) * sin(sys->bh[0].phi);
 			sys->bh[0].chi[2] = sys->bh[0].chi_Amp * sys->bh[0].cth;
-			sys->bh[1].chi[0] = sys->bh[1].chi_Amp * sqrt(1. - SQR(sys->bh[1].cth)) * cos(sys->bh[1].phi);
-			sys->bh[1].chi[1] = sys->bh[1].chi_Amp * sqrt(1. - SQR(sys->bh[1].cth)) * sin(sys->bh[1].phi);
+			// second spin
+			sys->bh[1].chi[0] = sys->bh[1].chi_Amp * sqrt(1.
+					- SQR(sys->bh[1].cth)) * cos(sys->bh[1].phi);
+			sys->bh[1].chi[1] = sys->bh[1].chi_Amp * sqrt(1.
+					- SQR(sys->bh[1].cth)) * sin(sys->bh[1].phi);
 			sys->bh[1].chi[2] = sys->bh[1].chi_Amp * sys->bh[1].cth;
 			break;
-		case COMP_TO_ANGLE :
-			sys->bh[0].chi_Amp = sqrt(SQR(sys->bh[0].chi[0]) + SQR(sys->bh[0].chi[1]) + SQR(sys->bh[0].chi[2]));
+		case COMP_TO_ANGLE:
+			// first spin
+			sys->bh[0].chi_Amp = sqrt(SQR(sys->bh[0].chi[0])
+					+ SQR(sys->bh[0].chi[1]) + SQR(sys->bh[0].chi[2]));
 			sys->bh[0].cth = sys->bh[0].chi[2] / sys->bh[0].chi_Amp;
-			sys->bh[0].phi = sys->bh[0].chi[1] / sys->bh[0].chi_Amp / sqrt(1. - SQR(sys->bh[0].cth));
-			sys->bh[1].chi_Amp = sqrt(SQR(sys->bh[1].chi[0]) + SQR(sys->bh[1].chi[1]) + SQR(sys->bh[1].chi[2]));
+			sys->bh[0].phi = sys->bh[0].chi[1] / sys->bh[0].chi_Amp / sqrt(1.
+					- SQR(sys->bh[0].cth));
+			// second spin
+			sys->bh[1].chi_Amp = sqrt(SQR(sys->bh[1].chi[0])
+					+ SQR(sys->bh[1].chi[1]) + SQR(sys->bh[1].chi[2]));
 			sys->bh[1].cth = sys->bh[1].chi[2] / sys->bh[1].chi_Amp;
-			sys->bh[1].phi = sys->bh[1].chi[1] / sys->bh[1].chi_Amp / sqrt(1. - SQR(sys->bh[1].cth));
+			sys->bh[1].phi = sys->bh[1].chi[1] / sys->bh[1].chi_Amp / sqrt(1.
+					- SQR(sys->bh[1].cth));
 			break;
 	}
 }
 
 void convert_etaM_m1m2(binary_System *sys, conversion_Mode mode) {
 	switch (mode) {
-		case ETAM_TO_M1M2 :
+		case ETAM_TO_M1M2:
 			sys->bh[0].m = (1. + sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 			sys->bh[1].m = (1. - sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 			break;
-		case M1M2_TO_ETAM :
+		case M1M2_TO_ETAM:
 			sys->M = sys->bh[0].m + sys->bh[1].m;
 			sys->eta = sys->bh[0].m * sys->bh[1].m / SQR(sys->M);
 			break;
 	}
 }
 
-// old starts
+// generator functions
 
-binary_system min, max;
-
-void gen_M_eta(dpc m1, dpc m2, dpc M, dpc eta) {
-	do {
-		*M = min.M + (max.M - min.M) * rand1();
-		// \todo át kell-e állítani eta-t?
-		*eta = min.eta + (max.eta - min.eta) * rand1();
-		double temp = sqrt(1. - 4. * *eta);
-		*m1 = (*M / 2.) * (1. + temp);
-		*m2 = (*M / 2.) * (1. - temp);
-	} while (min.bh1.m > *m1 || *m1 > max.bh1.m || min.bh2.m > *m2 || *m2 > max.bh2.m);
-}
-
-void gen_m1_m2(dpc m1, dpc m2, dpc M, dpc eta) {
-	*m1 = min.bh1.m + (max.bh1.m - min.bh1.m) * rand1();
-	*m2 = min.bh2.m + (max.bh2.m - min.bh2.m) * rand1();
-	*M = *m1 + *m2;
-	*eta = *m1 * *m2 / (*M * *M);
-}
-/*
-black_hole gen_Spin(const black_hole * const min, const black_hole * const max) {
-	black_hole bh;
-	bh.sp = min->sp + (max->sp - min->sp) * rand1();
-	bh.th = min->th + (max->th - min->th) * rand1();
-	bh.ph = min->ph + (max->ph - min->ph) * rand1();
-	bh.sx = bh.sp * sqrt(1. - bh.th * bh.th) * cos(bh.ph);
-	bh.sy = bh.sp * sqrt(1. - bh.th * bh.th) * sin(bh.ph);
-	bh.sz = bh.sp * bh.th;
-	return bh;
-}
-*/
-double gen_Inclination(void) {
-	return min.incl + (max.incl - min.incl) * rand1();
+void gen_Mass(binary_System *sys, binary_System *min, binary_System *max,
+		conversion_Mode mode) {
+	switch (mode) {
+		case ETAM:
+			do {
+				sys->M = RANDNK(min->M, max->M);
+				sys->eta = RANDNK(min->eta, max->eta);
+				sys->bh[0].m = (1. + sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
+				sys->bh[1].m = (1. - sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
+			} while (min->bh[0].m > sys->bh[0].m || sys->bh[0].m > max->bh[0].m
+					|| min->bh[1].m > sys->bh[1].m || sys->bh[1].m
+					> max->bh[1].m);
+			break;
+		case M1M2:
+			do {
+				sys->bh[0].m = RANDNK(min->bh[0].m, max->bh[0].m);
+				sys->bh[1].m = RANDNK(min->bh[1].m, max->bh[1].m);
+				sys->M = sys->bh[0].m + sys->bh[1].m;
+				sys->eta = sys->bh[0].m * sys->bh[1].m / SQR(sys->M);
+			} while (min->M > sys->M || sys->M > max->M || min->eta > sys->eta
+					|| sys->eta > max->eta);
+			break;
+	}
 }
 
-double gen_Distance(void) {
-	return min.dist + (max.dist - min.dist) * rand1();
+void gen_Chi(binary_System *sys, binary_System *min, binary_System *max) {
+	//first spin
+	sys->bh[0].chi_Amp = RANDNK(min->bh[0].chi_Amp, max->bh[0].chi_Amp);
+	sys->bh[0].cth = RANDNK(min->bh[0].cth, max->bh[0].cth);
+	sys->bh[0].phi = RANDNK(min->bh[0].phi, max->bh[0].phi);
+	sys->bh[0].chi[0] = sys->bh[0].chi_Amp * sqrt(1. - SQR(sys->bh[0].cth))
+			* cos(sys->bh[0].phi);
+	sys->bh[0].chi[1] = sys->bh[0].chi_Amp * sqrt(1. - SQR(sys->bh[0].cth))
+			* sin(sys->bh[0].phi);
+	sys->bh[0].chi[2] = sys->bh[0].chi_Amp * sys->bh[0].cth;
+	// second spin
+	sys->bh[1].chi_Amp = RANDNK(min->bh[1].chi_Amp, max->bh[1].chi_Amp);
+	sys->bh[1].cth = RANDNK(min->bh[1].cth, max->bh[1].cth);
+	sys->bh[1].phi = RANDNK(min->bh[1].phi, max->bh[1].phi);
+	sys->bh[1].chi[0] = sys->bh[1].chi_Amp * sqrt(1. - SQR(sys->bh[1].cth))
+			* cos(sys->bh[1].phi);
+	sys->bh[1].chi[1] = sys->bh[1].chi_Amp * sqrt(1. - SQR(sys->bh[1].cth))
+			* sin(sys->bh[1].phi);
+	sys->bh[1].chi[2] = sys->bh[1].chi_Amp * sys->bh[1].cth;
 }
 
-double gen_Declination(void) {
-	return min.dec + (max.dec - min.dec) * rand1();
+void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
+	sys->dist = RANDNK(min->dist, max->dist);
+	sys->incl = RANDNK(min->incl + DBL_MIN, max->incl);
+	sys->F.dec = RANDNK(min->F.dec, max->F.dec);
+	sys->F.pol = RANDNK(min->F.dec, max->F.pol);
+	sys->F.phi = RANDNK(min->F.dec, max->F.phi);
+	sys->F.F[0] = sys->F.F[1] = 1. / 0.;
 }
 
-double gen_Polarization(void) {
-	return min.pol + (max.pol - min.pol) * rand1();
+void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
+		conversion_Mode mode) {
+	gen_Mass(sys, min, max, mode);
+	gen_Chi(sys, min, max);
+	gen_Sys(sys, min, max);
 }
-
-double gen_Phi(void) {
-	return min.phi + (max.phi - min.phi) * rand1();
-}
-/*
-binary_system gen_Params() {
-	binary_system now;
-	now.bh1 = gen_Spin(&min.bh1, &max.bh1);
-	now.bh2 = gen_Spin(&min.bh2, &max.bh2);
-	gen_m1_m2(&now.bh1.m, &now.bh2.m, &now.M, &now.eta);
-	now.incl = gen_Inclination();
-	now.dist = gen_Distance();
-	now.dec = gen_Declination();
-	now.pol = gen_Polarization();
-	now.phi = gen_Phi();
-	return now;
-}
-*/
-void set(binary_system * const dest, const binary_system * const source) {
-	dest->bh1.sp = source->bh1.sp;
-	dest->bh1.sx = source->bh1.sx;
-	dest->bh1.sy = source->bh1.sy;
-	dest->bh1.sz = source->bh1.sz;
-	dest->bh1.th = source->bh1.th;
-	dest->bh1.ph = source->bh1.ph;
-	dest->bh1.m = source->bh1.m;
-	dest->bh2.sp = source->bh2.sp;
-	dest->bh2.sx = source->bh2.sx;
-	dest->bh2.sy = source->bh2.sy;
-	dest->bh2.sz = source->bh2.sz;
-	dest->bh2.th = source->bh2.th;
-	dest->bh2.ph = source->bh2.ph;
-	dest->bh2.m = source->bh2.m;
-	dest->incl = source->incl;
-	dest->dist = source->dist;
-	dest->eta = source->eta;
-	dest->M = source->M;
-	dest->dec = source->dec;
-	dest->phi = source->phi;
-	dest->pol = source->pol;
-}
-
-// old ends

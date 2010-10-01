@@ -6,7 +6,7 @@
 
 #include "match.h"
 
-extern double pi;
+double pi;
 
 int create_Signal_Struct(signalStruct *s, long size) {
 	s->size = size;
