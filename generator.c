@@ -5,6 +5,7 @@
  */
 
 #include "generator.h"
+#include <stdio.h>
 
 void convert_Angles_Components(binary_System *sys, conversion_Mode mode) {
 	switch (mode) {
@@ -54,11 +55,18 @@ void convert_etaM_m1m2(binary_System *sys, conversion_Mode mode) {
 
 // generator functions
 
-binary_System lower = { { { 0., -1., 0., 0., { 0., 0., 0. } }, { 0., -1., 0.,
-		0., { 0., 0., 0. } } }, 0., 0., DBL_MIN, 1., { -M_PI_2, 0., 0. } };
-binary_System upper = { { { 100., 1., 2. * M_PI, 1., { 1., 1., 1. } }, { 100.,
-		1., 2. * M_PI, 1., { 1., 1., 1. } } }, 200., 0.25, 2. * M_PI, 100., {
-		M_PI_2, M_PI, 2. * M_PI } };
+binary_System lower = {
+		{
+				{ 0., -1., 0., 0., { 0., 0., 0. } },	// BH1
+				{ 0., -1., 0., 0., { 0., 0., 0. } }		// BH2
+		},
+		0., 0., DBL_MIN, 1., { -M_PI_2, 0., 0., {0., 0.} } };
+binary_System upper = {
+		{
+				{ 40., 1., 2. * M_PI, 1., { 1., 1., 1. } },
+				{ 40., 1., 2. * M_PI, 1., { 1., 1., 1. } }
+		},
+		40., 0.25, 2. * M_PI, 10., { M_PI_2, M_PI, 2. * M_PI, {0., 0.} } };
 
 void check_Borders(binary_System *min, binary_System *max) {
 	short i;
@@ -111,6 +119,12 @@ void check_Borders(binary_System *min, binary_System *max) {
 	}
 	if (max->M > upper.M) {
 		max->M = upper.M;
+	}
+	if (min->eta < lower.eta) {
+		min->eta = lower.eta;
+	}
+	if (max->eta > upper.eta) {
+		max->eta = upper.eta;
 	}
 	if (min->incl < lower.incl) {
 		min->incl = lower.incl;
@@ -201,7 +215,6 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 
 void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
 		conversion_Mode mode) {
-	check_Borders(min, max);
 	gen_Mass(sys, min, max, mode);
 	gen_Chi(sys, min, max);
 	gen_Sys(sys, min, max);

@@ -56,6 +56,8 @@ void calc_Antenna_Function(binary_System *sys);
 
 // generator functions
 
+void check_Borders(binary_System *min, binary_System *max);
+
 void gen_Mass(binary_System *sys, binary_System *min, binary_System *max,
 		conversion_Mode mode);
 
