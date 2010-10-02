@@ -54,6 +54,96 @@ void convert_etaM_m1m2(binary_System *sys, conversion_Mode mode) {
 
 // generator functions
 
+binary_System lower = { { { 0., -1., 0., 0., { 0., 0., 0. } }, { 0., -1., 0.,
+		0., { 0., 0., 0. } } }, 0., 0., DBL_MIN, 1., { -M_PI_2, 0., 0. } };
+binary_System upper = { { { 100., 1., 2. * M_PI, 1., { 1., 1., 1. } }, { 100.,
+		1., 2. * M_PI, 1., { 1., 1., 1. } } }, 200., 0.25, 2. * M_PI, 100., {
+		M_PI_2, M_PI, 2. * M_PI } };
+
+void check_Borders(binary_System *min, binary_System *max) {
+	short i;
+	for (i = 0; i < 2; i++) {
+		if (min->bh[i].m < lower.bh[i].m) {
+			min->bh[i].m = lower.bh[i].m;
+		}
+		if (min->bh[i].cth < lower.bh[i].cth) {
+			min->bh[i].cth = lower.bh[i].cth;
+		}
+		if (min->bh[i].phi < lower.bh[i].phi) {
+			min->bh[i].phi = lower.bh[i].phi;
+		}
+		if (min->bh[i].chi_Amp < lower.bh[i].chi_Amp) {
+			min->bh[i].chi_Amp = lower.bh[i].chi_Amp;
+		}
+		if (min->bh[i].chi[0] < lower.bh[i].chi[0]) {
+			min->bh[i].chi[0] = lower.bh[i].chi[0];
+		}
+		if (min->bh[i].chi[1] < lower.bh[i].chi[1]) {
+			min->bh[i].chi[1] = lower.bh[i].chi[1];
+		}
+		if (min->bh[i].chi[2] < lower.bh[i].chi[2]) {
+			min->bh[i].chi[2] = lower.bh[i].chi[2];
+		}
+		if (max->bh[i].m > upper.bh[i].m) {
+			max->bh[i].m = upper.bh[i].m;
+		}
+		if (max->bh[i].cth > upper.bh[i].cth) {
+			max->bh[i].cth = upper.bh[i].cth;
+		}
+		if (max->bh[i].phi > upper.bh[i].phi) {
+			max->bh[i].phi = upper.bh[i].phi;
+		}
+		if (max->bh[i].chi_Amp > upper.bh[i].chi_Amp) {
+			max->bh[i].chi_Amp = upper.bh[i].chi_Amp;
+		}
+		if (max->bh[i].chi[0] > upper.bh[i].chi[0]) {
+			max->bh[i].chi[0] = upper.bh[i].chi[0];
+		}
+		if (max->bh[i].chi[1] > upper.bh[i].chi[1]) {
+			max->bh[i].chi[1] = upper.bh[i].chi[1];
+		}
+		if (max->bh[i].chi[2] > upper.bh[i].chi[2]) {
+			max->bh[i].chi[2] = upper.bh[i].chi[2];
+		}
+	}
+	if (min->M < lower.M) {
+		min->M = lower.M;
+	}
+	if (max->M > upper.M) {
+		max->M = upper.M;
+	}
+	if (min->incl < lower.incl) {
+		min->incl = lower.incl;
+	}
+	if (max->incl > upper.incl) {
+		max->incl = upper.incl;
+	}
+	if (min->dist < lower.dist) {
+		min->dist = lower.dist;
+	}
+	if (max->dist > upper.dist) {
+		max->dist = upper.dist;
+	}
+	if (min->F.dec < lower.F.dec) {
+		min->F.dec = lower.F.dec;
+	}
+	if (min->F.pol < lower.F.pol) {
+		min->F.pol = lower.F.pol;
+	}
+	if (min->F.phi < lower.F.phi) {
+		min->F.phi = lower.F.phi;
+	}
+	if (max->F.dec > upper.F.dec) {
+		max->F.dec = upper.F.dec;
+	}
+	if (max->F.pol > upper.F.pol) {
+		max->F.pol = upper.F.pol;
+	}
+	if (max->F.phi > upper.F.phi) {
+		max->F.phi = upper.F.phi;
+	}
+}
+
 void gen_Mass(binary_System *sys, binary_System *min, binary_System *max,
 		conversion_Mode mode) {
 	switch (mode) {
@@ -111,6 +201,7 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 
 void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
 		conversion_Mode mode) {
+	check_Borders(min, max);
 	gen_Mass(sys, min, max, mode);
 	gen_Chi(sys, min, max);
 	gen_Sys(sys, min, max);
