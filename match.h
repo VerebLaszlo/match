@@ -28,9 +28,11 @@ typedef enum {
  */
 typedef struct {
 	double *signal[NUM_OF_SIGNALS];	///< the signals in time domain with the following order: $h_{1+}$, $h_{1\times}$, $h_{2+}$, $h_{2\times}$.
+	fftw_complex *csignal[NUM_OF_SIGNALS];	///< the signals in frequency domain with the following order: \f$\tilde h_{1+}\f$, \f$\tilde h_{1\times}\f$, \f$\tilde h_{2+}\f$, $\tilde h_{2\times}$.
+	fftw_complex *cproduct[NUM_OF_SIGNALS];
+	fftw_plan plan[NUM_OF_SIGNALS];	///< FFT plans to calculate \f$\tilde h_{ij}=F\left(h_{ij}\right)\f$
+	fftw_plan iplan[NUM_OF_SIGNALS];	///< FFT plans to calculate \f$h_{ij}=iF\left(\tilde h_{ij}\right)\f$
 	double *psd;	///< the psd
-	fftw_complex *csignal[NUM_OF_SIGNALS];	///< the signals in frequency domain with the following order: $\tilde h_{1+}$, $\tilde h_{1\times}$, $\tilde h_{2+}$, $\tilde h_{2\times}$.
-	fftw_plan plan[NUM_OF_SIGNALS];	///< FFT plans to calculate $\tilde h_{ij}=F\left(h_{ij}\right)
 	long length[NUM_OF_SIGNALS];	///< the length of the signals
 	long size;	///< the allocated memory for the signals
 } signalStruct;
@@ -48,11 +50,6 @@ int create_Signal_Struct(signalStruct *s, long size);
 void destroy_Signal_Struct(signalStruct *s);
 
 /**
- *
- */
-signalStruct orthonormalise(signalStruct *s);
-
-/**
  *		The function calculates the normalized scalar product in frequency domain.
  * @param[in]	left	: left vector
  * @param[in]	right	: right vector
@@ -62,6 +59,79 @@ signalStruct orthonormalise(signalStruct *s);
  * @return	the scalar product
  */
 double inner_Product(fftw_complex left[], fftw_complex right[], double norm[], long min, long max);
+
+/**	Normalise the given signals.
+ *	The normalised signals are stored in the same structure.
+ * @param[in,ou] s   : the structure containing the signals
+ * @param[in]    min : the starting index
+ * @param[in]    max : the ending index
+ */
+void normalise_Self(signalStruct *s, long min, long max);
+
+/** Normalise the given signals.
+ *	The normalised signals are stored in a new structure.
+ * @param[out] s   : the structure containing the normalised signals
+ * @param[in]  s   : the structure containing the signals
+ * @param[in]  min : the starting index
+ * @param[in]  max : the ending index
+ */
+void normalise(signalStruct *out, signalStruct *s, long min, long max);
+
+/** Orthogonisate the given signal.
+ * The ortogonisated signals are stored in the same structure.
+ * @param[in,out] s   : the structure containing the signals
+ * @param[in]     min : the starting index
+ * @param[in]     max : the ending index
+ */
+void orthogonisate_Self(signalStruct *s, long min, long max);
+
+/** Orthogonisate the given signal.
+ * @param[out] out : the orthogonisated signals
+ * @param[in]  s   : the structure containing the signals
+ * @param[in]  min : the starting index
+ * @param[in]  max : the ending index
+ */
+void orthogonisate(signalStruct *out, signalStruct *s, long min, long max);
+
+/** Orthonormalise the given signal.
+ * The ortonoralised signals are stored in the same structure.
+ * @param[in,out] s   : the structure containing the signals
+ * @param[in]     min : the starting index
+ * @param[in]     max : the ending index
+ */
+void orthonormalise_Self(signalStruct *s, long min, long max);
+
+/** Orthonormalise the given signal.
+ * @param[out] out : the orthogonisated signals
+ * @param[in]  s   : the structure containing the signals
+ * @param[in]  min : the starting index
+ * @param[in]  max : the ending index
+ */
+void orthonormalise(signalStruct *out, signalStruct *s, long min, long max);
+
+double match_Best(signalStruct *s, long min, long max);
+
+double match_Worst(signalStruct *s, long min, long max);
+
+void calc_Overlap(double *best, double *worst, signalStruct *s, long min, long max);
+
+/**	Calculates the constatns needed by the M_best match.
+ * @param[out] A   : ++, +x
+ * @param[out] B   : x+, xx
+ * @param[out] C   : ????????????
+ * @param[in]  s   : the orthonormalised signals
+ * @param[in]  min : the starting index
+ * @param[in]  max : the ending index
+ */
+void calculate_Constants(double *A, double *B, double *C, signalStruct *s, long min, long max);
+
+/** Calculates the overlap maximased over the phases.
+ * @param[in] s   : structure containing the signals
+ * @param[in] min : starting index
+ * @param[in] max : ending index
+ * @return the overlap maximased over the phase
+ */
+double phase_Max(signalStruct *s, long min, long max);
 
 // Old Version Starts
 
