@@ -33,6 +33,7 @@ typedef struct {
 typedef struct {
 	black_Hole bh[2]; ///< parameters of the BHs
 	double M; ///< the total mass of the system
+	double chirpM; ///< the chirp mass of the system
 	double eta; ///< symmetric mass ratio of the system
 	double incl; ///< inlination of the system
 	double dist; ///< distance of the system
@@ -42,10 +43,12 @@ typedef struct {
 typedef enum {
 	ANGLE_TO_COMP = 0,
 	COMP_TO_ANGLE = 1,
-	ETAM_TO_M1M2 = 0,
-	M1M2_TO_ETAM = 1,
+	FROM_M1M2 = 0,
+	FROM_ETAM = 1,
+	FROM_ETACHIRP = 2,
 	ETAM = 0,
-	M1M2 = 1
+	ETACHRIP = 1,
+	M1M2 = 2
 } conversion_Mode;
 
 void convert_Angles_Components(binary_System *sys, conversion_Mode mode);

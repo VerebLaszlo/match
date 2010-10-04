@@ -42,31 +42,48 @@ void convert_Angles_Components(binary_System *sys, conversion_Mode mode) {
 
 void convert_etaM_m1m2(binary_System *sys, conversion_Mode mode) {
 	switch (mode) {
-		case ETAM_TO_M1M2:
+		case FROM_ETAM:
 			sys->bh[0].m = (1. + sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 			sys->bh[1].m = (1. - sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
+			sys->chirpM = pow(sys->bh[0].m * sys->bh[1].m, 3. / 5.) / pow(
+					sys->M, 1. / 5.);
 			break;
-		case M1M2_TO_ETAM:
+		case FROM_M1M2:
 			sys->M = sys->bh[0].m + sys->bh[1].m;
 			sys->eta = sys->bh[0].m * sys->bh[1].m / SQR(sys->M);
+			sys->chirpM = pow(sys->bh[0].m * sys->bh[1].m, 3. / 5.) / pow(
+					sys->M, 1. / 5.);
+			break;
+		case FROM_ETACHIRP:
+			sys->M = sys->chirpM / pow(sys->eta, 3. / 5.);
+			sys->bh[0].m = (1. + sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
+			sys->bh[1].m = (1. - sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 			break;
 	}
 }
 
 // generator functions
 
-binary_System lower = {
+binary_System lower =
+	{
 		{
-				{ 0., -1., 0., 0., { 0., 0., 0. } },	// BH1
-				{ 0., -1., 0., 0., { 0., 0., 0. } }		// BH2
-		},
-		0., 0., DBL_MIN, 1., { -M_PI_2, 0., 0., {0., 0.} } };
-binary_System upper = {
+			{ 0., -1., 0., 0.,
+				{ 0., 0., 0. } }, // BH1
+				{ 0., -1., 0., 0.,
+					{ 0., 0., 0. } } // BH2
+		}, 6., -1000., 0., DBL_MIN, 1.,
+		{ 0., 0., 0.,
+			{ 0., 0. } } };
+binary_System upper =
+	{
 		{
-				{ 40., 1., 2. * M_PI, 1., { 1., 1., 1. } },
-				{ 40., 1., 2. * M_PI, 1., { 1., 1., 1. } }
-		},
-		40., 0.25, 2. * M_PI, 10., { M_PI_2, M_PI, 2. * M_PI, {0., 0.} } };
+			{ 40., 1., 2. * M_PI, 1.,
+				{ 1., 1., 1. } }, // BH1
+				{ 40., 1., 2. * M_PI, 1.,
+					{ 1., 1., 1. } }//BH2
+		}, 60., 1000., 0.25, 2. * M_PI, 10.,
+		{ M_PI, M_PI, 2. * M_PI,
+			{ 0., 0. } } };
 
 void check_Borders(binary_System *min, binary_System *max) {
 	short i;

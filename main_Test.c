@@ -5,6 +5,7 @@
  */
 
 #include "generator.h"
+#include "detector.h"
 
 #include <lal/GenerateInspiral.h>
 #include <lal/LALStdlib.h>
@@ -26,7 +27,10 @@ int generate(long length);
 
 int SQT_diff_ST(long length);
 
+int measure_Time(long length);
+
 int main(int argc, char *argv[]) {
+	//measure_Time(atol(argv[1]));
 	SQT_diff_ST(atol(argv[1]));
 	//	generate(atoi(argv[1]));
 	puts("Done.");
@@ -34,14 +38,100 @@ int main(int argc, char *argv[]) {
 }
 
 void destroySTWave(CoherentGW waveform) {
-	XLALDestroyREAL4Vector(waveform.f->data);
-	LALFree(waveform.f);
-	XLALDestroyREAL4Vector(waveform.shift->data);
-	LALFree(waveform.shift);
-	XLALDestroyREAL8Vector(waveform.phi->data);
-	LALFree(waveform.phi);
-	XLALDestroyREAL4VectorSequence(waveform.a->data);
-	XLALFree(waveform.a);
+	if (waveform.f->data)
+		XLALDestroyREAL4Vector(waveform.f->data);
+	if (waveform.f)
+		LALFree(waveform.f);
+	if (waveform.shift->data)
+		XLALDestroyREAL4Vector(waveform.shift->data);
+	if (waveform.shift)
+		LALFree(waveform.shift);
+	if (waveform.phi->data)
+		XLALDestroyREAL8Vector(waveform.phi->data);
+	if (waveform.phi)
+		LALFree(waveform.phi);
+	if (waveform.a->data)
+		XLALDestroyREAL4VectorSequence(waveform.a->data);
+	if (waveform.a)
+		XLALFree(waveform.a);
+}
+
+#define MODE "SpinTaylorthreePointFivePN"
+#define PN "threePointFivePN"
+
+#include <time.h>
+
+int measure_Time(long length) {
+	double time[length / 100+10];
+	static LALStatus status;
+	CoherentGW waveform;
+	SimInspiralTable injParams;
+	PPNParamStruc ppnParams;
+	binary_System act, min, max;
+	memset(&injParams, 0, sizeof(SimInspiralTable));
+	memset(&ppnParams, 0, sizeof(PPNParamStruc));
+	min.bh[0].m = min.bh[1].m = min.bh[0].cth = min.bh[1].cth = min.bh[0].phi
+			= min.bh[1].phi = min.bh[0].chi_Amp = min.bh[1].chi_Amp
+					= min.bh[0].chi[0] = min.bh[0].chi[1] = min.bh[0].chi[2]
+							= min.bh[1].chi[0] = min.bh[1].chi[1]
+									= min.bh[1].chi[2] = min.M = min.eta
+											= min.incl = min.dist = min.F.dec
+													= min.F.pol = min.F.phi
+															= -1000.;
+	max.bh[0].m = max.bh[1].m = max.bh[0].cth = max.bh[1].cth = max.bh[0].phi
+			= max.bh[1].phi = max.bh[0].chi_Amp = max.bh[1].chi_Amp
+					= max.bh[0].chi[0] = max.bh[0].chi[1] = max.bh[0].chi[2]
+							= max.bh[1].chi[0] = max.bh[1].chi[1]
+									= max.bh[1].chi[2] = max.M = max.eta
+											= max.incl = max.dist = max.F.dec
+													= max.F.pol = max.F.phi
+															= 1000.;
+	check_Borders(&min, &max);
+	min.M = 15.;
+	long i;
+	clock_t t_I = clock();
+	for (i = 0; i < length; i++) {
+		gen_Parameters(&act, &min, &max, ETAM);
+		injParams.mass1 = act.bh[0].m;
+		injParams.mass2 = act.bh[1].m;
+		injParams.spin1x = act.bh[0].chi[0];
+		injParams.spin1y = act.bh[0].chi[1];
+		injParams.spin1z = act.bh[0].chi[2];
+		injParams.spin2x = act.bh[1].chi[0];
+		injParams.spin2y = act.bh[1].chi[1];
+		injParams.spin2z = act.bh[1].chi[2];
+		injParams.qmParameter1 = 1.;
+		injParams.qmParameter2 = 1.;
+		injParams.inclination = act.incl;
+		injParams.f_lower = 40.;
+		injParams.f_final = 0.;
+		injParams.distance = act.dist;
+		injParams.polarization = 0;
+		ppnParams.deltaT = 6.1035156e-05;
+		LALSnprintf(injParams.waveform,
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
+				MODE);
+		memset(&status, 0, sizeof(LALStatus));
+		memset(&waveform, 0, sizeof(CoherentGW));
+		LALGenerateInspiral(&status, &waveform, &injParams, &ppnParams);
+		if (status.statusCode) {
+			fprintf(stderr, MODE": error generating waveform\n");
+			continue;
+		}
+		XLALSQTPNDestroyCoherentGW(&waveform);
+		//destroySTWave(waveform);
+		if (i % 100 == 99) {
+			time[i/100] = (double)(clock() - t_I) / CLOCKS_PER_SEC;
+			printf("%ld: %lg\n", i + 1, time[i/100]);
+		}
+	}
+	FILE *file = fopen(DIR"time35PNST.data", "w");
+	for (i = 0; i < length / 100; i++) {
+		fprintf(file, PREC"\n", time[i]);
+		fflush(stdout);
+	}
+	fclose(file);
+	return 0;
 }
 
 int SQT_diff_ST(long length) {
@@ -61,7 +151,7 @@ int SQT_diff_ST(long length) {
 			"cth_2", "phi_2", "chi_2x", "chi_2y", "chi_2z");
 	fprintf(file_Gen, "%-15s| %-15s| %-15s| %-15s| %-15s|\n", "dist", "incs",
 			"dec", "pol", "phi");
-	fclose(file_Gen);
+//	fclose(file_Gen);
 	FILE *file_Out;
 	char file_Out_Name[50];
 	memset(&injParams, 0, 2 * sizeof(SimInspiralTable));
@@ -83,6 +173,7 @@ int SQT_diff_ST(long length) {
 													= max.F.pol = max.F.phi
 															= 1000.;
 	check_Borders(&min, &max);
+	min.M = 20.;
 	double h[2], hp, hc, cphi, sphi, cshift, sshift;
 	long i;
 	unsigned long k;
@@ -91,7 +182,8 @@ int SQT_diff_ST(long length) {
 	for (i = 0; i < length; i++) {
 		printf("%ld %ld\n", length, i);
 		gen_Parameters(&act[i], &min, &max, ETAM);
-		file_Gen = fopen(DIR"params.data", "a");
+		calc_Response_For_Detector(LH, act[i].F.dec, act[i].F.phi, act[i].F.pol, &act[i].F.F[0], &act[i].F.F[1]);
+//		file_Gen = fopen(DIR"params.data", "a");
 		fprintf(file_Gen, PREC2 PREC2 PREC2 PREC2, act[i].M, act[i].eta,
 				act[i].bh[0].m, act[i].bh[1].m);
 		fflush(file_Gen);
@@ -107,12 +199,12 @@ int SQT_diff_ST(long length) {
 		fprintf(file_Gen, PREC2 PREC2 PREC2, act[i].bh[1].chi[0],
 				act[i].bh[1].chi[1], act[i].bh[1].chi[2]);
 		fflush(file_Gen);
-		fprintf(file_Gen, PREC2 PREC2 PREC2 PREC2 PREC2, act[i].dist, act[i].incl,
-				act[i].F.dec, act[i].F.pol, act[i].F.phi);
+		fprintf(file_Gen, PREC2 PREC2 PREC2 PREC2 PREC2, act[i].dist,
+				act[i].incl, act[i].F.dec, act[i].F.pol, act[i].F.phi);
 		fflush(file_Gen);
 		fprintf(file_Gen, "\n");
 		fflush(file_Gen);
-		fclose(file_Gen);
+//		fclose(file_Gen);
 		injParams[0].mass1 = act[i].bh[0].m;
 		injParams[0].mass2 = act[i].bh[1].m;
 		injParams[0].spin1x = act[i].bh[0].chi[0];
@@ -132,21 +224,24 @@ int SQT_diff_ST(long length) {
 		memcpy(&injParams[1], &injParams[0], sizeof(SimInspiralTable));
 		LALSnprintf(injParams[0].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
-				"SpinQuadTaylortwoPointFivePNSS");
+				"SpinQuadTaylor"PN"SS");
 		LALSnprintf(injParams[1].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
-				"SpinTaylortwoPointFivePN");
-		for (j = 0; j < 2; j++) {
-			memset(&status, 0, sizeof(LALStatus));
-			memset(&waveform[j], 0, sizeof(CoherentGW));
-			LALGenerateInspiral(&status, &waveform[j], &injParams[j],
-					&ppnParams);
-			if (status.statusCode) {
-				fprintf(
-						stderr,
-						"%d: LALS(Q)TPNWaveformTest: error generating waveform\n",
-						j);
-			}
+				"SpinTaylor"PN);
+		memset(&status, 0, sizeof(LALStatus));
+		memset(&waveform[0], 0, sizeof(CoherentGW));
+		LALGenerateInspiral(&status, &waveform[0], &injParams[0], &ppnParams);
+		if (status.statusCode) {
+			fprintf(stderr, "LALSQTPNWaveformTest: error generating waveform\n");
+			continue;
+		}
+		memset(&status, 0, sizeof(LALStatus));
+		memset(&waveform[1], 0, sizeof(CoherentGW));
+		LALGenerateInspiral(&status, &waveform[1], &injParams[1], &ppnParams);
+		if (status.statusCode) {
+			fprintf(stderr, "LALSTPNWaveformTest: error generating waveform\n");
+			XLALSQTPNDestroyCoherentGW(&waveform[0]);
+			continue;
 		}
 		sprintf(file_Out_Name, DIR"gen%04ld.data", i);
 		file_Out = fopen(file_Out_Name, "w");
@@ -167,14 +262,34 @@ int SQT_diff_ST(long length) {
 				act[i].F.F[0] = act[i].F.F[1] = sqrt(2.) / 2.;
 				h[j] = act[i].F.F[0] * hp + act[i].F.F[1] * hc;
 			}
-			fprintf(file_Out, PREC PREC PREC PREC PREC"\n", k * ppnParams.deltaT, h[0], h[1], fabs(h[0]-h[1]), fabs(h[0]-h[1]) / h[0]);
+			fprintf(file_Out, PREC PREC PREC PREC PREC"\n", k
+					* ppnParams.deltaT, h[0], h[1], h[0] - h[1], (
+					h[0] - h[1]) / h[0]);
+		}
+		for (; k < waveform[!shorter].f->data->length; k++) {
+			cshift = cos(waveform[!shorter].shift->data->data[k]);
+			sshift = sin(waveform[!shorter].shift->data->data[k]);
+			cphi = cos(waveform[!shorter].phi->data->data[k]
+					- waveform[!shorter].phi->data->data[0]);
+			sphi = sin(waveform[!shorter].phi->data->data[k]
+					- waveform[!shorter].phi->data->data[0]);
+			hp = waveform[!shorter].a->data->data[2 * k] * cshift * cphi
+					- waveform[!shorter].a->data->data[2 * k + 1] * sshift
+							* sphi;
+			hc = waveform[!shorter].a->data->data[2 * k] * sshift * cphi
+					+ waveform[!shorter].a->data->data[2 * k + 1] * cshift
+							* sphi;
+			act[i].F.F[0] = act[i].F.F[1] = sqrt(2.) / 2.;
+			h[0] = act[i].F.F[0] * hp + act[i].F.F[1] * hc;
+			fprintf(file_Out, PREC PREC PREC PREC PREC"\n", k
+					* ppnParams.deltaT, h[0], 0., fabs(h[0]), fabs(h[0]) / h[0]);
 		}
 		XLALSQTPNDestroyCoherentGW(&waveform[0]);
 		destroySTWave(waveform[1]);
 		fclose(file_Out);
 		//// t[i] = time() - t_I;
 	}
-	//	fclose(file_Gen);
+	fclose(file_Gen);
 	return 0.;
 }
 
@@ -236,7 +351,7 @@ int test(void) {
 	sys.bh[1].phi = DEG_TO_RAD(90.);
 	sys.bh[1].cth = cos(DEG_TO_RAD(160.));
 	convert_Angles_Components(&sys, ANGLE_TO_COMP);
-	convert_etaM_m1m2(&sys, ETAM_TO_M1M2);
+	convert_etaM_m1m2(&sys, FROM_ETAM);
 	injParams[0].mass1 = sys.bh[0].m;
 	injParams[0].mass2 = sys.bh[1].m;
 	injParams[0].spin1x = sys.bh[0].chi[0];
