@@ -227,7 +227,8 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 	sys->F.dec = RANDNK(min->F.dec, max->F.dec);
 	sys->F.pol = RANDNK(min->F.dec, max->F.pol);
 	sys->F.phi = RANDNK(min->F.dec, max->F.phi);
-	sys->F.F[0] = sys->F.F[1] = 1. / 0.;
+	sys->F.F[0] = 0.5 * (1. + SQR(sys->F.phi)) * cos(sys->F.pol) * cos(sys->F.dec) - sys->F.phi * sin(sys->F.pol) * sin(sys->F.dec);
+	sys->F.F[2] = 0.5 * (1. + SQR(sys->F.phi)) * cos(sys->F.pol) * sin(sys->F.dec) - sys->F.phi * sin(sys->F.pol) * cos(sys->F.dec);
 }
 
 void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,

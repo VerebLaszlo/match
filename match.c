@@ -13,13 +13,19 @@ int create_Signal_Struct(signalStruct *s, long size) {
 	short i;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		s->signal[i] = fftw_malloc(s->size * sizeof(double));
+		memset(s->signal[i], 0, s->size * sizeof(double));
 		s->csignal[i] = fftw_malloc(s->size * sizeof(fftw_complex));
+		memset(s->csignal[i], 0, s->size * sizeof(fftw_complex));
 		s->cproduct[i] = fftw_malloc(s->size * sizeof(fftw_complex));
+		memset(s->cproduct[i], 0, s->size * sizeof(fftw_complex));
+		s->length[i] = s->size;
 		s->plan[i] = fftw_plan_dft_r2c_1d(s->size, s->signal[i], s->csignal[i],
 				FFTW_ESTIMATE);
-		s->iplan[i] = fftw_plan_dft_c2r_1d(s->size, s->cproduct[i], s->signal[i],
-				FFTW_ESTIMATE);
+		s->iplan[i] = fftw_plan_dft_c2r_1d(s->size, s->cproduct[i],
+				s->signal[i], FFTW_ESTIMATE);
 	}
+	s->psd = fftw_malloc(s->size * sizeof(double));
+	memset(s->psd, 0, s->size * sizeof(double));
 	return MATCH_SUCCES;
 }
 
@@ -39,8 +45,11 @@ void destroy_Signal_Struct(signalStruct *s) {
 			fftw_destroy_plan(s->plan[i]);
 		}
 		if (s->iplan[i]) {
-			fftw_destroy_plan(s->plan[i]);
+			fftw_destroy_plan(s->iplan[i]);
 		}
+	}
+	if (s->psd) {
+		fftw_free(s->psd);
 	}
 }
 
@@ -89,11 +98,14 @@ void orthogonisate_Self(signalStruct *s, long min, long max) {
 	short i;
 	long j;
 	for (i = 0; i < 2; i++) {
-		prod = inner_Product(s->csignal[2*i], s->csignal[2*i+1], s->psd, min, max);
+		prod = inner_Product(s->csignal[2 * i], s->csignal[2 * i + 1], s->psd,
+				min, max);
 		temp = sqrt(1. - SQR(prod));
-		for (j = 0; j < s->length[2*i]; j++) {
-			s->csignal[2*i+1][j][0] = (s->csignal[2*i+1][j][0] - s->csignal[2*i][j][0] * prod) / temp;
-			s->csignal[2*i+1][j][1] = (s->csignal[2*i+1][j][1] - s->csignal[2*i][j][1] * prod) / temp;
+		for (j = 0; j < s->length[2 * i]; j++) {
+			s->csignal[2 * i + 1][j][0] = (s->csignal[2 * i + 1][j][0]
+					- s->csignal[2 * i][j][0] * prod) / temp;
+			s->csignal[2 * i + 1][j][1] = (s->csignal[2 * i + 1][j][1]
+					- s->csignal[2 * i][j][1] * prod) / temp;
 		}
 	}
 }
@@ -105,13 +117,16 @@ void orthogonisate(signalStruct *out, signalStruct *s, long min, long max) {
 	short i;
 	long j;
 	for (i = 0; i < 2; i++) {
-		out->length[2*i] = s->length[2*i];
-		out->length[2*i+1] = s->length[2*i+1];
-		prod = inner_Product(s->csignal[2*i], s->csignal[2*i+1], s->psd, min, max);
+		out->length[2 * i] = s->length[2 * i];
+		out->length[2 * i + 1] = s->length[2 * i + 1];
+		prod = inner_Product(s->csignal[2 * i], s->csignal[2 * i + 1], s->psd,
+				min, max);
 		temp = sqrt(1. - SQR(prod));
-		for (j = 0; j < s->length[2*i]; j++) {
-			out->csignal[2*i+1][j][0] = (s->csignal[2*i+1][j][0] - s->csignal[2*i][j][0] * prod) / temp;
-			out->csignal[2*i+1][j][1] = (s->csignal[2*i+1][j][1] - s->csignal[2*i][j][1] * prod) / temp;
+		for (j = 0; j < s->length[2 * i]; j++) {
+			out->csignal[2 * i + 1][j][0] = (s->csignal[2 * i + 1][j][0]
+					- s->csignal[2 * i][j][0] * prod) / temp;
+			out->csignal[2 * i + 1][j][1] = (s->csignal[2 * i + 1][j][1]
+					- s->csignal[2 * i][j][1] * prod) / temp;
 		}
 	}
 }
@@ -122,17 +137,22 @@ void orthonormalise_Self(signalStruct *s, long min, long max) {
 	long j;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		prod = inner_Product(s->csignal[i], s->csignal[i], s->psd, min, max);
-		for (j = 0; j < s->length[i]; j++) {
-			s->csignal[i][j][0] /= prod;
-			s->csignal[i][j][1] /= prod;
+		if (prod != 0.) {
+			for (j = 0; j < s->length[i]; j++) {
+				s->csignal[i][j][0] /= prod;
+				s->csignal[i][j][1] /= prod;
+			}
 		}
 	}
 	for (i = 0; i < 2; i++) {
-		prod = inner_Product(s->csignal[2*i], s->csignal[2*i+1], s->psd, min, max);
+		prod = inner_Product(s->csignal[2 * i], s->csignal[2 * i + 1], s->psd,
+				min, max);
 		temp = sqrt(1. - SQR(prod));
-		for (j = 0; j < s->length[2*i]; j++) {
-			s->csignal[2*i+1][j][0] = (s->csignal[2*i+1][j][0] - s->csignal[2*i][j][0] * prod) / temp;
-			s->csignal[2*i+1][j][1] = (s->csignal[2*i+1][j][1] - s->csignal[2*i][j][1] * prod) / temp;
+		for (j = 0; j < s->length[2 * i]; j++) {
+			s->csignal[2 * i + 1][j][0] = (s->csignal[2 * i + 1][j][0]
+					- s->csignal[2 * i][j][0] * prod) / temp;
+			s->csignal[2 * i + 1][j][1] = (s->csignal[2 * i + 1][j][1]
+					- s->csignal[2 * i][j][1] * prod) / temp;
 		}
 	}
 }
@@ -152,18 +172,22 @@ void orthonormalise(signalStruct *out, signalStruct *s, long min, long max) {
 		}
 	}
 	for (i = 0; i < 2; i++) {
-		out->length[2*i] = s->length[2*i];
-		out->length[2*i+1] = s->length[2*i+1];
-		prod = inner_Product(s->csignal[2*i], s->csignal[2*i+1], s->psd, min, max);
+		out->length[2 * i] = s->length[2 * i];
+		out->length[2 * i + 1] = s->length[2 * i + 1];
+		prod = inner_Product(s->csignal[2 * i], s->csignal[2 * i + 1], s->psd,
+				min, max);
 		temp = sqrt(1. - SQR(prod));
-		for (j = 0; j < s->length[2*i]; j++) {
-			out->csignal[2*i+1][j][0] = (s->csignal[2*i+1][j][0] - s->csignal[2*i][j][0] * prod) / temp;
-			out->csignal[2*i+1][j][1] = (s->csignal[2*i+1][j][1] - s->csignal[2*i][j][1] * prod) / temp;
+		for (j = 0; j < s->length[2 * i]; j++) {
+			out->csignal[2 * i + 1][j][0] = (s->csignal[2 * i + 1][j][0]
+					- s->csignal[2 * i][j][0] * prod) / temp;
+			out->csignal[2 * i + 1][j][1] = (s->csignal[2 * i + 1][j][1]
+					- s->csignal[2 * i][j][1] * prod) / temp;
 		}
 	}
 }
 
-void calculate_Constants(double *A, double *B, double *C, signalStruct *s, long min, long max) {
+void calculate_Constants(double *A, double *B, double *C, signalStruct *s,
+		long min, long max) {
 	double pp = inner_Product(s->csignal[0], s->csignal[2], s->psd, min, max);
 	double cc = inner_Product(s->csignal[1], s->csignal[3], s->psd, min, max);
 	double pc = inner_Product(s->csignal[0], s->csignal[3], s->psd, min, max);
@@ -173,50 +197,88 @@ void calculate_Constants(double *A, double *B, double *C, signalStruct *s, long 
 	*C = pp * cp + pc * cc;
 }
 
-double match_Best(signalStruct *s, long min, long max) {
-	double A, B, C, M, max_Match = 0.;
-	long i;
-	for (i = 0; i < s->length[0]; i++) {
-		A = SQR(s->signal[0][i]) + SQR(s->signal[2][i]);
-		B = SQR(s->signal[1][i]) + SQR(s->signal[3][i]);
-		C = s->signal[0][i] * s->signal[2][i] + s->signal[1][i] * s->signal[3][i];
-		M = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
-		max_Match = max_Match > M ? max_Match : M;
-	}
-	return max_Match;
-}
-
-double match_Worst(signalStruct *s, long min, long max) {
-	double A, B, C, M, max_Match = 0.;
-	long i;
-	for (i = 0; i < s->length[0]; i++) {
-		A = SQR(s->signal[0][i]) + SQR(s->signal[2][i]);
-		B = SQR(s->signal[1][i]) + SQR(s->signal[3][i]);
-		C = s->signal[0][i] * s->signal[2][i] + s->signal[1][i] * s->signal[3][i];
-		M = sqrt((A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C)));
-		max_Match = max_Match > M ? max_Match : M;
-	}
-	return max_Match;
-}
-
-void calc_Overlap(double *best, double *worst, signalStruct *s, long min, long max) {
+double match_simple(signalStruct *s, long min, long max) {
 	short i;
+	long j;
+	for (i = 0; i < 2; i++) {
+		for (j = 0; j < s->length[i]; j++) {
+			s->signal[2*i][j] += s->signal[2*i+1][j];
+		}
+		fftw_execute(s->plan[2*i]);
+	}
+	double prod12, prod11, prod22;
+	prod12 = inner_Product(s->csignal[0], s->csignal[2], s->psd, min, max);
+	prod11 = inner_Product(s->csignal[0], s->csignal[0], s->psd, min, max);
+	prod22 = inner_Product(s->csignal[2], s->csignal[2], s->psd, min, max);
+	return prod12 / sqrt(prod11 * prod22);
+}
+
+double match_Best(signalStruct *s) {
+	double A, B, C, M, max_Match = 0.;
+	long i;
+	for (i = 0; i < s->length[0]; i++) {
+		A = SQR(s->signal[0][i]) + SQR(s->signal[2][i]);
+		B = SQR(s->signal[1][i]) + SQR(s->signal[3][i]);
+		C = s->signal[0][i] * s->signal[2][i] + s->signal[1][i]
+				* s->signal[3][i];
+		M = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
+/*		printf("XXXXXXXX "PREC PREC PREC PREC"\n", s->signal[0][i],
+				s->signal[1][i], s->signal[2][i], s->signal[3][i]);
+		fflush(stdout);
+*/
+		break;
+		max_Match = max_Match > M ? max_Match : M;
+	}
+	return max_Match;
+}
+
+double match_Worst(signalStruct *s) {
+	double A, B, C, M, max_Match = 0.;
+	long i;
+	for (i = 0; i < s->length[0]; i++) {
+		A = SQR(s->signal[0][i]) + SQR(s->signal[2][i]);
+		B = SQR(s->signal[1][i]) + SQR(s->signal[3][i]);
+		C = s->signal[0][i] * s->signal[2][i] + s->signal[1][i]
+				* s->signal[3][i];
+		M = sqrt((A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C)));
+		printf("M="PREC "M^2="PREC "="PREC"-("PREC")^2\n", sqrt((A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C))), (A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C)), (A + B) / 2., SQR(A - B) / 4. + SQR(C));
+		max_Match = max_Match > M ? max_Match : M;
+	}
+	return max_Match;
+}
+
+void calc_Overlap(double *best, double *worst, signalStruct *s, long min,
+		long max) {
+	short i;
+	long j;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		fftw_execute(s->plan[i]);
 	}
 	orthonormalise_Self(s, min, max);
-	long j;
+/*	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		for (j = 0; j < 2; j++) {
+			printf("TEST: "PREC PREC PREC PREC PREC PREC"\n", s->signal[i][j],
+					s->signal[i][j], s->csignal[i][j][0], s->csignal[i][j][1], s->cproduct[i][j][0], s->cproduct[i][j][1]);
+		}
+	}*/
+	///< \todo itt rossz
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		for (j = 0; j < s->length[0]; j++) {
-			s->cproduct[i][j][0] = SQR(s->csignal[i/2][j][0]) + SQR(s->csignal[i%2+2][j][1]);
-			s->cproduct[i][j][1] = s->csignal[i/2][j][0] * s->csignal[i%2+2][j][1] + s->csignal[i/2][j][1] * s->csignal[i%2+2][j][0];
+			if (s->psd[j] != 0.) {
+			s->cproduct[i][j][0] = (s->csignal[i / 2][j][0] * s->csignal[i % 2
+					+ 2][j][0] + s->csignal[i / 2][j][1]
+					* s->csignal[i % 2 + 2][j][1]) / s->psd[j];
+			s->cproduct[i][j][1] = (s->csignal[i / 2][j][1] * s->csignal[i % 2
+					+ 2][j][0] - s->csignal[i / 2][j][0]
+					* s->csignal[i % 2 + 2][j][1]) / s->psd[j];
+			}
 		}
 	}
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		fftw_execute(s->iplan[i]);
 	}
-	*best = match_Best(s, min, max);
-	*worst = match_Worst(s, min, max);
+	*best = match_Best(s);
+	*worst = match_Worst(s);
 }
 
 // Old Version Starts

@@ -26,8 +26,8 @@ endif
 LAL_INC=$(shell pkg-config --cflags lalinspiral)
 LAL_LIB=$(shell pkg-config --libs lalinspiral)
 
-test: main_Test.c generator.o util_math.o detector.o
-	${CC} -o test main_Test.c generator.o util_math.o detector.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
+test: main_Test.c generator.o util_math.o detector.o match.o
+	${CC} -o test main_Test.c generator.o util_math.o detector.o match.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
 
 testRun: test
 	${RUN} ./test ${PAR}

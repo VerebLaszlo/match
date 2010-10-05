@@ -12,6 +12,8 @@
 #include "generator.h"
 #include "detector.h"
 
+#define PREC "% -15.9lg "
+
 /**	sonstants for error reporting
  */
 typedef enum {
@@ -109,10 +111,47 @@ void orthonormalise_Self(signalStruct *s, long min, long max);
  */
 void orthonormalise(signalStruct *out, signalStruct *s, long min, long max);
 
-double match_Best(signalStruct *s, long min, long max);
+/** Calculates the simplest overlap.
+ * \f$h_i=h_{i+}F_++h_{i\times}F_\times
+ * @param[in] s   : structure containing the signals
+ * @param[in] min : starting index
+ * @param[in] max : ending index
+ * @return the overlap
+ */
+double match_simple(signalStruct *s, long min, long max);
 
-double match_Worst(signalStruct *s, long min, long max);
+/** Calculates the typical overlap.
+ * @param[in] s   : structure containing the signals
+ * @param[in] min : starting index
+ * @param[in] max : ending index
+ * @return the overlap
+ */
+double match_typical(signalStruct *s, long min, long max);
 
+/**	Calculates the M_best overlap
+ * @param[in] s   : the structure containing the signals
+ * @param[in] min : the starting point
+ * @param[in] max : the ending point
+ * @return the best match
+ */
+double match_Best(signalStruct *s);
+
+/**	Calculates the M_minimax overlap
+ * @param[in] s   : the structure containing the signals
+ * @param[in] min : the starting point
+ * @param[in] max : the ending point
+ * @return the minimax match
+ */
+double match_Worst(signalStruct *s);
+
+/** Calculates the two overlaps.
+ * In the signalStruct structure only the signals must to be given and the length of the signals
+ * @param[out] best  : the M_best overlap
+ * @param[out] worst : the M_minimax overlap
+ * @param[in]  s     : the structure containing the signals
+ * @param[in]  min   : the starting index
+ * @param[in]  max   : the endign index
+ */
 void calc_Overlap(double *best, double *worst, signalStruct *s, long min, long max);
 
 /**	Calculates the constatns needed by the M_best match.
