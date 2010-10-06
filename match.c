@@ -131,30 +131,86 @@ void orthogonisate(signalStruct *out, signalStruct *s, long min, long max) {
 	}
 }
 
-void orthonormalise_Self(signalStruct *s, long min, long max) {
-	double prod, temp;
-	short i;
-	long j;
+void proba(signalStruct *s, long min, long max) {
+	double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS];
+	short i, j;
+	long k;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
-		prod = inner_Product(s->csignal[i], s->csignal[i], s->psd, min, max);
-		if (prod != 0.) {
-			for (j = 0; j < s->length[i]; j++) {
-				s->csignal[i][j][0] /= prod;
-				s->csignal[i][j][1] /= prod;
+		fftw_execute(s->plan[i]);
+	}
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		for (j = 0; j < NUM_OF_SIGNALS; j++) {
+			prod[i][j] = inner_Product(s->csignal[i], s->csignal[j], s->psd,
+					min, max);
+		}
+		if (i == j) {
+			for (k = 0; k < s->length[i]; k++) {
+				s->csignal[i][k][0] /= prod[i][j];
+				s->csignal[i][k][1] /= prod[i][j];
 			}
 		}
 	}
-	for (i = 0; i < 2; i++) {
-		prod = inner_Product(s->csignal[2 * i], s->csignal[2 * i + 1], s->psd,
-				min, max);
-		temp = sqrt(1. - SQR(prod));
-		for (j = 0; j < s->length[2 * i]; j++) {
-			s->csignal[2 * i + 1][j][0] = (s->csignal[2 * i + 1][j][0]
-					- s->csignal[2 * i][j][0] * prod) / temp;
-			s->csignal[2 * i + 1][j][1] = (s->csignal[2 * i + 1][j][1]
-					- s->csignal[2 * i][j][1] * prod) / temp;
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		for (j = 0; j < NUM_OF_SIGNALS; j++) {
+			prod[i][j] = inner_Product(s->csignal[i], s->csignal[j], s->psd,
+					min, max);
 		}
 	}
+	printf("CDCD"PREC"\n", inner_Product(s->csignal[1], s->csignal[0], s->psd,
+			min, max));
+	for (k = 0; k < s->size; k++) {
+		s->csignal[1][k][0] -= s->csignal[0][k][0] * prod[0][1] / prod[0][0];
+		s->csignal[1][k][1] -= s->csignal[0][k][1] * prod[0][1] / prod[0][0];
+	}
+	printf("CDCD"PREC"\n", inner_Product(s->csignal[1], s->csignal[0], s->psd,
+			min, max));
+	fflush(stdout);
+	//	printf("R"PREC PREC"\n", inner_Product(s->csignal[1], s->csignal[0], s->psd, min, max), prod[0][1]);
+}
+
+void orthonormalise_Self(signalStruct *s, long min, long max) {
+	double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS];
+	short i, j;
+	long k;
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		for (j = 0; j < NUM_OF_SIGNALS; j++) {
+			prod[i][j] = inner_Product(s->csignal[i], s->csignal[j], s->psd,
+					min, max);
+		}
+		if (i == j) {
+			for (k = 0; k < s->length[i]; k++) {
+				s->csignal[i][k][0] /= prod[i][j];
+				s->csignal[i][k][1] /= prod[i][j];
+			}
+		}
+	}
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		for (j = 0; j < NUM_OF_SIGNALS; j++) {
+			prod[i][j] = inner_Product(s->csignal[i], s->csignal[j], s->psd,
+					min, max);
+		}
+	}
+	for (i = 0; i < 2; i++) {
+		for (k = 0; k < s->size; k++) {
+			s->csignal[2*i+1][k][0] -= s->csignal[2*i][k][0] * prod[2*i][2*i+1]
+					/ prod[2*i][2*i];
+			s->csignal[2*i+1][k][1] -= s->csignal[2*i][k][1] * prod[2*i][2*i+1]
+					/ prod[2*i][2*i];
+		}
+	}
+	/*
+	 double prod1;
+	 for (i = 0; i < 2; i++) {
+	 prod1 = inner_Product(s->csignal[2 * i], s->csignal[2 * i + 1], s->psd,
+	 min, max);
+	 temp = sqrt(1. - SQR(prod1));
+	 for (j = 0; j < s->length[2 * i]; j++) {
+	 s->csignal[2 * i + 1][j][0] = (s->csignal[2 * i + 1][j][0]
+	 - s->csignal[2 * i][j][0] * prod1) / temp;
+	 s->csignal[2 * i + 1][j][1] = (s->csignal[2 * i + 1][j][1]
+	 - s->csignal[2 * i][j][1] * prod1) / temp;
+	 }
+	 }*/
 }
 
 void orthonormalise(signalStruct *out, signalStruct *s, long min, long max) {
@@ -202,15 +258,105 @@ double match_simple(signalStruct *s, long min, long max) {
 	long j;
 	for (i = 0; i < 2; i++) {
 		for (j = 0; j < s->length[i]; j++) {
-			s->signal[2*i][j] += s->signal[2*i+1][j];
+			s->signal[2 * i][j] += s->signal[2 * i + 1][j];
 		}
-		fftw_execute(s->plan[2*i]);
+		fftw_execute(s->plan[2 * i]);
 	}
 	double prod12, prod11, prod22;
 	prod12 = inner_Product(s->csignal[0], s->csignal[2], s->psd, min, max);
 	prod11 = inner_Product(s->csignal[0], s->csignal[0], s->psd, min, max);
 	prod22 = inner_Product(s->csignal[2], s->csignal[2], s->psd, min, max);
 	return prod12 / sqrt(prod11 * prod22);
+}
+
+double match_typical(signalStruct *s, long min, long max) {
+	short i;
+	long j;
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		fftw_execute(s->plan[i]);
+	}
+	orthonormalise_Self(s, min, max);
+	// number is the signal, the index is the polarisation 0=+, 1=x
+	double prod11, prod22[2], prod12[2];
+	prod11 = inner_Product(s->csignal[0], s->csignal[0], s->psd, min, max);
+	for (i = 0; i < 2; i++) {
+		prod12[i] = inner_Product(s->csignal[0], s->csignal[i + 2], s->psd,
+				min, max);
+		prod22[i] = inner_Product(s->csignal[i + 2], s->csignal[i + 2], s->psd,
+				min, max);
+	}
+	return sqrt(SQR(prod12[0]) / (prod11 * prod22[0]) + SQR(prod12[1])
+			/ (prod11 * prod22[1]));
+	//	return sqrt(SQR(prod12[0]) / (prod11*prod22[0])*SQR(prod12[1]*55) / (prod11*prod22[1]));
+	// átírni innen
+	/*	for (i = 0; i < 2; i++) {
+	 for (j = 0; j < s->length[0]; j++) {
+	 if (s->psd[j] != 0.) {
+	 s->cproduct[i][j][0] = (s->csignal[i / 2][j][0] * s->csignal[i % 2
+	 + 2][j][0] + s->csignal[i / 2][j][1]
+	 * s->csignal[i % 2 + 2][j][1]) / s->psd[j];
+	 s->cproduct[i][j][1] = (s->csignal[i / 2][j][1] * s->csignal[i % 2
+	 + 2][j][0] - s->csignal[i / 2][j][0]
+	 * s->csignal[i % 2 + 2][j][1]) / s->psd[j];
+	 }
+	 }
+	 }
+	 */// átírni eddig
+	/*	double M, Mmax = 0.;
+	 for (i = 0; i < 2; i++) {
+	 fftw_execute(s->iplan[i]);
+	 }
+	 for (j = 0; j < s->length[0]; j++) {
+	 printf("%ld"PREC "^2"PREC"," PREC"^2" PREC"\n", j, s->signal[0][j], SQR(s->signal[0][j]), s->signal[1][j], SQR(s->signal[1][j]));fflush(stdout);
+	 M = sqrt(SQR(s->signal[0][j]) + SQR(s->signal[1][j]));
+	 Mmax = Mmax > M ? Mmax : M;
+	 }
+	 return Mmax;*/
+}
+
+double match_typical_time(signalStruct *s, long min, long max) {
+	short i;
+	long j;
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		fftw_execute(s->plan[i]);
+	}
+	orthonormalise_Self(s, min, max);
+	// number is the signal, the index is the polarisation 0=+, 1=x
+	double prod11, prod22[2], prod12[2];
+	prod11 = inner_Product(s->csignal[0], s->csignal[0], s->psd, min, max);
+	for (i = 0; i < 2; i++) {
+		prod12[i] = inner_Product(s->csignal[0], s->csignal[i + 2], s->psd,
+				min, max);
+		prod22[i] = inner_Product(s->csignal[i + 2], s->csignal[i + 2], s->psd,
+				min, max);
+	}
+	return sqrt(SQR(prod12[0]) / (prod11 * prod22[0]) + SQR(prod12[1])
+			/ (prod11 * prod22[1]));
+	//	return sqrt(SQR(prod12[0]) / (prod11*prod22[0])*SQR(prod12[1]*55) / (prod11*prod22[1]));
+	// átírni innen
+	/*	for (i = 0; i < 2; i++) {
+	 for (j = 0; j < s->length[0]; j++) {
+	 if (s->psd[j] != 0.) {
+	 s->cproduct[i][j][0] = (s->csignal[i / 2][j][0] * s->csignal[i % 2
+	 + 2][j][0] + s->csignal[i / 2][j][1]
+	 * s->csignal[i % 2 + 2][j][1]) / s->psd[j];
+	 s->cproduct[i][j][1] = (s->csignal[i / 2][j][1] * s->csignal[i % 2
+	 + 2][j][0] - s->csignal[i / 2][j][0]
+	 * s->csignal[i % 2 + 2][j][1]) / s->psd[j];
+	 }
+	 }
+	 }
+	 */// átírni eddig
+	/*	double M, Mmax = 0.;
+	 for (i = 0; i < 2; i++) {
+	 fftw_execute(s->iplan[i]);
+	 }
+	 for (j = 0; j < s->length[0]; j++) {
+	 printf("%ld"PREC "^2"PREC"," PREC"^2" PREC"\n", j, s->signal[0][j], SQR(s->signal[0][j]), s->signal[1][j], SQR(s->signal[1][j]));fflush(stdout);
+	 M = sqrt(SQR(s->signal[0][j]) + SQR(s->signal[1][j]));
+	 Mmax = Mmax > M ? Mmax : M;
+	 }
+	 return Mmax;*/
 }
 
 double match_Best(signalStruct *s) {
@@ -222,10 +368,10 @@ double match_Best(signalStruct *s) {
 		C = s->signal[0][i] * s->signal[2][i] + s->signal[1][i]
 				* s->signal[3][i];
 		M = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
-/*		printf("XXXXXXXX "PREC PREC PREC PREC"\n", s->signal[0][i],
-				s->signal[1][i], s->signal[2][i], s->signal[3][i]);
-		fflush(stdout);
-*/
+		/*		printf("XXXXXXXX "PREC PREC PREC PREC"\n", s->signal[0][i],
+		 s->signal[1][i], s->signal[2][i], s->signal[3][i]);
+		 fflush(stdout);
+		 */
 		break;
 		max_Match = max_Match > M ? max_Match : M;
 	}
@@ -241,7 +387,10 @@ double match_Worst(signalStruct *s) {
 		C = s->signal[0][i] * s->signal[2][i] + s->signal[1][i]
 				* s->signal[3][i];
 		M = sqrt((A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C)));
-		printf("M="PREC "M^2="PREC "="PREC"-("PREC")^2\n", sqrt((A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C))), (A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C)), (A + B) / 2., SQR(A - B) / 4. + SQR(C));
+		printf("M="PREC "M^2="PREC "="PREC"-("PREC")^2\n", sqrt((A + B) / 2.
+				- sqrt(SQR(A - B) / 4. + SQR(C))), (A + B) / 2. - sqrt(
+				SQR(A - B) / 4. + SQR(C)), (A + B) / 2., SQR(A - B) / 4.
+				+ SQR(C));
 		max_Match = max_Match > M ? max_Match : M;
 	}
 	return max_Match;
@@ -255,22 +404,22 @@ void calc_Overlap(double *best, double *worst, signalStruct *s, long min,
 		fftw_execute(s->plan[i]);
 	}
 	orthonormalise_Self(s, min, max);
-/*	for (i = 0; i < NUM_OF_SIGNALS; i++) {
-		for (j = 0; j < 2; j++) {
-			printf("TEST: "PREC PREC PREC PREC PREC PREC"\n", s->signal[i][j],
-					s->signal[i][j], s->csignal[i][j][0], s->csignal[i][j][1], s->cproduct[i][j][0], s->cproduct[i][j][1]);
-		}
-	}*/
+	/*	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+	 for (j = 0; j < 2; j++) {
+	 printf("TEST: "PREC PREC PREC PREC PREC PREC"\n", s->signal[i][j],
+	 s->signal[i][j], s->csignal[i][j][0], s->csignal[i][j][1], s->cproduct[i][j][0], s->cproduct[i][j][1]);
+	 }
+	 }*/
 	///< \todo itt rossz
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		for (j = 0; j < s->length[0]; j++) {
 			if (s->psd[j] != 0.) {
-			s->cproduct[i][j][0] = (s->csignal[i / 2][j][0] * s->csignal[i % 2
-					+ 2][j][0] + s->csignal[i / 2][j][1]
-					* s->csignal[i % 2 + 2][j][1]) / s->psd[j];
-			s->cproduct[i][j][1] = (s->csignal[i / 2][j][1] * s->csignal[i % 2
-					+ 2][j][0] - s->csignal[i / 2][j][0]
-					* s->csignal[i % 2 + 2][j][1]) / s->psd[j];
+				s->cproduct[i][j][0] = (s->csignal[i / 2][j][0] * s->csignal[i
+						% 2 + 2][j][0] + s->csignal[i / 2][j][1] * s->csignal[i
+						% 2 + 2][j][1]) / s->psd[j];
+				s->cproduct[i][j][1] = (s->csignal[i / 2][j][1] * s->csignal[i
+						% 2 + 2][j][0] - s->csignal[i / 2][j][0] * s->csignal[i
+						% 2 + 2][j][1]) / s->psd[j];
 			}
 		}
 	}
@@ -322,6 +471,7 @@ void blackman(double array[], long length, double wn[]) {
 
 double* psd(double n[], long length, double dt, void(*winf)(double array[],
 		long length, double wn[])) {
+	winf(n, 0, n);
 	double * wn = fftw_malloc(length * sizeof(double));
 	fftw_complex *cn = fftw_malloc(length * sizeof(fftw_complex));
 	fftw_plan pn = fftw_plan_dft_r2c_1d(length, wn, cn, FFTW_ESTIMATE);

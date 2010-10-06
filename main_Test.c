@@ -106,7 +106,7 @@ int calc_Match(long length) {
 															= 1000.;
 	check_Borders(&min, &max);
 	min.M = 20.;
-	double hp, hc, cphi, sphi, cshift, sshift;
+	double hp[2], hc[2], cphi[2], sphi[2], cshift, sshift;
 	long i;
 	unsigned long k;
 	short j;
@@ -159,7 +159,7 @@ int calc_Match(long length) {
 		//injParams[1].mass1 = 2. * injParams[0].mass1;	// valami problémát okoz
 		///***   PROBA   ***///
 		LALSnprintf(injParams[0].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SS");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinTaylor"PN);
 		LALSnprintf(injParams[1].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinTaylor"PN);
 		memset(&status, 0, sizeof(LALStatus));
@@ -193,17 +193,30 @@ int calc_Match(long length) {
 			for (k = 0; k < waveform[j].f->data->length; k++) {
 				cshift = cos(waveform[j].shift->data->data[k]);
 				sshift = sin(waveform[j].shift->data->data[k]);
-				cphi = cos(waveform[j].phi->data->data[k]
+				cphi[0] = cos(waveform[j].phi->data->data[k]
 						- waveform[j].phi->data->data[0]);
-				sphi = sin(waveform[j].phi->data->data[k]
+				cphi[1] = cos(waveform[j].phi->data->data[k]
+						- waveform[j].phi->data->data[0] + M_PI / 2);
+				sphi[0] = sin(waveform[j].phi->data->data[k]
 						- waveform[j].phi->data->data[0]);
-				hp = waveform[j].a->data->data[2 * k] * cshift * cphi
-						- waveform[j].a->data->data[2 * k + 1] * sshift * sphi;
-				hc = waveform[j].a->data->data[2 * k] * sshift * cphi
-						+ waveform[j].a->data->data[2 * k + 1] * cshift * sphi;
-				act[i].F.F[0] = act[i].F.F[1] = sqrt(2.) / 2.;
-				signal.signal[2 * j][k] = act[i].F.F[0] * hp;
-				signal.signal[2 * j + 1][k] = act[i].F.F[1] * hc;
+				sphi[1] = sin(waveform[j].phi->data->data[k]
+						- waveform[j].phi->data->data[0] + M_PI / 2);
+				hp[0] = waveform[j].a->data->data[2 * k] * cshift * cphi[0]
+						- waveform[j].a->data->data[2 * k + 1] * sshift * sphi[0];
+				hp[1] = waveform[j].a->data->data[2 * k] * cshift * cphi[1]
+						- waveform[j].a->data->data[2 * k + 1] * sshift * sphi[1];
+				hc[0] = waveform[j].a->data->data[2 * k] * sshift * cphi[0]
+						+ waveform[j].a->data->data[2 * k + 1] * cshift * sphi[0];
+				hc[1] = waveform[j].a->data->data[2 * k] * sshift * cphi[1]
+						+ waveform[j].a->data->data[2 * k + 1] * cshift * sphi[1];
+//				act[i].F.F[0] = act[i].F.F[1] = sqrt(2.) / 2.;
+				//signal.signal[2 * j][k] = act[i].F.F[0] * hp[0];
+				//signal.signal[2 * j + 1][k] = act[i].F.F[1] * hc[0];
+				signal.signal[2 * j][k] = act[i].F.F[0] * hp[0] + act[i].F.F[1] * hc[0];
+				signal.signal[2 * j + 1][k] = act[i].F.F[0] * hp[1] + act[i].F.F[1] * hc[1];
+				/*if (k < 3) {
+					printf(PREC PREC"\n", signal.signal[2*j][k], signal.signal[3*j+1][k]);fflush(stdout);
+				}*/
 			}
 		}
 		double freq_Max = (injParams[0].f_final + injParams[1].f_final) / 2.;
@@ -218,7 +231,10 @@ int calc_Match(long length) {
 			fr += freq_Step;
 			maxfr++;
 		}
-		printf(PREC"\n", match_simple(&signal, minfr, maxfr));fflush(stdout);
+//		proba(&signal, minfr, maxfr);
+		double xxx = match_typical(&signal, minfr, maxfr);
+		printf(PREC"\n", xxx);fflush(stdout);
+//		printf(PREC"\n", match_simple(&signal, minfr, maxfr));fflush(stdout);
 //		calc_Overlap(&best, &worst, &signal, minfr, maxfr);
 //		printf(PREC PREC"\n", best, worst);
 		destroy_Signal_Struct(&signal);

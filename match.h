@@ -119,6 +119,7 @@ void orthonormalise(signalStruct *out, signalStruct *s, long min, long max);
  * @return the overlap
  */
 double match_simple(signalStruct *s, long min, long max);
+void proba(signalStruct *s, long min, long max);
 
 /** Calculates the typical overlap.
  * @param[in] s   : structure containing the signals
@@ -127,6 +128,7 @@ double match_simple(signalStruct *s, long min, long max);
  * @return the overlap
  */
 double match_typical(signalStruct *s, long min, long max);
+double match_typical_time(signalStruct *s, long min, long max);
 
 /**	Calculates the M_best overlap
  * @param[in] s   : the structure containing the signals
