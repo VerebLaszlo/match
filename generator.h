@@ -8,7 +8,10 @@
 #define GENERATOR_H
 
 #include <float.h>
+#include <stdio.h>
 #include "util_math.h"
+
+#define PREC "% -15.9lg "
 
 typedef struct {
 	double m; ///< mass in \f$M_\odot\f$
@@ -50,6 +53,8 @@ typedef enum {
 	ETACHRIP = 1,
 	M1M2 = 2
 } conversion_Mode;
+
+void print_Binary_System(binary_System *sys, FILE *stream);
 
 void convert_Angles_Components(binary_System *sys, conversion_Mode mode);
 

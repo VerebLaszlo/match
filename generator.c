@@ -7,6 +7,13 @@
 #include "generator.h"
 #include <stdio.h>
 
+void print_Binary_System(binary_System *sys, FILE *stream) {
+	fprintf(stream, "M_C="PREC"M="PREC" eta="PREC" m_1="PREC" m_2="PREC, sys->chirpM, sys->M, sys->eta, sys->bh[0].m, sys->bh[1].m);
+	fprintf(stream, "chi_1="PREC" phi_1="PREC" theta_1="PREC" chi_2="PREC" phi_2="PREC" theta_2="PREC, sys->bh[0].chi_Amp, sys->bh[0].phi, sys->bh[0].cth, sys->bh[1].chi_Amp, sys->bh[1].phi, sys->bh[1].cth);
+	fprintf(stream, "x_1="PREC" y_1="PREC" z_1="PREC" x_2="PREC" y_2="PREC" z_2="PREC, sys->bh[0].chi[0], sys->bh[0].chi[1], sys->bh[0].chi[2], sys->bh[1].chi[0], sys->bh[1].chi[1], sys->bh[1].chi[2]);
+	fprintf(stream, "d_L="PREC" i="PREC" dec="PREC" pol="PREC" phi="PREC" F_+="PREC" F_x="PREC"\n", sys->dist, sys->incl, sys->F.dec, sys->F.pol, sys->F.phi, sys->F.F[0], sys->F.F[1]);
+}
+
 void convert_Angles_Components(binary_System *sys, conversion_Mode mode) {
 	switch (mode) {
 		case ANGLE_TO_COMP:
@@ -28,14 +35,14 @@ void convert_Angles_Components(binary_System *sys, conversion_Mode mode) {
 			sys->bh[0].chi_Amp = sqrt(SQR(sys->bh[0].chi[0])
 					+ SQR(sys->bh[0].chi[1]) + SQR(sys->bh[0].chi[2]));
 			sys->bh[0].cth = sys->bh[0].chi[2] / sys->bh[0].chi_Amp;
-			sys->bh[0].phi = sys->bh[0].chi[1] / sys->bh[0].chi_Amp / sqrt(1.
-					- SQR(sys->bh[0].cth));
+			sys->bh[0].phi = asin(sys->bh[0].chi[1] / sys->bh[0].chi_Amp / sqrt(1.
+					- SQR(sys->bh[0].cth)));
 			// second spin
 			sys->bh[1].chi_Amp = sqrt(SQR(sys->bh[1].chi[0])
 					+ SQR(sys->bh[1].chi[1]) + SQR(sys->bh[1].chi[2]));
 			sys->bh[1].cth = sys->bh[1].chi[2] / sys->bh[1].chi_Amp;
-			sys->bh[1].phi = sys->bh[1].chi[1] / sys->bh[1].chi_Amp / sqrt(1.
-					- SQR(sys->bh[1].cth));
+			sys->bh[1].phi = asin(sys->bh[1].chi[1] / sys->bh[1].chi_Amp / sqrt(1.
+					- SQR(sys->bh[1].cth)));
 			break;
 	}
 }
@@ -71,7 +78,7 @@ binary_System lower =
 				{ 0., 0., 0. } }, // BH1
 				{ 0., -1., 0., 0.,
 					{ 0., 0., 0. } } // BH2
-		}, 6., -1000., 0., DBL_MIN, 1.,
+		}, 4., -1000., 0., DBL_MIN, 1.,
 		{ 0., 0., 0.,
 			{ 0., 0. } } };
 binary_System upper =
@@ -81,7 +88,7 @@ binary_System upper =
 				{ 1., 1., 1. } }, // BH1
 				{ 40., 1., 2. * M_PI, 1.,
 					{ 1., 1., 1. } }//BH2
-		}, 60., 1000., 0.25, 2. * M_PI, 10.,
+		}, 87., 1000., 0.25, 2. * M_PI, 10.,
 		{ M_PI, M_PI, 2. * M_PI,
 			{ 0., 0. } } };
 

@@ -114,12 +114,45 @@ void calc_Response(double D[3][3], double dec, double phi, double pol,
 	}
 }
 
-void calc_Response_For_Detector(detector det, double dec, double phi,
+double GMST(double GPSsec)
+/* Derives the `Greenwich Mean Sidereal Time' (in radians!) */
+/* from GPS time (in seconds).                              */
+/* (see K.R.Lang(1999): Astrophysical formulae, p.80 sqq.)  */
+{
+	/* double Julian_Jan1st2000midnight = 2451544.5; */
+	/* double Julian_Jan1st2000noon     = 2451545.0; */
+	double GPS_Jan1st2000midnight = 630720013.0;
+	double leapseconds = 32.0; /* at Jan 1st 2000 */
+	double seconds, days, centuries, secCurrentDay, result;
+	if (GPSsec > (GPS_Jan1st2000midnight + 189388800.0))
+		leapseconds += 1.0; /* one more leapsecond after 2005/'06 */
+	if (GPSsec > 914803214.0)
+		leapseconds += 1.0; /* Leap second after 2008/'09 */
+	if (GPSsec < GPS_Jan1st2000midnight) {
+		printf(" : WARNING: GMST's before 1.1.2000 may be inaccurate! \n");
+		printf(" :          (requested: GMST(GPS=%.3fs))\n", GPSsec);
+	}
+	/* time since Jan 1st 2000 (0:00h) */
+	seconds = (GPSsec - GPS_Jan1st2000midnight) + (leapseconds - 32.0);
+	days = floor(seconds / (24.0 * 60.0 * 60.0)) - 0.5;
+	secCurrentDay = fmod(seconds, 24.0 * 60.0 * 60.0);
+	centuries = days / 36525.0;
+	result = 24110.54841 + (centuries * (8640184.812866 + centuries * (0.093104
+			+ centuries * 6.2e-6)));
+	result += secCurrentDay * 1.002737909350795; /* (UTC day is 1.002 * MST day) */
+	result = fmod(result / (24.0 * 60.0 * 60.0), 1.0);
+	result *= 2.0 * M_PI;
+	return result;
+}
+
+void calc_Response_For_Detector(detector det, double dec, double alpha,
 		double pol, double *fp, double *fc) {
 	double rm[3][3];
 	detector_table dettable;
-
+	double gmst = GMST(968654557.950);
+	double phi = alpha - gmst;
 	dettable = GetDetectorTable(det);
 	calc_Response_Matrix(dettable.nx, dettable.ny, rm);
 	calc_Response(rm, dec, phi, pol, fp, fc);
 }
+
