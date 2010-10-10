@@ -34,6 +34,10 @@ int SQT_diff_ST(long length);
 int measure_Time(long length);
 
 int main(int argc, char *argv[]) {
+    if (argc!=2) {
+        printf("Not enough parameter.\n");
+        return -1;
+    }
 	calc_Match(atol(argv[1]));
 	//measure_Time(atol(argv[1]));
 	//SQT_diff_ST(atol(argv[1]));
