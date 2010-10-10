@@ -4,6 +4,7 @@
  * @brief
  */
 
+#define restrict __restrict__
 #include "generator.h"
 #include "match.h"
 #include "detector.h"
