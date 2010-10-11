@@ -56,11 +56,19 @@ double inner_Product(fftw_complex left[], fftw_complex right[], double norm[],
 void product(fftw_complex out[], fftw_complex left[], fftw_complex right[],
 		double norm[], long minfr, long maxfr) {
 	long i;
-	for (i = minfr + 1; i < maxfr; i++) {
-		out[i][0] = (left[i][0] * right[i][0] + left[i][1] * right[i][1])
-				/ norm[i];
-		out[i][1] = (left[i][1] * right[i][0] - left[i][0] * right[i][1])
-				/ norm[i];
+	for (i = minfr; i < maxfr; i++) {
+		if (norm[i] != 0.) {
+			out[i][0] = 4. * (left[i][0] * right[i][0] + left[i][1]
+					* right[i][1]) / norm[i];
+			out[i][1] = 4. * (left[i][1] * right[i][0] - left[i][0]
+					* right[i][1]) / norm[i];
+		} else {
+			out[i][0] = out[i][1] = 0.;
+			out[i][0] = 4. * (left[i][0] * right[i][0] + left[i][1]
+					* right[i][1]);
+			out[i][1] = 4. * (left[i][1] * right[i][0] - left[i][0]
+					* right[i][1]);
+		}
 	}
 }
 
@@ -246,22 +254,19 @@ double match_Typical(signalStruct *in, long minfr, long maxfr,
 		fftw_plan iplan;
 		for (i = 0; i < 2; i++) {
 			//memset(new, 0, in->size *sizeof(fftw_complex));
-			iplan = fftw_plan_dft_c2r_1d(in->size, new, in->signal[2 * i],
+			iplan = fftw_plan_dft_c2r_1d(in->size, new, in->signal[i + 2],
 					FFTW_ESTIMATE);
-			product(new, in->csignal[2 * i], in->csignal[2 * i + 1], in->psd,
-					minfr, maxfr);
+			product(new, in->csignal[H1P], in->csignal[i + 2], in->psd, 0,
+					in->size);
 			fftw_execute(iplan);
 			fftw_destroy_plan(iplan);
 		}
 		fftw_free(new);
-		double norm = 4. * sqrt(sqrt(prod[H1P][H1P] * prod[H2P][H2P]
-				* prod[H1C][H1C] * prod[H2C][H2C])); ///< \verify miért jó így????
-		norm = 4. * sqrt(sqrt(prod[H1P][H1P] * prod[H2P][H2P] * prod[H1C][H1C]
-				* prod[H2C][H2C])); ///< \verify miért jó így????
 		for (k = 0; k < in->size; k++) {
-			M = sqrt(SQR(in->signal[0][k]) / (prod[H1P][H1P] * prod[H1C][H1C])
-					+ SQR(in->signal[2][k]) / (prod[H2P][H2P]
-							* prod[H2C][H2C])) / 4.;
+			M = sqrt(SQR(in->signal[H2P][k]) / prod[H2P][H2P]
+					+ SQR(in->signal[H2C][k]) / prod[H2C][H2C]);
+			//printf(PREC PREC"\n", SQR(in->signal[H2P][k]) / prod[H2P][H2P] / prod[H1P][H1P], SQR(in->signal[H2C][k]) / prod[H2C][H2C] / prod[H1P][H1P]);fflush(stdout);
+			M /= sqrt(4. * prod[H1P][H1P]);
 			Mmax = Mmax > M ? Mmax : M;
 		}
 		return Mmax;
@@ -347,6 +352,11 @@ double match_Best(signalStruct *in, double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS])
 		//		printf(PREC PREC PREC"\n", (A+B)/2., SQR(A-B)/4., SQR(C));fflush(stdout);
 		//		printf(PREC PREC"\n", (A+B)/2., sqrt(SQR(A-B)/4.+ SQR(C)));fflush(stdout);
 		M = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
+		/*if (M > 1.9) {
+			printf(PREC PREC PREC PREC"\n", (A + B) / 2., SQR(A - B) / 4.,
+					SQR(C), M);
+			fflush(stdout);
+		}*/
 		//		printf("0 = "PREC", "PREC" = "PREC", M = "PREC"\n", C, A, B, M);
 		fflush(stdout);
 		//		printf(PREC PREC PREC PREC"\n", A, B, C, M);fflush(stdout);
@@ -375,7 +385,7 @@ double match_Worst(signalStruct *in,
 		 - sqrt(SQR(A - B) / 4. + SQR(C))), (A + B) / 2. - sqrt(
 		 SQR(A - B) / 4. + SQR(C)), (A + B) / 2., SQR(A - B) / 4.
 		 + SQR(C));*/
-		maxfr_Match = maxfr_Match < M ? maxfr_Match : M;
+		maxfr_Match = maxfr_Match > M ? maxfr_Match : M;
 	}
 	return maxfr_Match;
 }

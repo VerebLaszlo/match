@@ -162,8 +162,10 @@ int calc_Match(long length) {
 		///***   PROBA   ***///
 		LALSnprintf(injParams[0].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SS");
+				//LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SELF");
 		LALSnprintf(injParams[1].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SS");
+				//LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SELF");
 		memset(&status, 0, sizeof(LALStatus));
 		memset(&waveform[0], 0, sizeof(CoherentGW));
 		LALGenerateInspiral(&status, &waveform[0], &injParams[0], &ppnParams);
@@ -223,10 +225,13 @@ int calc_Match(long length) {
 				//				signal.signal[2 * j][k] = act.F.F[0] * hp[0];
 				//				signal.signal[2 * j + 1][k] = act.F.F[1] * hc[0];
 				typ2.signal[2 * j][k] = typ1.signal[2 * j][k] = simp.signal[2 * j][k] = signal.signal[2
-						* j][k] = act.F.F[0] * hp[0] + act.F.F[1] * hc[0];
+						* j][k] =
+								//act.F.F[0] * hp[0] + act.F.F[1] * hc[0];
+								act.F.F[0] * hp[0];
 				typ2.signal[2 * j + 1][k] = typ1.signal[2 * j + 1][k] = simp.signal[2 * j + 1][k]
-						= signal.signal[2 * j + 1][k] = act.F.F[0] * hp[1]
-								+ act.F.F[1] * hc[1];
+						= signal.signal[2 * j + 1][k] =
+								//act.F.F[0] * hp[1] + act.F.F[1] * hc[1];
+								act.F.F[1] * hc[0];
 				/*if (k > randIn.psd.length  - 2) {
 				 printf(PREC PREC"\n", signal.signal[2*j][k], signal.signal[3*j+1][k]);fflush(stdout);
 				 }*/
@@ -251,8 +256,8 @@ int calc_Match(long length) {
 		printf("TypT = "PREC"\n", match_Typical(&typ2, minfr, maxfr, TIME));fflush(stdout);
 		calc_Overlap(&best, &worst, &signal, minfr, maxfr);
 		printf("Best = "PREC"\nWorst = "PREC"\n", best, worst);
-//		calc_Overlap_Time(&bestT, &worstT, &signal, minfr, maxfr);
-//		printf("BestT = "PREC"\nWorstT = "PREC"\n", bestT, worstT);
+		calc_Overlap_Time(&bestT, &worstT, &simp, minfr, maxfr);
+		printf("BestT = "PREC"\nWorstT = "PREC"\n", bestT / 2., worstT / 2.);
 		destroy_Signal_Struct(&simp);
 		destroy_Signal_Struct(&typ1);
 		destroy_Signal_Struct(&typ2);
@@ -580,9 +585,9 @@ int generate(long length) {
 		injParams[0].coa_phase = M_PI / 2.;
 		injParams[1].coa_phase = 0.;
 		LALSnprintf(injParams[0].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"NO");
 		LALSnprintf(injParams[1].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"NO");
 		memset(&status, 0, sizeof(LALStatus));
 		memset(&waveform[0], 0, sizeof(CoherentGW));
 		LALGenerateInspiral(&status, &waveform[0], &injParams[0], &ppnParams);
