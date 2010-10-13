@@ -4,6 +4,7 @@
  * @brief
  */
 
+#define restrict __restrict__
 #include "generator.h"
 #include "match.h"
 #include "detector.h"
@@ -33,8 +34,10 @@ int SQT_diff_ST(long length);
 int measure_Time(long length);
 
 int main(int argc, char *argv[]) {
-	int x = argc;
-	x = argc;
+    if (argc!=2) {
+        printf("Not enough parameter.\n");
+        return -1;
+    }
 	calc_Match(atol(argv[1]));
 	//measure_Time(atol(argv[1]));
 	//SQT_diff_ST(atol(argv[1]));
@@ -163,7 +166,7 @@ int calc_Match(long length) {
 		//injParams[1].mass1 = 2. * injParams[0].mass1;	// valami problémát okoz
 		///***   PROBA   ***///
 		LALSnprintf(injParams[0].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SS");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");
 		//LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SELF");
 		LALSnprintf(injParams[1].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");

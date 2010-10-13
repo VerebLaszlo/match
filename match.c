@@ -283,6 +283,7 @@ void calc_Overlap(double *best, double *worst, signalStruct *in, long minfr,
 			prod[i][j] = inner_Product(in->csignal[i], in->csignal[j], in->psd,
 					minfr, maxfr);
 		}
+	}
 	double A = SQR(prod[H1P][H2P]) + SQR(prod[H1P][H2C]);
 	double B = SQR(prod[H1C][H2P]) + SQR(prod[H1C][H2C]);
 	double C = (prod[H1P][H2P] * prod[H1C][H2P] + prod[H1P][H2C]
