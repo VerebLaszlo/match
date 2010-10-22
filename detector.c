@@ -145,14 +145,4 @@ double GMST(double GPSsec)
 	return result;
 }
 
-void calc_Response_For_Detector(detector det, double dec, double alpha,
-		double pol, double *fp, double *fc) {
-	double rm[3][3];
-	detector_table dettable;
-	double gmst = GMST(968654557.950);
-	double phi = alpha - gmst;
-	dettable = GetDetectorTable(det);
-	calc_Response_Matrix(dettable.nx, dettable.ny, rm);
-	calc_Response(rm, dec, phi, pol, fp, fc);
-}
 

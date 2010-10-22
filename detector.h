@@ -54,16 +54,6 @@ void calc_Response_Matrix(const double nx[3], const double ny[3], double rm[3][3
  */
 void calc_Response(double D[3][3], double dec, double phi, double pol, double *fp, double *fc);
 
-/**
- *		The function calulates the given detectors response-function. Currentli supports only three.
- *	\bug	Még be kell fejezni a többi detektorra
- * @param[in]	det	: the detectors ID from the enumeration, (LL : Livingston, LH : Hanford, VIRGO: Virgo)
- * @param[in]	dec	: the declination of the source
- * @param[in]	phi	: \todo ez mi
- * @param[in]	pol	: the sources polarization angle
- * @param[out] fp	: F+
- * @param[out] fc	: Fx
- */
-void calc_Response_For_Detector(detector det, double dec, double phi, double pol, double *fp, double *fc);
+double GMST(double GPSsec);
 
 #endif /* DETECTOR_H_ */

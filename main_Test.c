@@ -23,6 +23,9 @@ int lalDebugLevel = 0; ///< the debug level
 #define PREC2 "% -15.9lg| "
 
 #define DIR "test_Dir/"
+
+void print_Params_To_Waveform(FILE *stream, binary_System sys);
+
 int test(void);
 
 int generate(long length);
@@ -33,17 +36,29 @@ int SQT_diff_ST(long length);
 
 int measure_Time(long length);
 
+double calc_Periods(long *per1, long *per2, signalStruct *signal);
+
 int main(int argc, char *argv[]) {
-    if (argc!=2) {
-        printf("Not enough parameter.\n");
-        return -1;
-    }
-	calc_Match(atol(argv[1]));
+	if (argc != 2) {
+		printf("Not enough parameter.\n");
+		return -1;
+	}
+	//calc_Match(atol(argv[1]));
 	//measure_Time(atol(argv[1]));
 	//SQT_diff_ST(atol(argv[1]));
-	//generate(atoi(argv[1]));
+	generate(atoi(argv[1]));
 	puts("Done.");
 	return 0;
+}
+
+void print_Params_To_Waveform(FILE *stream, binary_System sys) {
+	fprintf(stream,"#................M_Chirp,M,eta,m1,m2: "PREC PREC PREC PREC PREC"\n");
+	fprintf(stream,"#....chi1,theta1,varphi1,kappa1,psi1: "PREC PREC PREC PREC PREC"\n");
+	fprintf(stream,"#....chi2,theta2,varphi2,kappa2,psi2: "PREC PREC PREC PREC PREC"\n");
+	fprintf(stream,"#...........incl,d_L,f_L,f_F,t_S,t_L: "PREC PREC PREC PREC PREC PREC"\n");
+	fprintf(stream,"#chi1x,chi1y,chi1z,chi2x,chi2y,chi2z: "PREC PREC PREC PREC PREC PREC"\n");
+	fprintf(stream,"#...typ,typT,best,worst,bestT,worstT: "PREC PREC PREC PREC PREC PREC"\n");
+	fflush(stream);
 }
 
 void destroySTWave(CoherentGW waveform) {
@@ -69,6 +84,8 @@ void destroySTWave(CoherentGW waveform) {
 #define PN "threePointFivePN"
 
 int calc_Match(long length) {
+	char file_Name[50];
+	FILE *file;
 	static LALStatus status;
 	CoherentGW waveform[2];
 	SimInspiralTable injParams[2];
@@ -77,99 +94,46 @@ int calc_Match(long length) {
 	binary_System min, max;
 	signalStruct signal, typ1, typ2, simp;
 	static RandomInspiralSignalIn randIn;
-	double best, worst, bestT, worstT;
-	//// double t[length + 1];
-	//// double t_I = time();
-	/*FILE *file_Gen = fopen(DIR"params.data", "w");
-	 fprintf(file_Gen, "#%-14s| %-15s| %-15s| %-15s| ", "M", "eta", "m_1", "m_2");
-	 fprintf(file_Gen, "%-15s| %-15s| %-15s| %-15s| %-15s| %-15s| ", "chi_1",
-	 "cth_1", "phi_1", "chi_1x", "chi_1y", "chi_1z");
-	 fprintf(file_Gen, "%-15s| %-15s| %-15s| %-15s| %-15s| %-15s| ", "chi_2",
-	 "cth_2", "phi_2", "chi_2x", "chi_2y", "chi_2z");
-	 fprintf(file_Gen, "%-15s| %-15s| %-15s| %-15s| %-15s|\n", "dist", "incs",
-	 "dec", "pol", "phi");*/
-	//	fclose(file_Gen);
-	//	FILE *file_Out;
-	//	char file_Out_Name[50];
+	double t, tt, best, worst, bestT, worstT;
 	memset(&injParams, 0, 2 * sizeof(SimInspiralTable));
 	memset(&ppnParams, 0, sizeof(PPNParamStruc));
-	min.bh[0].m = min.bh[1].m = min.bh[0].cth = min.bh[1].cth = min.bh[0].phi
-			= min.bh[1].phi = min.bh[0].chi_Amp = min.bh[1].chi_Amp
-					= min.bh[0].chi[0] = min.bh[0].chi[1] = min.bh[0].chi[2]
-							= min.bh[1].chi[0] = min.bh[1].chi[1]
-									= min.bh[1].chi[2] = min.M = min.eta
-											= min.incl = min.dist = min.F.dec
-													= min.F.pol = min.F.phi
-															= -1000.;
-	max.bh[0].m = max.bh[1].m = max.bh[0].cth = max.bh[1].cth = max.bh[0].phi
-			= max.bh[1].phi = max.bh[0].chi_Amp = max.bh[1].chi_Amp
-					= max.bh[0].chi[0] = max.bh[0].chi[1] = max.bh[0].chi[2]
-							= max.bh[1].chi[0] = max.bh[1].chi[1]
-									= max.bh[1].chi[2] = max.M = max.eta
-											= max.incl = max.dist = max.F.dec
-													= max.F.pol = max.F.phi
-															= 1000.;
-	check_Borders(&min, &max);
-
+	init_Binary_System(&min, &max);
+	min.bh[0].m = max.bh[0].m = 34.0;
+	min.bh[1].m = max.bh[1].m = 3.4;
+	convert_Masses(&min, FROM_M1M2);
+	convert_Masses(&max, FROM_M1M2);
+	srand(10);
 	double hp, hc, cphi, sphi, cshift, sshift;
 	long i;
-	unsigned long k;
-	unsigned short j;
-	//// t[0] = time() - t_I;
+	long k;
+	short j;
 	for (i = 0; i < length; i++) {
-		printf("%ld %ld\n", length, i);
-		gen_Parameters(&act, &min, &max, ETAM);
-		calc_Response_For_Detector(LH, act.F.dec, act.F.phi, act.F.pol,
-				&act.F.F[0], &act.F.F[1]);
-		//		file_Gen = fopen(DIR"params.data", "a");
-		/*		fprintf(file_Gen, PREC2 PREC2 PREC2 PREC2, act.M, act.eta,
-		 act.bh[0].m, act.bh[1].m);
-		 fflush(file_Gen);
-		 fprintf(file_Gen, PREC2 PREC2 PREC2, act.bh[0].chi_Amp,
-		 act.bh[0].cth, act.bh[0].phi);
-		 fflush(file_Gen);
-		 fprintf(file_Gen, PREC2 PREC2 PREC2, act.bh[0].chi[0],
-		 act.bh[0].chi[1], act.bh[0].chi[2]);
-		 fflush(file_Gen);
-		 fprintf(file_Gen, PREC2 PREC2 PREC2, act.bh[1].chi_Amp,
-		 act.bh[1].cth, act.bh[1].phi);
-		 fflush(file_Gen);
-		 fprintf(file_Gen, PREC2 PREC2 PREC2, act.bh[1].chi[0],
-		 act.bh[1].chi[1], act.bh[1].chi[2]);
-		 fflush(file_Gen);
-		 fprintf(file_Gen, PREC2 PREC2 PREC2 PREC2 PREC2, act.dist,
-		 act.incl, act.F.dec, act.F.pol, act.F.phi);
-		 fflush(file_Gen);
-		 fprintf(file_Gen, "\n");
-		 fflush(file_Gen);*/
-		//		fclose(file_Gen);
-		injParams[0].mass1 = act.bh[0].m = 34.;
-		injParams[0].mass2 = act.bh[1].m = 3.4;
-		injParams[0].spin1x = act.bh[0].chi[0];// = 0.0790765695;
-		injParams[0].spin1y = act.bh[0].chi[1];// = 0.1589679868;
-		injParams[0].spin1z = act.bh[0].chi[2];// = 0.9820794649;
-		injParams[0].spin2x = act.bh[1].chi[0];// = 0.118388124;
-		injParams[0].spin2y = act.bh[1].chi[1];// = -0.1715059157;
-		injParams[0].spin2z = act.bh[1].chi[2];// = 0.9759989616;
+		printf("%ld %ld\n", length, i + 1);
+		gen_Parameters(&act, &min, &max, ETAM, THETA_VPHI);
+		injParams[0].mass1 = act.bh[0].m;
+		injParams[0].mass2 = act.bh[1].m;
+		injParams[0].spin1x = act.bh[0].chi[0];// = 0.;//998 * sin(1.43);// = 0.0790765695;
+		injParams[0].spin1y = act.bh[0].chi[1];// = 0.998;// = 0.1589679868;
+		injParams[0].spin1z = act.bh[0].chi[2];// = 0.;//998 * cos(1.43);// = 0.9820794649;
+		injParams[0].spin2x = act.bh[1].chi[0];// = 0.;//998 * sin(1.43);// = 0.118388124;
+		injParams[0].spin2y = act.bh[1].chi[1];// = 0.998;// = -0.1715059157;
+		injParams[0].spin2z = act.bh[1].chi[2];// = 0.;//998 * cos(1.43);// = 0.9759989616;
 		injParams[0].qmParameter1 = 1.;
 		injParams[0].qmParameter2 = 1.;
-		injParams[0].inclination = act.incl;// = 1.43;
+		injParams[0].inclination = act.incl = 1.43;
 		double freq_Min = injParams[0].f_lower = 40.;
 		injParams[0].f_final = 0.;
-		injParams[0].distance = act.dist;// = 1.;
+		injParams[0].distance = act.dist = 1.;
 		injParams[0].polarization = 0;
 		ppnParams.deltaT = 6.1035156e-05;
 		//		act.F.F[0] = act.F.F[1] = sqrt(2.) / 2.;
 		//act.F.F[0] = act.F.F[1];
 		memcpy(&injParams[1], &injParams[0], sizeof(SimInspiralTable));
-		///***   PROBA   ***///
-		//injParams[1].mass1 = 2. * injParams[0].mass1;	// valami problémát okoz
-		///***   PROBA   ***///
 		LALSnprintf(injParams[0].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");
 		//LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SELF");
 		LALSnprintf(injParams[1].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SS");
 		//LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SELF");
 		memset(&status, 0, sizeof(LALStatus));
 		memset(&waveform[0], 0, sizeof(CoherentGW));
@@ -205,6 +169,23 @@ int calc_Match(long length) {
 			typ1.psd[j] = typ2.psd[j] = simp.psd[j] = signal.psd[j]
 					= randIn.psd.data[j];
 		}
+		sprintf(file_Name, "test_Dir/gen%04ld.data", i);
+		file = fopen(file_Name, "w");
+		fprintf(file, "#m1=% -5lg m2=% -5lg", act.bh[0].m, act.bh[1].m);
+		fprintf(file, "chi1x="PREC"chi1y="PREC"chi1z="PREC, act.bh[0].chi[0],
+				act.bh[0].chi[1], act.bh[0].chi[2]);
+		fprintf(file, "chi2x="PREC"chi2y="PREC"chi2z="PREC"\n",
+				act.bh[1].chi[0], act.bh[1].chi[1], act.bh[1].chi[2]);
+		fprintf(file, "#incl="PREC"f_L=% -5lg f_F=% -5lg d_L=% -5lg ",
+				act.incl, 40., 0., act.dist);
+		fprintf(file, "t_s="PREC"M="PREC"eta="PREC"M_chip="PREC"\n",
+				ppnParams.deltaT, act.M, act.eta, act.chirpM);
+		fprintf(file, "#chi1="PREC"theta1="PREC"phi1="PREC, act.bh[0].chi_Amp,
+				acos(act.bh[0].theta), act.bh[0].varphi);
+		fprintf(file, "chi2="PREC"theta2="PREC"phi2="PREC"\n",
+				act.bh[1].chi_Amp, acos(act.bh[1].theta), act.bh[1].varphi);
+		fflush(file);
+		fflush(stdout);
 		for (j = 0; j < 2; j++) {
 			for (k = 0; k < waveform[j].f->data->length; k++) {
 				cshift = cos(waveform[j].shift->data->data[k]);
@@ -242,14 +223,28 @@ int calc_Match(long length) {
 		}
 		//		proba(&signal, minfr, maxfr);
 		//		printf("Simp = "PREC"\n", match_Simple(&simp, minfr, maxfr));fflush(stdout);
-		printf("T  = "PREC"\n", match_Typical(&typ1, minfr, maxfr, NONE));
+		t = match_Typical(&typ1, minfr, maxfr, NONE);
+		printf("T  = "PREC"\n", t);
 		fflush(stdout);
-		printf("TT = "PREC"\n", match_Typical(&typ2, minfr, maxfr, TIME));
+		tt = match_Typical(&typ2, minfr, maxfr, TIME);
+		printf("TT = "PREC"\n", tt);
 		fflush(stdout);
 		calc_Overlap(&best, &worst, &signal, minfr, maxfr);
 		printf("B = "PREC"\nW = "PREC"\n", best, worst);
 		calc_Overlap_Time(&bestT, &worstT, &simp, minfr, maxfr);
 		printf("BT = "PREC"\nWT = "PREC"\n", bestT, worstT);
+		fprintf(
+				file,
+				"#typ="PREC"typT="PREC"best="PREC"worst="PREC"bestT="PREC"worstT="PREC"\n",
+				t, tt, best, worst, bestT, worstT);
+		fprintf(file, "#%s%16s%16s%16s%16s\n", "time", "h_1+", "h_1x", "h_2+",
+				"h_2x");
+		for (k = 0; k < signal.size; k++) {
+			fprintf(file, PREC PREC PREC PREC PREC"\n", k * ppnParams.deltaT,
+					signal.signal[H1P][k], signal.signal[H1C][k],
+					signal.signal[H2P][k], signal.signal[H2C][k]);
+		}
+		fclose(file);
 		destroy_Signal_Struct(&simp);
 		destroy_Signal_Struct(&typ1);
 		destroy_Signal_Struct(&typ2);
@@ -274,28 +269,12 @@ int measure_Time(long length) {
 	binary_System act, min, max;
 	memset(&injParams, 0, sizeof(SimInspiralTable));
 	memset(&ppnParams, 0, sizeof(PPNParamStruc));
-	min.bh[0].m = min.bh[1].m = min.bh[0].cth = min.bh[1].cth = min.bh[0].phi
-			= min.bh[1].phi = min.bh[0].chi_Amp = min.bh[1].chi_Amp
-					= min.bh[0].chi[0] = min.bh[0].chi[1] = min.bh[0].chi[2]
-							= min.bh[1].chi[0] = min.bh[1].chi[1]
-									= min.bh[1].chi[2] = min.M = min.eta
-											= min.incl = min.dist = min.F.dec
-													= min.F.pol = min.F.phi
-															= -1000.;
-	max.bh[0].m = max.bh[1].m = max.bh[0].cth = max.bh[1].cth = max.bh[0].phi
-			= max.bh[1].phi = max.bh[0].chi_Amp = max.bh[1].chi_Amp
-					= max.bh[0].chi[0] = max.bh[0].chi[1] = max.bh[0].chi[2]
-							= max.bh[1].chi[0] = max.bh[1].chi[1]
-									= max.bh[1].chi[2] = max.M = max.eta
-											= max.incl = max.dist = max.F.dec
-													= max.F.pol = max.F.phi
-															= 1000.;
-	check_Borders(&min, &max);
+	init_Binary_System(&min, &max);
 	min.M = 15.;
 	long i;
 	clock_t t_I = clock();
 	for (i = 0; i < length; i++) {
-		gen_Parameters(&act, &min, &max, ETAM);
+		gen_Parameters(&act, &min, &max, ETAM, THETA_VPHI);
 		injParams.mass1 = act.bh[0].m;
 		injParams.mass2 = act.bh[1].m;
 		injParams.spin1x = act.bh[0].chi[0];
@@ -359,23 +338,7 @@ int SQT_diff_ST(long length) {
 	char file_Out_Name[50];
 	memset(&injParams, 0, 2 * sizeof(SimInspiralTable));
 	memset(&ppnParams, 0, sizeof(PPNParamStruc));
-	min.bh[0].m = min.bh[1].m = min.bh[0].cth = min.bh[1].cth = min.bh[0].phi
-			= min.bh[1].phi = min.bh[0].chi_Amp = min.bh[1].chi_Amp
-					= min.bh[0].chi[0] = min.bh[0].chi[1] = min.bh[0].chi[2]
-							= min.bh[1].chi[0] = min.bh[1].chi[1]
-									= min.bh[1].chi[2] = min.M = min.eta
-											= min.incl = min.dist = min.F.dec
-													= min.F.pol = min.F.phi
-															= -1000.;
-	max.bh[0].m = max.bh[1].m = max.bh[0].cth = max.bh[1].cth = max.bh[0].phi
-			= max.bh[1].phi = max.bh[0].chi_Amp = max.bh[1].chi_Amp
-					= max.bh[0].chi[0] = max.bh[0].chi[1] = max.bh[0].chi[2]
-							= max.bh[1].chi[0] = max.bh[1].chi[1]
-									= max.bh[1].chi[2] = max.M = max.eta
-											= max.incl = max.dist = max.F.dec
-													= max.F.pol = max.F.phi
-															= 1000.;
-	check_Borders(&min, &max);
+	init_Binary_System(&min, &max);
 	double h[2], hp, hc, cphi, sphi, cshift, sshift;
 	long i;
 	unsigned long k;
@@ -383,27 +346,25 @@ int SQT_diff_ST(long length) {
 	//// t[0] = time() - t_I;
 	for (i = 0; i < length; i++) {
 		printf("%ld %ld\n", length, i);
-		gen_Parameters(&act[i], &min, &max, ETAM);
-		calc_Response_For_Detector(LH, act[i].F.dec, act[i].F.phi,
-				act[i].F.pol, &act[i].F.F[0], &act[i].F.F[1]);
+		gen_Parameters(&act[i], &min, &max, ETAM, THETA_VPHI);
 		//		file_Gen = fopen(DIR"params.data", "a");
 		fprintf(file_Gen, PREC2 PREC2 PREC2 PREC2, act[i].M, act[i].eta,
 				act[i].bh[0].m, act[i].bh[1].m);
 		fflush(file_Gen);
 		fprintf(file_Gen, PREC2 PREC2 PREC2, act[i].bh[0].chi_Amp,
-				act[i].bh[0].cth, act[i].bh[0].phi);
+				act[i].bh[0].theta, act[i].bh[0].varphi);
 		fflush(file_Gen);
 		fprintf(file_Gen, PREC2 PREC2 PREC2, act[i].bh[0].chi[0],
 				act[i].bh[0].chi[1], act[i].bh[0].chi[2]);
 		fflush(file_Gen);
 		fprintf(file_Gen, PREC2 PREC2 PREC2, act[i].bh[1].chi_Amp,
-				act[i].bh[1].cth, act[i].bh[1].phi);
+				act[i].bh[1].theta, act[i].bh[1].varphi);
 		fflush(file_Gen);
 		fprintf(file_Gen, PREC2 PREC2 PREC2, act[i].bh[1].chi[0],
 				act[i].bh[1].chi[1], act[i].bh[1].chi[2]);
 		fflush(file_Gen);
 		fprintf(file_Gen, PREC2 PREC2 PREC2 PREC2 PREC2, act[i].dist,
-				act[i].incl, act[i].F.dec, act[i].F.pol, act[i].F.phi);
+				act[i].incl, act[i].F.dec, act[i].F.pol, act[i].F.alpha);
 		fflush(file_Gen);
 		fprintf(file_Gen, "\n");
 		fflush(file_Gen);
@@ -413,12 +374,12 @@ int SQT_diff_ST(long length) {
 		injParams[0].mass1 = act[i].bh[0].m = 4.5;
 		injParams[0].mass2 = act[i].bh[1].m = 4.5;
 		act[i].bh[0].chi_Amp = 0.6;
-		act[i].bh[0].cth = cos(0.);
+		act[i].bh[0].theta = 0.;
 		act[i].bh[0].phi = 80. * M_PI / 180.;
 		act[i].bh[0].chi_Amp = 0.7;
-		act[i].bh[0].cth = cos(160. * M_PI / 180.);
+		act[i].bh[0].theta = 160. * M_PI / 180.;
 		act[i].bh[0].phi = 80. * M_PI / 180.;
-		convert_Angles_Components(&act[i], ANGLE_TO_COMP);
+		convert_Spins(&act[i], FROM_THETA_VPHI);
 		injParams[0].spin1x = act[i].bh[0].chi[0];
 		injParams[0].spin1y = act[i].bh[0].chi[1];
 		injParams[0].spin1z = act[i].bh[0].chi[2];
@@ -524,27 +485,13 @@ int generate(long length) {
 	 printf(PREC PREC PREC"\n", act.bh[1].chi_Amp, act.bh[1].phi, act.bh[1].cth);
 	 exit(-1);
 	 *////***   PROBA   ***///
-	min.bh[0].m = min.bh[1].m = min.bh[0].cth = min.bh[1].cth = min.bh[0].phi
-			= min.bh[1].phi = min.bh[0].chi_Amp = min.bh[1].chi_Amp
-					= min.bh[0].chi[0] = min.bh[0].chi[1] = min.bh[0].chi[2]
-							= min.bh[1].chi[0] = min.bh[1].chi[1]
-									= min.bh[1].chi[2] = min.M = min.eta
-											= min.incl = min.dist = min.F.dec
-													= min.F.pol = min.F.phi
-															= -1000.;
-	max.bh[0].m = max.bh[1].m = max.bh[0].cth = max.bh[1].cth = max.bh[0].phi
-			= max.bh[1].phi = max.bh[0].chi_Amp = max.bh[1].chi_Amp
-					= max.bh[0].chi[0] = max.bh[0].chi[1] = max.bh[0].chi[2]
-							= max.bh[1].chi[0] = max.bh[1].chi[1]
-									= max.bh[1].chi[2] = max.M = max.eta
-											= max.incl = max.dist = max.F.dec
-													= max.F.pol = max.F.phi
-															= 1000.;
-	check_Borders(&min, &max);
+	init_Binary_System(&min, &max);
 	FILE *file = NULL;
 	FILE *gen = fopen("generating/params.data", "w");
 	char file_Name[50];
 	double hp, hc, cphi, sphi, cshift, sshift;
+	long per1, per2;
+	double delta;
 	long i;
 	unsigned long k;
 	short j, longest;
@@ -554,20 +501,26 @@ int generate(long length) {
 		fflush(stdout);
 		sprintf(file_Name, "generating/%04ld.out", i);
 		file = fopen(file_Name, "w");
-		gen_Parameters(&act, &min, &max, ETAM);
-		/*		act.dist = 46.5;
-		 act.incl = 15. / 180. * M_PI;
-		 act.F.dec = -46. / 180. * M_PI;
-		 act.F.pol = 74. / 180. * M_PI;
-		 act.F.phi = 7.9 * 60. * 60.;	// h -> sec
-		 calc_Response_For_Detector(LH, act.F.dec, act.F.phi, act.F.pol,
-		 &act.F.F[0], &act.F.F[1]);
-		 act.bh[0].chi_Amp = 0.6;
-		 act.bh[1].chi_Amp = 0.7;
-		 //act.bh[0].phi = acos((.1) / (sin(act.incl) *));
-		 act.M = 4.6 / pow(0.24, 3. / 5.);*/
-		injParams[0].mass1 = act.bh[0].m = 34;//(1. + sqrt(1. - 4. * act.eta)) * act.M / 2.;
-		injParams[0].mass2 = act.bh[1].m = 3.4;//(1. - sqrt(1. - 4. * act.eta)) * act.M / 2.;
+		gen_Parameters(&act, &min, &max, ETAM, THETA_VPHI);
+		act.F.gmst = GMST(968654558.);
+		act.F.alpha = (7. * 60. + 12.) * 60. + 58.46;
+		act.F.dec = DEG_TO_RAD(-26.1275);//-46.);
+		act.F.pol = DEG_TO_RAD(1.586);//20.);
+		act.dist = 36.;//46.5;
+		act.coaPhase = DEG_TO_RAD(150.);
+		act.incl = DEG_TO_RAD(2.444);//15.);
+		act.bh[0].chi_Amp = 0.625;
+		act.bh[0].theta = DEG_TO_RAD(81.);
+		act.bh[0].varphi = DEG_TO_RAD(0.);
+		act.bh[1].chi_Amp = 0.7;
+		act.bh[1].theta = DEG_TO_RAD(81.);
+		act.bh[1].varphi = DEG_TO_RAD(160.);
+		convert_Spins(&act, FROM_THETA_VPHI);
+		act.chirpM = 4.825;//4.6;
+		act.eta = 0.244;
+		convert_Masses(&act, FROM_ETACHIRP);
+		injParams[0].mass1 = act.bh[0].m;
+		injParams[0].mass2 = act.bh[1].m;
 		injParams[0].spin1x = act.bh[0].chi[0];
 		injParams[0].spin1y = act.bh[0].chi[1];
 		injParams[0].spin1z = act.bh[0].chi[2];
@@ -581,15 +534,15 @@ int generate(long length) {
 		injParams[0].f_final = 0.;
 		injParams[0].distance = act.dist;
 		injParams[0].polarization = 0;
+		injParams[0].coa_phase = act.coaPhase;
 		print_Binary_System(&act, gen);
+		//		print_Binary_System(&act, gen);
 		ppnParams.deltaT = 6.1035156e-05;
 		memcpy(&injParams[1], &injParams[0], sizeof(SimInspiralTable));
-		injParams[0].coa_phase = M_PI / 2.;
-		injParams[1].coa_phase = 0.;
 		LALSnprintf(injParams[0].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"NO");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"ALL");
 		LALSnprintf(injParams[1].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"NO");
+				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinQuadTaylor"PN"SS");
 		memset(&status, 0, sizeof(LALStatus));
 		memset(&waveform[0], 0, sizeof(CoherentGW));
 		LALGenerateInspiral(&status, &waveform[0], &injParams[0], &ppnParams);
@@ -605,37 +558,68 @@ int generate(long length) {
 			XLALSQTPNDestroyCoherentGW(&waveform[0]);
 			continue;
 		}
-		longest = waveform[0].f->data->length < waveform[1].f->data->length ? 0
+		longest = waveform[0].f->data->length > waveform[1].f->data->length ? 0
 				: 1;
 		create_Signal_Struct(&signal, waveform[longest].f->data->length);
 		for (j = 0; j < 2; j++) {
 			for (k = 0; k < waveform[j].f->data->length; k++) {
 				cshift = cos(waveform[j].shift->data->data[k]);
 				sshift = sin(waveform[j].shift->data->data[k]);
-				cphi = cos(waveform[j].phi->data->data[k]
-						- waveform[j].phi->data->data[0]);// + j * M_PI / 2);
-				sphi = sin(waveform[j].phi->data->data[k]
-						- waveform[j].phi->data->data[0]);// + j * M_PI / 2);
+				cphi = cos(waveform[j].phi->data->data[k]);
+				sphi = sin(waveform[j].phi->data->data[k]);
 				hp = waveform[j].a->data->data[2 * k] * cshift * cphi
 						- waveform[j].a->data->data[2 * k + 1] * sshift * sphi;
 				hc = waveform[j].a->data->data[2 * k] * sshift * cphi
 						+ waveform[j].a->data->data[2 * k + 1] * cshift * sphi;
 				signal.signal[2 * j][k] = act.F.F[0] * hp + act.F.F[1] * hc;
 			}
-			XLALSQTPNDestroyCoherentGW(&waveform[j]);
 		}
-		puts("R");
-		for (k = 0; k < (unsigned long)signal.size; k++) {
-			fprintf(file, PREC PREC PREC PREC"\n", k * ppnParams.deltaT,
-					signal.signal[0][k], signal.signal[2][k],
-					signal.signal[0][k] - signal.signal[2][k]);
+		delta = calc_Periods(&per1, &per2, &signal);
+		fprintf(gen, "ALL periods=%ld SS periods=%ld Dperiods=%lg\n", per1,
+				per2, delta);
+		for (k = 0; k < waveform[!longest].f->data->length; k++) {
+			fprintf(file, PREC PREC PREC"\n", k * ppnParams.deltaT,
+					signal.signal[2 * longest][k],
+					signal.signal[2 * !longest][k]);
 			fflush(file);
 		}
+		for (; k < waveform[longest].f->data->length; k++) {
+			fprintf(file, PREC PREC"\n", k * ppnParams.deltaT, signal.signal[2
+					* longest][k]);
+			fflush(file);
+		}
+		XLALSQTPNDestroyCoherentGW(&waveform[0]);
+		XLALSQTPNDestroyCoherentGW(&waveform[1]);
 		destroy_Signal_Struct(&signal);
 		fclose(file);
 	}
 	fclose(gen);
 	return 0;
+}
+
+double calc_Periods(long *per1, long *per2, signalStruct *signal) {
+	double prev, act;
+	*per1 = *per2 = 0;
+	long i;
+	prev = signal->signal[H1][0] * signal->signal[H1][1];
+	for (i = 1; i < signal->size; i++) {
+		act = signal->signal[H1][i] * signal->signal[H1][i + 1];
+		if (act <= 0. && prev > 0.) {
+			(*per1)++;
+		}
+		prev = act;
+	}
+	prev = signal->signal[H2][0] * signal->signal[H2][1];
+	for (i = 1; i < signal->size; i++) {
+		act = signal->signal[H2][i] * signal->signal[H2][i + 1];
+		if (act <= 0. && prev > 0.) {
+			(*per2)++;
+		}
+		prev = act;
+	}
+	(*per1) /= 2.;
+	(*per2) /= 2.;
+	return *per1 - *per2;
 }
 
 int test(void) {
@@ -653,12 +637,12 @@ int test(void) {
 	sys.incl = DEG_TO_RAD(-47.);
 	sys.bh[0].chi_Amp = 0.55;
 	sys.bh[0].phi = DEG_TO_RAD(85.);
-	sys.bh[0].cth = cos(DEG_TO_RAD(-60.));
+	sys.bh[0].theta = DEG_TO_RAD(-60.);
 	sys.bh[1].chi_Amp = 0.65;
 	sys.bh[1].phi = DEG_TO_RAD(90.);
-	sys.bh[1].cth = cos(DEG_TO_RAD(160.));
-	convert_Angles_Components(&sys, ANGLE_TO_COMP);
-	convert_etaM_m1m2(&sys, FROM_ETAM);
+	sys.bh[1].theta = DEG_TO_RAD(160.);
+	convert_Spins(&sys, THETA_VPHI);
+	convert_Masses(&sys, FROM_ETAM);
 	injParams[0].mass1 = sys.bh[0].m;
 	injParams[0].mass2 = sys.bh[1].m;
 	injParams[0].spin1x = sys.bh[0].chi[0];
