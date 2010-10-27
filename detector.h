@@ -8,19 +8,7 @@
 #define DETECTOR_H_
 
 #include "util.h"
-
-/**
- *		Enumeration of the detectors
- */
-typedef enum detector_Enum {
-	LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT
-} detector;
-
-typedef struct detector_table {
-    enum detector_Enum id;
-    char* name;
-    double nx[3],ny[3],x[3];
-} detector_table;
+#include "variables.h"
 
 /**
  *		The function converts the detector-string to detector-enum value.
@@ -55,5 +43,17 @@ void calc_Response_Matrix(const double nx[3], const double ny[3], double rm[3][3
 void calc_Response(double D[3][3], double dec, double phi, double pol, double *fp, double *fc);
 
 double GMST(double GPSsec);
+
+/**
+ *		The function calulates the given detectors response-function. Currentli supports only three.
+ *	\bug	Még be kell fejezni a többi detektorra
+ * @param[in]	det	: the detectors ID from the enumeration, (LL : Livingston, LH : Hanford, VIRGO: Virgo)
+ * @param[in]	dec	: the declination of the source
+ * @param[in]	phi	: \todo ez mi
+ * @param[in]	pol	: the sources polarization angle
+ * @param[out] fp	: F+
+ * @param[out] fc	: Fx
+ */
+void calc_Response_For_Detector(detector det, binary_System *sys);
 
 #endif /* DETECTOR_H_ */

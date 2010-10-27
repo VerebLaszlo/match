@@ -4,12 +4,13 @@
 # Ignore the folders
 doc
 Debug
-LAL EXE
-Test
+BACKUP
+data_BigDog
 test_Dir
 generator
 generating
 own
+LALSQTPNWaveformTest.cx
 
 # Ignore the exec file and everything created by the program
 match
