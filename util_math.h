@@ -82,6 +82,15 @@ double deg_To_Rad(double deg);
 double rad_To_Deg(double rad);
 #define RAD_TO_DEG(rad) ((rad) * 180. / M_PI)
 
+#define HOUR_TO_DEG(H) (15. * H)
+#define HOUR_TO_RAD(H) (DEG_TO_RAD(HOUR_TO_DEG(H)))
+
+#define SEC_TO_DEG(S) (15. * H / 3600.)
+#define SEC_TO_RAD(S) (DEG_TO_RAD(SEC_TO_DEG(S)))
+
+#define TIME_TO_DEG(H,M,S) (SEC_TO_DEG(S+60.*(M+60.*H)))
+#define TIME_TO_RAD(H,M,S) (DEG_TO_RAD(TIME_TO_DEG(H,M,S)))
+
 //	vector functions
 
 /**	Returns the dot product.
