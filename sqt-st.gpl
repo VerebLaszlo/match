@@ -1,0 +1,100 @@
+#!/usr/bin/gnuplot -persist
+outputFile=sprintf("gen%04d.eps", index)
+set output outputFile
+file=sprintf("gen%04d.data", index)
+
+# paraméterek beolvasása
+#length=sprintf("%s", length);
+#command=sprintf("head -n 1 gen%04d.data | tr -s ' ' | tr ' ' '\n' | tail -n 5",index)
+command=sprintf("head -n 1 gen%04d.data",index)
+masses=system(command);
+masses=masses[39:*]
+command=sprintf("head -n 2 gen%04d.data | tail -n 1",index)
+chi1all=system(command);
+chi1all=chi1all[39:*]
+command=sprintf("head -n 3 gen%04d.data | tail -n 1",index)
+chi2all=system(command);
+chi2all=chi2all[39:*]
+command=sprintf("head -n 4 gen%04d.data | tail -n 1",index)
+sysparam=system(command);
+sysparam=sysparam[39:*]
+command=sprintf("head -n 5 gen%04d.data | tail -n 1",index)
+chiparam=system(command);
+chiparam=chiparam[39:*]
+command=sprintf("head -n 6 gen%04d.data | tail -n 1",index)
+matches=system(command);
+matches=matches[39:*]
+# pareméter beolvasás vége
+# egyedülálló paraméterek kiolvasása
+MChirp=masses[0:length]
+MTotal=masses[length:2*length]
+etaxx=masses[2*length:3*length]
+m1=masses[3*length:4*length]
+m2=masses[4*length:5*length]
+chi1=chi1all[0:length]
+theta1=chi1all[length:2*length]
+varphi1=chi1all[2*length:3*length]
+kappa1=chi1all[3*length:4*length]
+psi1=chi1all[4*length:5*length]
+chi2=chi2all[0:length]
+theta2=chi2all[length:2*length]
+varphi2=chi2all[2*length:3*length]
+kappa2=chi2all[3*length:4*length]
+psi2=chi2all[4*length:5*length]
+incl=sysparam[0:length]
+dL=sysparam[length:2*length]
+fL=sysparam[2*length:3*length]
+fF=sysparam[3*length:4*length]
+tS=sysparam[4*length:5*length]
+tL=sysparam[5*length:6*length]
+chi1x=chiparam[0:length]
+chi1y=chiparam[length:2*length]
+chi1z=chiparam[2*length:3*length]
+chi2x=chiparam[3*length:4*length]
+chi2y=chiparam[4*length:5*length]
+chi2z=chiparam[5*length:6*length]
+typ=matches[0:length]
+typT=matches[length:2*length]
+best=matches[2*length:3*length]
+worst=matches[3*length:4*length]
+bestT=matches[4*length:5*length]
+worstT=matches[5*length:6*length]
+# egyedülálló paraméterek kiolvasásának vége
+
+set border 4095 lw 0.5
+set xtics border mirror norotate autofreq
+set ytics border mirror norotate autofreq
+unset title
+set xlabel "t[s]"
+set multiplot
+set size 0.5,0.5
+set origin 0.0,0.5
+set xra [0.0:1.0]
+set ylabel "h_+" rotate by 0
+p file u 1:2 t MChirp w l ls 3, file u 1:4 t MTotal w l ls 2
+set origin 0.0,0.0
+set ylabel "h_x" rotate by 0
+p file u 1:3 t etaxx w l ls 3, file u 1:5 t m1 w l ls 2
+set origin 0.5,0.5
+set xra [0.6:1.0]
+set ylabel "h_+" rotate by 0
+p file u 1:2 t m2 w l ls 3, file u 1:4 t chi1 w l ls 2
+set origin 0.5,0.0
+set ylabel "h_x" rotate by 0
+p file u 1:3 t theta1 w l ls 3, file u 1:5 t varphi1 w l ls 2
+unset size
+unset origin
+unset xlabel
+unset ylabel
+unset border
+unset tics
+set origin 0.0,-0.95
+set title tS
+p [] [0:1] 2 notitle
+unset origin
+unset multiplot
+
+show output
+
+index=index+1
+if(index<max) reread
