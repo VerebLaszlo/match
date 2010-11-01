@@ -258,8 +258,10 @@ double match_Typical(signalStruct *in, long minfr, long maxfr,
 		}
 		fftw_free(new);
 		for (k = 0; k < in->size; k++) {// valamiért ki kell hagyni az első elemet
-			M = sqrt(SQR(in->signal[H2P][k]) / prod[H2P][H2P]
-					+ SQR(in->signal[H2C][k]) / prod[H2C][H2C]);
+			M = sqrt(SQR(in->signal[H2P][k])
+					/ prod[H2P][H2P]
+					+ SQR(in->signal[H2C][k])
+					/ prod[H2C][H2C]);
 			M /= sqrt(prod[H1P][H1P]);
 			Mmax = Mmax > M ? Mmax : M;
 		}
