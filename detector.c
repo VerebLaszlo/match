@@ -151,7 +151,6 @@ void calc_Response_For_Detector(detector det, binary_System *sys) {
 	detector_table dettable;
 	double phi = sys->F.alpha - sys->F.gmst;
 	phi = DEG_TO_RAD(phi *15. / 3600.);// sec -> deg -> rad
-	printf("%lg\n", phi);
 	dettable = GetDetectorTable(det);
 	calc_Response_Matrix(dettable.nx, dettable.ny, rm);
 	calc_Response(rm, sys->F.dec, phi, sys->F.pol, &(sys->F.F[0]),

@@ -1,0 +1,30 @@
+#!/usr/bin/gnuplot -persist
+
+set terminal postscript landscape enhanced color dashlength 1.0 linewidth 1.0\
+	defaultplex palfuncparam 2000,0.003 butt "Helvetica" 18
+
+set datafile commentschars "#%"
+
+index=0
+max = 4#6
+SunMass="M_{{/=12 O}&{/*-.60 O}{/=12 \267}}"
+ticsF="%.3g"
+prec=0.0001
+length=11
+ws1="&{xxxxxxxxxx}"
+ws2="&{xxxxxxxxxxxxxxxxxxxx}"
+
+set style line 1 lt 1 lw 1 lc rgb "#CC0000" # sötétpiros
+set style line 2 lt 1 lw 1 lc rgb "#00007F" # sötétkék
+set style line 3 lt 2 lw 2 lc rgb "#CC0000" # sötétpiros
+set style line 4 lt 1 lw 2 lc rgb "#00007F" # sötétkék
+set style line 5 lt 1 lw 0 lc rgb "#9900FF" # lila
+
+set lmargin 6
+set bmargin 2
+set rmargin 0.5
+set tmargin 2
+
+set key below
+
+load "article.gpl"

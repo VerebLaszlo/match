@@ -15,7 +15,7 @@
 #include "detector.h"
 
 #define PREC "% -14.8lg "
-#define PREC_PL "% -10.4lg "
+#define PREC_PL "% 10.4lg "
 
 typedef enum {
 	FROM_XYZ = 0, FROM_THETA_VPHI, FROM_CTHETA_VPHI, FROM_THETA_PHI, FROM_CTHETA_PHI, FROM_KAPPA_PSI,
@@ -36,7 +36,7 @@ typedef enum {
 void init_Binary_System(binary_System *min, binary_System *max);
 
 void print_Binary_System(binary_System *sys, program_Params *params,
-		FILE *stream);
+		FILE *stream, double time);
 
 void convert_Spins(binary_System *sys, conversion_Mode_Spins mode);
 

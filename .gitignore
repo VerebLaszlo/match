@@ -1,33 +1,25 @@
-# Ignore objects and archives.
+# programming 
 *.[oa]
+test
+
+# generated
+*eps
+
+# folders
+BACKUP
+Test
+data_BigDog
+own
 
 # Ignore the folders
-doc
-Debug
-BACKUP
-data_BigDog
-test_Dir
-generator
-generating
-own
-LALSQTPNWaveformTest.cx
-
-# Ignore the exec file and everything created by the program
-match
-new
-main
-gen
-sqt
-lal
-test
-*.out
+*cx
+*ods
+*pdf
 *dat
+*zip
+*dia
+*txt
 
 # Ignore everything starting with dot, exept .gitignore
 .*
 !.gitignore
-
-# Other thins
-parameters.data
-to_Plot.data
-*.dia

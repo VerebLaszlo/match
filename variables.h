@@ -61,7 +61,7 @@ typedef struct {
 	double incl; ///< inlination of the system
 	double dist; ///< distance of the system
 	double coaPhase;
-	double coaTime;
+	double coaTime[2];
 	antenna_Func F; ///< antenna functions
 } binary_System;
 

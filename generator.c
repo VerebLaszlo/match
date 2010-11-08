@@ -10,7 +10,8 @@
 void init_Binary_System(binary_System *min, binary_System *max) {
 	memset(min, 0, sizeof(binary_System));
 	memset(max, 0, sizeof(binary_System));
-	min->coaTime = max->coaTime = 0.;
+	min->coaTime[0] = max->coaTime[0] = 0.;
+	min->coaTime[1] = max->coaTime[1] = 0.;
 	min->incl = DBL_MIN;
 	short i;
 	for (i = 0; i < 2; i++) {
@@ -35,10 +36,10 @@ void init_Binary_System(binary_System *min, binary_System *max) {
 }
 
 void print_Binary_System(binary_System *sys, program_Params *params,
-		FILE *stream) {
+		FILE *stream, double time) {
 	fprintf(
 			stream,
-			"#........index,f_I,f_F,f_S,t_S,F+,Fx: % -10ld"PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
+			"#........index,f_I,f_F,f_S,t_S,F+,Fx: % 10ld "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
 			params->index, params->freq_Initial, params->freq_Final,
 			params->freq_Sampling, params->time_Sampling, sys->F.F[0],
 			sys->F.F[1]);
@@ -59,7 +60,7 @@ void print_Binary_System(binary_System *sys, program_Params *params,
 	fprintf(
 			stream,
 			"#.incl,d_L,t_C,phi_C,dec,pol,ra,gmst: "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			sys->incl, sys->dist, sys->coaTime, sys->coaPhase, sys->F.dec,
+			sys->incl, sys->dist, time, sys->coaPhase, sys->F.dec,
 			sys->F.pol, sys->F.alpha, sys->F.gmst);
 	fprintf(
 			stream,
@@ -79,6 +80,7 @@ void print_Binary_System(binary_System *sys, program_Params *params,
 }
 
 void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
+	double temp;
 	short i;
 	switch (mode) {
 		case FROM_XYZ:
@@ -87,15 +89,20 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 						+ SQR(sys->bh[i].chi[1]) + SQR(sys->bh[i].chi[2]));
 				sys->bh[i].ctheta = sys->bh[i].chi[2] / sys->bh[i].chi_Amp;
 				sys->bh[i].theta = acos(sys->bh[i].ctheta);
-				sys->bh[i].varphi = asin(sys->bh[i].chi[1] / sys->bh[i].chi_Amp
+				sys->bh[i].varphi = acos(sys->bh[i].chi[0] / sys->bh[i].chi_Amp
 						/ sin(sys->bh[i].theta));
 				sys->bh[i].phi = sys->bh[i].varphi + M_PI / 2.; ///< kihasználva, hogy \f$\hat{L_N} x-z síkban van, álltalánosítani kell\f$
-				sys->bh[i].kappa = acos(sin(sys->bh[i].theta) * sin(
-						sys->bh[i].phi) * sin(sys->incl)
-						+ cos(sys->bh[i].theta) * cos(sys->incl));
-				sys->bh[i].psi = atan(tan(sys->bh[i].phi) * cos(sys->incl)
-						- sin(sys->incl) / (cos(sys->bh[i].phi) * tan(
-								sys->bh[i].theta)));
+				temp = sin(sys->bh[i].theta) * cos(
+						sys->bh[i].varphi) * sin(sys->incl)
+						+ cos(sys->bh[i].theta) * cos(sys->incl);
+				if (1. - temp < 1.e-10 || 1. + temp < 1.e-10) temp = 1.;
+				if (temp < 1.e-10) temp = 0.;
+				sys->bh[i].kappa = acos(temp);
+				temp = tan(sys->bh[i].phi) * cos(sys->incl)
+						- sin(sys->incl) / (sin(sys->bh[i].varphi) * tan(
+								sys->bh[i].theta));
+				if (fabs(temp) < 1.e-15) temp = 0.;
+				sys->bh[i].psi = atan(temp);
 			}
 			break;
 		case FROM_THETA_VPHI:
