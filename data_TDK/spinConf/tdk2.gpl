@@ -1,0 +1,226 @@
+#!/usr/bin/gnuplot -persist
+outFile=sprintf("gen%04d.eps", index);
+set output outFile;
+inFile1=sprintf("6gen%04d.dat", index);
+inFile2=sprintf("37gen%04d.dat", index);
+inFile3=sprintf("68gen%04d.dat", index);
+
+# paraméterek beolvasása
+#length=sprintf("%s", length);
+#command=sprintf("head -n 1 gen%04d_0.data | tr -s ' ' | tr ' ' '\n' | tail -n 5",index)
+#command="head -n 1 ".inFile;
+#genparams=system(command);
+#genparams=genparams[45:*];
+command="head -n 2 ".inFile1." | tail -n 1";
+masses1=system(command);
+masses1=masses1[45:*];
+command="head -n 2 ".inFile2." | tail -n 1";
+masses2=system(command);
+masses2=masses2[45:*];
+command="head -n 2 ".inFile3." | tail -n 1";
+masses3=system(command);
+masses3=masses3[45:*];
+#command="head -n 3 ".inFile1." | tail -n 1";
+#chi1all=system(command);
+#chi1all=chi1all[45:*]
+#command="head -n 4 ".inFile1." | tail -n 1";
+#chi2all=system(command);
+#chi2all=chi2all[45:*];
+command="head -n 5 ".inFile1." | tail -n 1";
+sysparam1=system(command);
+sysparam1=sysparam1[45:*];
+command="head -n 5 ".inFile2." | tail -n 1";
+sysparam2=system(command);
+sysparam2=sysparam2[45:*];
+command="head -n 5 ".inFile3." | tail -n 1";
+sysparam3=system(command);
+sysparam3=sysparam3[45:*];
+#command="head -n 6 ".inFile." | tail -n 1";
+#chiparam=system(command);
+#chiparam=chiparam[45:*];
+command="head -n 7 ".inFile1." | tail -n 1";
+matches1=system(command);
+matches1=matches1[45:*];
+command="head -n 7 ".inFile2." | tail -n 1";
+matches2=system(command);
+matches2=matches2[45:*];
+command="head -n 7 ".inFile3." | tail -n 1";
+matches3=system(command);
+matches3=matches3[45:*];
+#command="head -n 8 ".inFile." | tail -n 1";
+#other=system(command);
+#other=other[45:*]
+## pareméter beolvasás vége
+## egyedülálló paraméterek kiolvasása
+#fInit=genparams[length:2*length];   fInit=fInit*1.0;
+#fFinal=genparams[2*length:3*length];fFinal=fFinal*1.0;
+#fSampl=genparams[3*length:4*length];fSampl=fSampl*1.0;
+#tSampl=genparams[4*length:5*length];tSampl=tSampl*1.0;
+#Fp=genparams[5*length:6*length];    Fp=Fp*1.0;
+#Fc=genparams[6*length:7*length];    Fc=Fc*1.0;
+##-------------------------------------------------------
+#MChirp=masses[0:length];            MChirp=MChirp*1.0;
+#MTotal=masses[length:2*length];     MTotal=MTotal*1.0;
+#eta=masses[2*length:3*length];      eta=eta*1.0;
+nu1=masses1[3*length:4*length];       nu1=1.0/nu1;
+nu2=masses2[3*length:4*length];       nu2=1.0/nu2;
+nu3=masses3[3*length:4*length];       nu3=1.0/nu3;
+#m1=masses[4*length:5*length];       m1=m1*1.0;
+#m2=masses[5*length:6*length];       m2=m2*1.0;
+##-------------------------------------------------------
+#chi1=chi1all[0:length];             chi1=chi1*1.0;
+#theta1=chi1all[length:2*length];    theta1=theta1*1.0;
+#varphi1=chi1all[2*length:3*length]; varphi1=varphi1*1.0;
+#kappa1=chi1all[3*length:4*length];  kappa1=kappa1*1.0;
+#psi1=chi1all[4*length:5*length];    psi1=psi1*1.0;
+#if (kappa1 != 0 && abs(kappa1) != 1 && psi1 == 0) psi1s=", {/Symbol z}_1=0";
+#if (kappa1 != 0 && abs(kappa1) != 1 && psi1 == 1) psi1s=", {/Symbol z}_1={/Symbol p}";
+#if (kappa1 != 0 && abs(kappa1) != 1 && psi1 == -1) psi1s=", {/Symbol z}_1=-{/Symbol p}";
+#if (kappa1 != 0 && abs(kappa1) != 1 && psi1 != 0 && abs(psi1) != 1) psi1s=sprintf(", {/Symbol z}_1=% .3g{/Symbol p}", psi1);
+#if (kappa1 != 0 && abs(kappa1) != 1 ) kappa1s=sprintf("{/Symbol k}_1=% .3g{/Symbol p}", kappa1);
+#if (kappa1 == -1) kappa1s="{/Symbol k}_1=-{/Symbol p}"; psi1s="";
+#if (kappa1 == 1) kappa1s="{/Symbol k}_1={/Symbol p}"; psi1s="";
+#if (kappa1 == 0) kappa1s="{/Symbol k}_1=0"; psi1s="";
+#chi2=chi2all[0:length];             chi2=chi2*1.0;
+#theta2=chi2all[length:2*length];    theta2=theta2*1.0;
+#varphi2=chi2all[2*length:3*length]; varphi2=varphi2*1.0;
+#kappa2=chi2all[3*length:4*length];  kappa2=kappa2*1.0;
+#psi2=chi2all[4*length:5*length];    psi2=psi2*1.0;
+#if (kappa2 != 0 && kappa2 != 1 && kappa2 != -1 && psi2 != 0) psi2s=sprintf(", {/Symbol z}_2=% .3g{/Symbol p}", psi2); else psi2s=sprintf(", {/Symbol z}_2=% .3g", psi2);
+#if (kappa2 != 0 && abs(kappa2) != 1 && psi2 == 0) psi2s=", {/Symbol z}_2=0";
+#if (kappa2 != 0 && abs(kappa2) != 1 && psi2 == 1) psi2s=", {/Symbol z}_2={/Symbol p}";
+#if (kappa2 != 0 && abs(kappa2) != 1 && psi2 == -1) psi2s=", {/Symbol z}_2=-{/Symbol p}";
+#if (kappa2 != 0 && abs(kappa2) != 1 && psi2 != 0 && abs(psi2) != 1) psi2s=sprintf(", {/Symbol z}_2=% .3g{/Symbol p}", psi2);
+#if (kappa2 != 0 && abs(kappa2) != 1 ) kappa2s=sprintf(", {/Symbol k}_2=% .3g{/Symbol p}", kappa2);
+#if (kappa2 == -1) kappa2s=", {/Symbol k}_2=-{/Symbol p}"; psi2s="";
+#if (kappa2 == 1) kappa2s=", {/Symbol k}_2={/Symbol p}"; psi2s="";
+#if (kappa2 == 0) kappa2s=", {/Symbol k}_2=0"; psi2s="";
+##-------------------------------------------------------
+#incl=sysparam[0:length];            incl=incl*1.0;
+#dL=sysparam[length:2*length];       dL=dL*1.0;
+tC11=sysparam1[2*length:3*length];    tC11=tC11*1.0;
+tC21=sysparam1[3*length:4*length];    tC21=tC21*1.0;
+tC1=tC11>tC21?tC11:tC21;
+tD1=abs(tC11-tC21);
+tL1=tC1-2.0*tD1;
+if (tL1 == tC1) tL1=tL1/10.0;
+tC12=sysparam2[2*length:3*length];    tC12=tC12*1.0;
+tC22=sysparam2[3*length:4*length];    tC22=tC22*1.0;
+tC2=tC12>tC22?tC12:tC22;
+tD2=abs(tC12-tC22);
+tL2=tC2-2.0*tD2;
+if (tL2 == tC2) tL2=tL2/10.0;
+tC13=sysparam3[2*length:3*length];    tC13=tC13*1.0;
+tC23=sysparam3[3*length:4*length];    tC23=tC23*1.0;
+tC3=tC13>tC23?tC13:tC23;
+tD3=abs(tC13-tC23);
+tL3=tC3-2.0*tD3;
+if (tL3 == tC3) tL3=tL3/10.0;
+#tD=(tC-tL)/2.6
+#phiC=sysparam[4*length:5*length];   phiC=phiC*1.0;
+#dec=sysparam[5*length:6*length];    dec=dec*1.0;
+#pol=sysparam[6*length:7*length];    pol=pol*1.0;
+#ra=sysparam[7*length:8*length];     ra=ra*1.0;
+#gmst=sysparam[8*length:9*length];   gmst=gmst*1.0;
+##-------------------------------------------------------
+#chi1x=chiparam[0:length];           chi1x=chi1x*1.0;
+#chi1y=chiparam[length:2*length];    chi1y=chi1y*1.0;
+#chi1z=chiparam[2*length:3*length];  chi1z=chi1z*1.0;
+#chi2x=chiparam[3*length:4*length];  chi2x=chi2x*1.0;
+#chi2y=chiparam[4*length:5*length];  chi2y=chi2y*1.0;
+#chi2z=chiparam[5*length:6*length];  chi2z=chi2z*1.0;
+##-------------------------------------------------------
+#typ=matches[0:length];              typ=typ*1.0;
+typT1=matches1[length:2*length];      typT1=typT1*1.0;
+typT2=matches2[length:2*length];      typT2=typT2*1.0;
+typT3=matches3[length:2*length];      typT3=typT3*1.0;
+#best=matches[2*length:3*length];    best=best*1.0;
+#worst=matches[3*length:4*length];   worst=worst*1.0;
+#bestT=matches[4*length:5*length];   bestT=bestT*1.0;
+#worstT=matches[5*length:6*length];  worstT=worstT*1.0;
+##-------------------------------------------------------
+#period1=other[0:length];            period1=period1*1.0;
+#period2=other[length:2*length];     period2=period2*1.0;
+#periodD=other[2*length:3*length];   periodD=periodD*1.0;
+#fE1=other[3*length:4*length];       fE1=fE1*1.0;
+#fE2=other[4*length:5*length];       fE2=fE2*1.0;
+# egyedülálló paraméterek kiolvasásának vége
+mainTitle1=sprintf("{/Symbol n}=%.3g, M_{typ}=%.4g", nu1, typT1);
+mainTitle2=sprintf("{/Symbol n}=%.3g, M_{typ}=%.4g", nu2, typT2);
+mainTitle3=sprintf("{/Symbol n}=%.3g, M_{typ}=%.4g", nu3, typT3);
+#mainTitle=mainTitle.", M_{typ}=% .4g";
+#mainTitle=sprintf(mainTitle, typT);
+#leftTitle=sprintf("m=%.3g".SunMass." , {/Symbol n}=%.3g\n\n\n\n\n\n\n"\
+#.ws1."{/Symbol c}_1=%.3g, {/Symbol k}_1=% .3g{/Symbol p}, {/Symbol z}_1=% .3g{/Symbol p}\n"\
+#.ws1."{/Symbol c}_2=%.3g, {/Symbol k}_2=% .3g{/Symbol p}, {/Symbol z}_2=% .3g{/Symbol p}\n\
+#",MTotal,1./nu,chi1,kappa1,psi1,chi2,kappa2,psi2);
+#rightTitle=sprintf("{/URWChanceryL N}_{S}=%.3g, {/URWChanceryL N}_{SQ}=%.3g, {/URWChanceryL M}_{typ}=%.3g",\
+#period1, period2, typT);
+
+set border 4095 lw 0.5;
+set ytics border mirror norotate autofreq;
+unset title;
+unset xlabel;
+set multiplot;
+	if (index == 4) set yra[-1e-20:+1e-20];
+	set size 0.50,0.33;
+	set ylabel "h" rotate by 0 offset 5.0,0.0;
+	set origin 0.00,0.66;
+	set xra [0.0:*];
+	set xtics border mirror norotate autofreq;
+	set title mainTitle1 offset -5.0,-12.0;
+	p inFile1 u 1:3 notitle w l ls 2, inFile1 u 1:2 notitle w l ls 3;
+	unset ylabel;
+	set origin 0.50,0.66;
+	set xra [tL1:*];
+	set xtics border mirror norotate  tD1/2.0;
+	unset title;
+	p inFile1 u 1:3 notitle w l ls 2, inFile1 u 1:2 notitle w l ls 3;
+# 2.
+	set yra[*:*];
+	set xlabel "t[s]";
+	set ylabel "h" rotate by 0 offset 5.0,0.0;
+	set origin 0.00,0.33;
+	set xra [0.0:*];
+	set xtics border mirror norotate autofreq;
+	set title mainTitle2 offset -5.0,-12.0;
+	p inFile2 u 1:3 notitle w l ls 2, inFile2 u 1:2 notitle w l ls 3;
+	unset ylabel;
+	set origin 0.50,0.33;
+	set xra [tL2:*];
+	set xtics border mirror norotate tD2/2.0;
+	unset title;
+	p inFile2 u 1:3 notitle w l ls 2, inFile2 u 1:2 notitle w l ls 3;
+# 3.
+	set yra[*:*];
+	set xlabel "t[s]";
+	set ylabel "h" rotate by 0 offset 5.0,0.0;
+	set origin 0.00,0.00;
+	set xra [0.0:*];
+	set xtics border mirror norotate autofreq;
+	set title mainTitle3 offset -5.0,-12.0;
+	p inFile3 u 1:3 notitle w l ls 2, inFile3 u 1:2 notitle w l ls 3;
+	unset ylabel;
+	set origin 0.50,0.00;
+	set xra [tL3:*];
+	set xtics border mirror norotate tD3/2.0;
+	unset title;
+	p inFile3 u 1:3 notitle w l ls 2, inFile3 u 1:2 notitle w l ls 3;
+#set ylabel "h" rotate by 0 offset 5.0;
+#unset ylabel #"h" rotate by 0
+#set xtics tL,abs(tC1-tC2)/2.0
+	unset size
+	unset origin
+	unset xlabel
+	unset ylabel
+	unset border
+	unset tics
+	set origin 0.0,0.0
+	unset title #if (index % 2 == 0) set title mainTitle offset 0.0,-15.0; else set title mainTitle offset 0.0,-17.0;
+	p [] [0:1] 2 notitle w l ls 3, 2 notitle w l ls 2
+	unset origin
+unset multiplot;
+show output;
+
+index=index+1
+if(index<max) reread

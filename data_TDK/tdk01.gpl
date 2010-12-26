@@ -1,0 +1,150 @@
+#!/usr/bin/gnuplot -persist
+if (index % 2 == 0 ) outFile=sprintf("6.8gen%04d.eps", index/2); set output outFile
+inFile=sprintf("6.8gen%04d.dat", index)
+
+# paraméterek beolvasása
+#length=sprintf("%s", length);
+#command=sprintf("head -n 1 gen%04d_0.data | tr -s ' ' | tr ' ' '\n' | tail -n 5",index)
+command="head -n 1 ".inFile;
+genparams=system(command);
+genparams=genparams[45:*];
+command="head -n 2 ".inFile." | tail -n 1";
+masses=system(command);
+masses=masses[45:*];
+command="head -n 3 ".inFile." | tail -n 1";
+chi1all=system(command);
+chi1all=chi1all[45:*]
+command="head -n 4 ".inFile." | tail -n 1";
+chi2all=system(command);
+chi2all=chi2all[45:*];
+command="head -n 5 ".inFile." | tail -n 1";
+sysparam=system(command);
+sysparam=sysparam[45:*];
+command="head -n 6 ".inFile." | tail -n 1";
+chiparam=system(command);
+chiparam=chiparam[45:*];
+command="head -n 7 ".inFile." | tail -n 1";
+matches=system(command);
+matches=matches[45:*];
+command="head -n 8 ".inFile." | tail -n 1";
+other=system(command);
+other=other[45:*]
+## pareméter beolvasás vége
+## egyedülálló paraméterek kiolvasása
+#fInit=genparams[length:2*length];   fInit=fInit*1.0;
+#fFinal=genparams[2*length:3*length];fFinal=fFinal*1.0;
+#fSampl=genparams[3*length:4*length];fSampl=fSampl*1.0;
+#tSampl=genparams[4*length:5*length];tSampl=tSampl*1.0;
+#Fp=genparams[5*length:6*length];    Fp=Fp*1.0;
+#Fc=genparams[6*length:7*length];    Fc=Fc*1.0;
+##-------------------------------------------------------
+#MChirp=masses[0:length];            MChirp=MChirp*1.0;
+#MTotal=masses[length:2*length];     MTotal=MTotal*1.0;
+#eta=masses[2*length:3*length];      eta=eta*1.0;
+#nu=masses[3*length:4*length];       nu=nu*1.0;
+#m1=masses[4*length:5*length];       m1=m1*1.0;
+#m2=masses[5*length:6*length];       m2=m2*1.0;
+##-------------------------------------------------------
+#chi1=chi1all[0:length];             chi1=chi1*1.0;
+#theta1=chi1all[length:2*length];    theta1=theta1*1.0;
+#varphi1=chi1all[2*length:3*length]; varphi1=varphi1*1.0;
+kappa1=chi1all[3*length:4*length];  kappa1=kappa1/pi;#*1.0;
+psi1=chi1all[4*length:5*length];    psi1=psi1/pi;#*1.0;
+if (kappa1 == 0)\
+	kappa1=sprintf("{/Symbol k}_1=% .3g", kappa1);\
+	psi1="";\
+else\
+	kappa1=sprintf("{/Symbol k}_1=% .3g{/Symbol p}", kappa1);\
+	if (psi1 != 0)\
+		psi1=sprintf(", {/Symbol z}_1=% .3g{/Symbol p}", psi1);\
+	else\
+		psi1=sprintf(", {/Symbol z}_1=% .3g", psi1);
+#chi2=chi2all[0:length];             chi2=chi2*1.0;
+#theta2=chi2all[length:2*length];    theta2=theta2*1.0;
+#varphi2=chi2all[2*length:3*length]; varphi2=varphi2*1.0;
+kappa2=chi2all[3*length:4*length];  kappa2=kappa2/pi;#*1.0;
+psi2=chi2all[4*length:5*length];    psi2=psi2/pi;#*1.0;
+if (kappa2 == 0)\
+	kappa2=sprintf(", {/Symbol k}_2=% .3g", kappa2);\
+	psi2="";\
+else\
+	kappa2=sprintf(", {/Symbol k}_2=% .3g{/Symbol p}", kappa2);\
+	if (psi2 != 0)\
+		psi2=sprintf(", {/Symbol z}_2=% .3g{/Symbol p}", psi2);\
+	else\
+		psi2=sprintf(", {/Symbol z}_2=% .3g", psi2);
+##-------------------------------------------------------
+#incl=sysparam[0:length];            incl=incl*1.0;
+#dL=sysparam[length:2*length];       dL=dL*1.0;
+tC1=sysparam[2*length:3*length];    tC1=tC1*1.0;
+tC2=sysparam[3*length:4*length];    tC2=tC2*1.0;
+tC=tC1>tC2?tC1:tC2;
+tL=tC-2.0*abs(tC1-tC2)
+if (tL == tC) tL=tL/10.0;
+#tD=(tC-tL)/2.6
+#phiC=sysparam[4*length:5*length];   phiC=phiC*1.0;
+#dec=sysparam[5*length:6*length];    dec=dec*1.0;
+#pol=sysparam[6*length:7*length];    pol=pol*1.0;
+#ra=sysparam[7*length:8*length];     ra=ra*1.0;
+#gmst=sysparam[8*length:9*length];   gmst=gmst*1.0;
+##-------------------------------------------------------
+#chi1x=chiparam[0:length];           chi1x=chi1x*1.0;
+#chi1y=chiparam[length:2*length];    chi1y=chi1y*1.0;
+#chi1z=chiparam[2*length:3*length];  chi1z=chi1z*1.0;
+#chi2x=chiparam[3*length:4*length];  chi2x=chi2x*1.0;
+#chi2y=chiparam[4*length:5*length];  chi2y=chi2y*1.0;
+#chi2z=chiparam[5*length:6*length];  chi2z=chi2z*1.0;
+##-------------------------------------------------------
+typ=matches[0:length];              typ=typ*1.0;
+typT=matches[length:2*length];      typT=typT*1.0;
+#best=matches[2*length:3*length];    best=best*1.0;
+#worst=matches[3*length:4*length];   worst=worst*1.0;
+#bestT=matches[4*length:5*length];   bestT=bestT*1.0;
+#worstT=matches[5*length:6*length];  worstT=worstT*1.0;
+##-------------------------------------------------------
+#period1=other[0:length];            period1=period1*1.0;
+#period2=other[length:2*length];     period2=period2*1.0;
+#periodD=other[2*length:3*length];   periodD=periodD*1.0;
+#fE1=other[3*length:4*length];       fE1=fE1*1.0;
+#fE2=other[4*length:5*length];       fE2=fE2*1.0;
+# egyedülálló paraméterek kiolvasásának vége
+mainTitle=kappa1.psi1.kappa2.psi2;
+mainTitle=mainTitle.", M_{typ}=% .4g";
+mainTitle=sprintf(mainTitle, typT);
+#leftTitle=sprintf("m=%.3g".SunMass." , {/Symbol n}=%.3g\n\n\n\n\n\n\n"\
+#.ws1."{/Symbol c}_1=%.3g, {/Symbol k}_1=% .3g{/Symbol p}, {/Symbol z}_1=% .3g{/Symbol p}\n"\
+#.ws1."{/Symbol c}_2=%.3g, {/Symbol k}_2=% .3g{/Symbol p}, {/Symbol z}_2=% .3g{/Symbol p}\n\
+#",MTotal,1./nu,chi1,kappa1,psi1,chi2,kappa2,psi2);
+#rightTitle=sprintf("{/URWChanceryL N}_{S}=%.3g, {/URWChanceryL N}_{SQ}=%.3g, {/URWChanceryL M}_{typ}=%.3g",\
+#period1, period2, typT);
+
+set border 4095 lw 0.5
+set xtics border mirror norotate autofreq
+set ytics border mirror norotate autofreq
+unset title
+if (index % 2 == 1) set xlabel "t[s]";
+if (index % 2 == 0) set multiplot
+set size 0.5,0.49
+if (index % 2 == 0) set origin 0.0,0.51; else set origin 0.0,0.0;
+#set xra [0.0:1.0]
+set ylabel "h" rotate by 0 offset 5.0;
+set xra [0.0:*]
+p inFile u 1:3 notitle w l ls 2, inFile u 1:2 notitle w l ls 3
+if (index % 2 == 0) set origin 0.5,0.51; else set origin 0.5,0.0;
+unset ylabel #"h" rotate by 0
+set xra [tL:*]
+p inFile u 1:3 notitle w l ls 2, inFile u 1:2 notitle w l ls 3
+unset size
+unset origin
+unset xlabel
+unset ylabel
+unset border
+unset tics
+set origin 0.0,0.0
+if (index % 2 == 0) set title mainTitle offset 0.0,-26.0; else set title mainTitle offset 0.0,-28.0;
+p [] [0:1] 2 notitle w l ls 3, 2 notitle w l ls 2
+unset origin
+if (index % 2 == 1) unset multiplot; show output;
+
+index=index+1
+if(index<max) reread

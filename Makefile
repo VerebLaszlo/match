@@ -26,7 +26,7 @@ endif
 LAL_INC=$(shell pkg-config --cflags lalinspiral)
 LAL_LIB=$(shell pkg-config --libs lalinspiral)
 
-test: main_Test.c generator.o util_math.o detector.o match.o match_Multi.o variables.h
+test: main_Test.c generator.o util_math.o detector.o match.o match_Multi.o variables.h match_Multi.h
 	${CC} -o test main_Test.c generator.o util_math.o detector.o match.o match_Multi.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
 
 testRun: test
@@ -36,8 +36,8 @@ OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
 NEWDEPS=main_Match.c match.o
 all: new
 
-gen: main_Generator.c confuse-parser.c
-	${CC} -o gen main_Generator.c confuse-parser.c ${CFLAGS} ${LAL_INC} ${LAL_LIB}
+gen: main_Generator.c generator.o util_math.o detector.o match.o match_Multi.o variables.h match_Multi.h
+	${CC} -o gen main_Generator.c generator.o util_math.o detector.o match.o match_Multi.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
 
 main: main_Old_Match.c match.c detector.c
 	${CC} -o main main_Old_Match.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm

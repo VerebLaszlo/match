@@ -36,7 +36,7 @@ typedef enum {
 void init_Binary_System(binary_System *min, binary_System *max);
 
 void print_Binary_System(binary_System *sys, program_Params *params,
-		FILE *stream, double time);
+		FILE *stream, double fE1, double fE2);
 
 void convert_Spins(binary_System *sys, conversion_Mode_Spins mode);
 

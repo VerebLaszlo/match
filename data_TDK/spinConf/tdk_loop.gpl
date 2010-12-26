@@ -1,0 +1,39 @@
+#!/usr/bin/gnuplot -persist
+
+FontSize=17.0
+SunMassSize=5.0*FontSize/6.0
+
+set terminal postscript landscape enhanced color dashlength 1.0 linewidth 1.0\
+	defaultplex palfuncparam 2000,0.003 butt "Helvetica" FontSize
+
+set datafile commentschars "#%"
+set datafile separator "X"
+
+max=system("ls *dat | wc -l");
+max=max/2;
+#print max;
+#SunMass="M_{{/=".SunMassSize." O}&{/*-.74 O}{/=16.5 \267}}"
+SunMass=sprintf("M_{{/=%g O}&{/*-.74 O}{/=%g \267}}", SunMassSize, SunMassSize);
+length=11
+prec="%.3g";
+precM="%.5g";
+ws1="&{xxxxxxxxxx}"
+ws2="&{xxxxxxxxxxxxxxxxxxxx}"
+
+set style line 1 lt 1 lc 3
+set style line 2 lt 1 lc 1
+set style line 3 lt 1 lc rgb "#9900FF"
+set style line 4 lt 1 lc 5
+
+
+set lmargin 9.0
+set bmargin 3.5
+set rmargin 3.0
+set tmargin 1.0
+
+set key below
+
+index=0
+load "tdk.gpl"
+#index=0
+#load "tdk01.gpl"

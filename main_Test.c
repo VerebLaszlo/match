@@ -19,11 +19,12 @@
 
 NRCSID(LALSQTPNWAVEFORMTESTC, "$Id: LALSQTPNWaveformTest.c,v 0.1 2010/05/21");
 
-int lalDebugLevel = 0; ///< the debug level
-
 #define PREC2 "% -15.9lg| "
 
 #define DIR "test_Dir/"
+
+extern double maxT;
+extern short maxTindex;
 
 void print_Params_To_Waveform(FILE *stream, binary_System sys);
 
@@ -47,97 +48,47 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 	program_Params params;
-	binary_System act[2*PAR_NUM];
-	char dir[50] = "data_TDK/";
+	binary_System minta;
+	binary_System *act;
+	cover cov = SPECIAL;//SPHERIC;
+	char dir[50];
+	if (cov == SPECIAL) {
+		sprintf(dir, "data_TDK/special/");
+		puts("!!");
+	} else {
+		sprintf(dir, "data_TDK/spinConf/");
+	}
 	memset(&params, 0, sizeof(program_Params));
-	memset(&act, 0, PAR_NUM * sizeof(binary_System));
+	memset(&minta, 0, sizeof(binary_System));
+	minta.dist = 1.;
+	minta.incl = 1.43;
+	calc_Response_For_Detector(LH, &minta);
 	params.freq_Sampling = 16380.;
 	params.time_Sampling = 1. / params.freq_Sampling;
 	params.freq_Initial = 40.;
 	params.freq_Final = 0.;
-	double incl = 1.43;
-	long i;
-	/*
-	// poster hullámai
-	act[0].dist = act[PAR_NUM].dist = 1.;
-	act[0].bh[0].m = 34.;
-	act[0].bh[1].m = 3.4;
-	act[PAR_NUM].bh[0].m = 3.4;
-	act[PAR_NUM].bh[1].m = 3.4;
-	convert_Masses(&act[0], FROM_M1M2);
-	convert_Masses(&act[PAR_NUM], FROM_M1M2);
-	act[0].incl = act[PAR_NUM].incl = incl;
-	act[0].bh[0].chi_Amp = act[0].bh[1].chi_Amp = 0.998;
-	act[PAR_NUM].bh[0].chi_Amp = act[PAR_NUM].bh[1].chi_Amp = 0.998;
-	act[0].bh[0].kappa = act[PAR_NUM].bh[0].kappa = 1.35;
-	act[0].bh[1].kappa = act[PAR_NUM].bh[1].kappa = 1.31;
-	act[0].bh[1].psi = act[PAR_NUM].bh[1].psi = 0.0;
-	act[0].bh[1].psi = act[PAR_NUM].bh[1].psi = acos(
-			(cos(0.33) - cos(act[0].bh[0].kappa) * cos(act[0].bh[1].kappa)) /
-			(sin(act[0].bh[0].kappa)*sin(act[0].bh[1].kappa))
-	);
-	convert_Spins(&act[0], FROM_KAPPA_PSI);
-	convert_Spins(&act[PAR_NUM], FROM_KAPPA_PSI);
-	calc_Response_For_Detector(LH, &act[0]);
-	calc_Response_For_Detector(LH, &act[PAR_NUM]);
-	*/
-	act[0].bh[0].chi[0] = act[0].bh[1].chi[0] = 0.998 * sin(incl);
-	act[0].bh[0].chi[1] = act[0].bh[1].chi[1] = 0.;
-	act[0].bh[0].chi[2] = act[0].bh[1].chi[2] = 0.998 * cos(incl);
-	// -L ~ S1 ~ S2
-	act[1].bh[0].chi[0] = 0.998 * -cos(incl);
-	act[1].bh[0].chi[1] = 0.;
-	act[1].bh[0].chi[2] = 0.998 * sin(incl);
-	act[1].bh[1].chi[0] = 0.;
-	act[1].bh[1].chi[1] = 0.998;
-	act[1].bh[1].chi[2] = 0.;
-	/*
-	// L ~ S1 ~ S2
-	act[1].bh[0].chi[0] = act[1].bh[1].chi[0] = 0.998 * sin(incl);
-	act[1].bh[0].chi[1] = act[1].bh[1].chi[1] = 0.;
-	act[1].bh[0].chi[2] = act[1].bh[1].chi[2] = 0.998 * cos(incl);
-	// -L ~ S1 ~ S2
-	act[2].bh[0].chi[0] = act[2].bh[1].chi[0] = 0.998 * -sin(incl);
-	act[2].bh[0].chi[1] = act[2].bh[1].chi[1] = 0.;
-	act[2].bh[0].chi[2] = act[2].bh[1].chi[2] = 0.998 * -cos(incl);
-	// L ~ -S1 ~ S2
-	act[3].bh[0].chi[0] = -(act[3].bh[1].chi[0] = 0.998 * sin(incl));
-	act[3].bh[0].chi[1] =   act[3].bh[1].chi[1] = 0.;
-	act[3].bh[0].chi[2] = -(act[3].bh[1].chi[2] = 0.998 * cos(incl));
-	// L ~ S1 ~ -S2
-	act[4].bh[0].chi[0] = -(act[4].bh[1].chi[0] = 0.998 * -sin(incl));
-	act[4].bh[0].chi[1] =   act[4].bh[1].chi[1] = 0.;
-	act[4].bh[0].chi[2] = -(act[4].bh[1].chi[2] = 0.998 * -cos(incl));
-	// L T S1 ~ S2
-	act[5].bh[0].chi[0] = act[5].bh[1].chi[0] = 0.998 * -cos(incl);
-	act[5].bh[0].chi[1] = act[5].bh[1].chi[1] = 0.;
-	act[5].bh[0].chi[2] = act[5].bh[1].chi[2] = 0.998 * sin(incl);
-	// L ~ S1 ~ -S2
-	act[6].bh[0].chi[0] = -(act[6].bh[1].chi[0] = 0.998 * -cos(incl));
-	act[6].bh[0].chi[1] =   act[6].bh[1].chi[1] = 0.;
-	act[6].bh[0].chi[2] = -(act[6].bh[1].chi[2] = 0.998 * sin(incl));
-	// L T S1 ~ S2
-	act[7].bh[0].chi[0] = act[7].bh[1].chi[0] = 0.;
-	act[7].bh[0].chi[1] = act[7].bh[1].chi[1] = 0.998 * 1.;
-	act[7].bh[0].chi[2] = act[7].bh[1].chi[2] = 0.;
-*/
-	for (i = 0; i < PAR_NUM; i++) {
-		memcpy(&act[PAR_NUM + i], &act[i], sizeof(binary_System));
-		act[i].dist = act[PAR_NUM + i].dist = 1.;
-		act[i].bh[0].m = 34.;
-		act[i].bh[1].m = 3.4;
-		act[PAR_NUM + i].bh[0].m = 3.4;
-		act[PAR_NUM + i].bh[1].m = 3.4;
-		convert_Masses(&act[i], FROM_M1M2);
-		convert_Masses(&act[PAR_NUM + i], FROM_M1M2);
-		act[i].incl = incl;
-		act[PAR_NUM + i].incl = incl;
-		convert_Spins(&act[i], FROM_XYZ);
-		convert_Spins(&act[PAR_NUM + i], FROM_XYZ);
-		calc_Response_For_Detector(LH, &act[i]);
-		calc_Response_For_Detector(LH, &act[PAR_NUM + i]);
-	}
-	multi_Match(&params, act, 2*PAR_NUM, dir);
+	minta.bh[0].m = 18.7;
+	minta.bh[1].m = 18.7;
+	convert_Masses(&minta, FROM_M1M2);
+	long length;
+	act = fill_TDK(&length, &minta, cov);
+	multi_Match(&params, act, length, dir);
+	printf("%d: %lg\n", maxTindex, maxT);
+	maxT = 0.;
+	free(act);
+	minta.bh[0].m = 34.;
+	minta.bh[1].m = 3.4;
+	convert_Masses(&minta, FROM_M1M2);
+	act = fill_TDK(&length, &minta, cov);
+	multi_Match(&params, act, length, dir);
+	printf("%d: %lg\n", maxTindex, maxT);
+	free(act);
+	/*	minta.bh[0].m = 34.;
+	 minta.bh[1].m = 34.;
+	 convert_Masses(&minta, FROM_M1M2);
+	 act = fill_TDK(&length, &minta, cov);
+	 multi_Match(&params, act, length, dir);
+	 free(act);*/
 	//calc_Match(atol(argv[1]));
 	//measure_Time(atol(argv[1]));
 	//SQT_diff_ST(atol(argv[1]));
@@ -246,8 +197,10 @@ int calc_Match(long length) {
 								= signal.signal[2 * j + 1][k] = hc;
 			}
 		}
-		params.periodsD = calc_Periods(&params.periods[0], &params.periods[1], &signal);
-		act.coaTime[0] = (waveform[0].f->data->length - 1) * params.time_Sampling;
+		params.periodsD = calc_Periods(&params.periods[0], &params.periods[1],
+				&signal);
+		act.coaTime[0] = (waveform[0].f->data->length - 1)
+				* params.time_Sampling;
 		double freq_Max = (injParams[0].f_final + injParams[1].f_final) / 2.;
 		double freq_Step, fr = 0.;
 		freq_Step = 1. / (ppnParams.deltaT * randIn.psd.length);
@@ -281,7 +234,7 @@ int calc_Match(long length) {
 		for (j = 0; j < 2; j++) {
 			sprintf(file_Name[j], "%sgen%04ld_%d.dat", dir, i, j);
 			file[j] = fopen(file_Name[j], "w");
-			print_Binary_System(&act, &params, file[j], act.coaTime[j]);
+			//print_Binary_System(&act, &params, file[j], act.coaTime[j]);
 			fprintf(file[j], "#%s%16s%16s%16s\n", "time", "h", "h_+", "h_x");
 			for (k = 0; k < waveform[j].f->data->length; k++) {
 				fprintf(file[j], PREC PREC PREC PREC"\n", k * ppnParams.deltaT,
@@ -643,30 +596,30 @@ int generate(long length) {
 }
 
 /*
-double calc_Periods(double *per1, double *per2, signalStruct *signal) {
-	double prev, act;
-	*per1 = *per2 = 0;
-	long i;
-	prev = signal->signal[H1][0] * signal->signal[H1][1];
-	for (i = 1; i < signal->size; i++) {
-		act = signal->signal[H1][i] * signal->signal[H1][i + 1];
-		if (act <= 0. && prev > 0.) {
-			(*per1)++;
-		}
-		prev = act;
-	}
-	prev = signal->signal[H2][0] * signal->signal[H2][1];
-	for (i = 1; i < signal->size; i++) {
-		act = signal->signal[H2][i] * signal->signal[H2][i + 1];
-		if (act <= 0. && prev > 0.) {
-			(*per2)++;
-		}
-		prev = act;
-	}
-	(*per1) /= 2.;
-	(*per2) /= 2.;
-	return (*per1 - *per2) / (*per1);
-}*/
+ double calc_Periods(double *per1, double *per2, signalStruct *signal) {
+ double prev, act;
+ *per1 = *per2 = 0;
+ long i;
+ prev = signal->signal[H1][0] * signal->signal[H1][1];
+ for (i = 1; i < signal->size; i++) {
+ act = signal->signal[H1][i] * signal->signal[H1][i + 1];
+ if (act <= 0. && prev > 0.) {
+ (*per1)++;
+ }
+ prev = act;
+ }
+ prev = signal->signal[H2][0] * signal->signal[H2][1];
+ for (i = 1; i < signal->size; i++) {
+ act = signal->signal[H2][i] * signal->signal[H2][i + 1];
+ if (act <= 0. && prev > 0.) {
+ (*per2)++;
+ }
+ prev = act;
+ }
+ (*per1) /= 2.;
+ (*per2) /= 2.;
+ return (*per1 - *per2) / (*per1);
+ }*/
 
 int test(void) {
 	static LALStatus status;
