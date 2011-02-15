@@ -38,7 +38,7 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 	//	srand(10);
 	short j, l;
 	long i, k;
-	double cshift, sshift, cphi[2], sphi[2], hp;
+	double cshift, sshift, cphi[2], sphi[2], hp, hc;
 	double f0, f1;
 	for (i = 0; i < num; i++) {
 		if ((i + 1) % 10 == 0) {
@@ -105,6 +105,8 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 		injParams[1].spin2x = act[i].bh[1].chi[0];
 		injParams[1].spin2y = act[i].bh[1].chi[1];
 		injParams[1].spin2z = act[i].bh[1].chi[2];
+		injParams[1].qmParameter1 = injParams[0].qmParameter1 = 1.;
+		injParams[1].qmParameter2 = injParams[0].qmParameter2 = 1.;
 		injParams[1].inclination = injParams[0].inclination = act[i].incl;
 		double freq_Min = injParams[0].f_lower = 40.;
 		injParams[1].f_final = injParams[0].f_final = 0.;
@@ -113,10 +115,10 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 		injParams[1].coa_phase = injParams[0].coa_phase = act[i].coaPhase = 0.;
 		ppnParams.deltaT = 1. / params->freq_Sampling;
 		injParams[1].f_lower = injParams[0].f_lower = params->freq_Initial;
-		snprintf(injParams[0].waveform,
+		LALSnprintf(injParams[0].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
 				"SpinQuadTaylor"PN1"SOSSQM");
-		snprintf(injParams[1].waveform,
+		LALSnprintf(injParams[1].waveform,
 				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinTaylor"PN1"SS");
 		memset(&status, 0, sizeof(LALStatus));
 		memset(&waveform[0], 0, sizeof(CoherentGW));

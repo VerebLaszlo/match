@@ -13,6 +13,9 @@ void write_simple(FILE *file, char *title, SimInspiralTable sim, PPNParamStruc p
                 sim.spin2x,
                 sim.spin2y,
                 sim.spin2z);
+        fprintf(file,"\tqm="FORMAT"\n\tqm="FORMAT"\n",
+                sim.qmParameter1,
+                sim.qmParameter2);
         fprintf(file,"\tfL="FORMAT"\n\tfF="FORMAT"\n",
                 sim.f_lower,
                 sim.f_final);
@@ -52,6 +55,8 @@ void FillFromConfuse(cfg_t *tmp, SimInspiralTable *injParams, PPNParamStruc *ppn
         injParams->spin2x = cfg_getfloat(tmp,"spin2x");
         injParams->spin2y = cfg_getfloat(tmp,"spin2y");
         injParams->spin2z = cfg_getfloat(tmp,"spin2z");
+        injParams->qmParameter1 = cfg_getfloat(tmp,"qm1");
+        injParams->qmParameter2 = cfg_getfloat(tmp,"qm2");
         injParams->inclination = cfg_getfloat(tmp,"incl");
         injParams->f_lower = cfg_getfloat(tmp,"fL");
         injParams->f_final = cfg_getfloat(tmp,"fF");
@@ -122,6 +127,8 @@ int parse_confuse(char const *filename,Parameters *out) {
         CFG_FLOAT("spin2x", default_siminsp.spin2x, CFGF_NONE),
         CFG_FLOAT("spin2y", default_siminsp.spin2y, CFGF_NONE),
         CFG_FLOAT("spin2z", default_siminsp.spin2z, CFGF_NONE),
+        CFG_FLOAT("qm1",default_siminsp.qmParameter1, CFGF_NONE),
+        CFG_FLOAT("qm2",default_siminsp.qmParameter2, CFGF_NONE),
         CFG_FLOAT("incl",default_siminsp.inclination, CFGF_NONE),
         CFG_FLOAT("fI", 50, CFGF_NONE),
         CFG_FLOAT("fL", default_siminsp.f_lower, CFGF_NONE),

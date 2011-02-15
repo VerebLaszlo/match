@@ -1,25 +1,16 @@
 # programming 
 *.[oa]
-test
+*.d
+match
 
 # generated
-*eps
 
 # folders
-BACKUP
-Test
-data_BigDog
-own
 
 # Ignore the folders
-*cx
-*ods
-*pdf
-*dat
-*zip
-*dia
-*txt
 
 # Ignore everything starting with dot, exept .gitignore
+*~
+*.autosave
 .*
 !.gitignore
