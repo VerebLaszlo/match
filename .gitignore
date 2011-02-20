@@ -2,10 +2,12 @@
 *.[oa]
 *.d
 match
+test
 
 # generated
 
 # hidden files
+*.cx
 *~
 *.autosave
 

@@ -7,6 +7,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -15,7 +16,8 @@
 
 //typedef double * const dpc;
 
-//	logikai változótípus definiálása ismeretlen értékkel is
+/**	logikai változótípus definiálása ismeretlen értékkel is
+ */
 typedef enum {
 	null = -1, false = 0, true = 1
 } bool;

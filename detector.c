@@ -7,7 +7,7 @@
 #include "detector.h"
 #include "util_math.h"
 
-#define DETECTOR_NUMBER 10
+#define DETECTOR_NUMBER 10///<a
 const detector_table Detectors[] =
 	{
 		{ LL, "LL",
@@ -49,8 +49,12 @@ const detector_table Detectors[] =
 		{ CIT, "CIT",
 			{ -0.2648, -0.4953, -0.8274 },
 			{ 0.8819, -0.4715, 0.0000 },
-			{ -2.490650, -4.658700, 3.562064 } } };
-
+			{ -2.490650, -4.658700, 3.562064 } } };///<a
+/**
+ * X
+ * @param str
+ * @return
+ */
 detector con_Det_Str_Enum(char *str) {
 	int i;
 
@@ -66,6 +70,11 @@ detector con_Det_Str_Enum(char *str) {
 
 }
 
+/**
+ * X
+ * @param id
+ * @return
+ */
 detector_table GetDetectorTable(enum detector_Enum id) {
 	int i;
 
@@ -78,7 +87,12 @@ detector_table GetDetectorTable(enum detector_Enum id) {
 	return Detectors[DETECTOR_NUMBER - 1];
 }
 
-// megcsinálni normálisabbra!
+/**
+ * X
+ * @param nx
+ * @param ny
+ * @param rm
+ */
 void calc_Response_Matrix(const double nx[], const double ny[], double rm[3][3]) {
 	long i, j;
 	for (i = 0; i < 3; i++) {
@@ -89,6 +103,15 @@ void calc_Response_Matrix(const double nx[], const double ny[], double rm[3][3])
 	}
 }
 
+/**
+ * X
+ * @param D
+ * @param dec
+ * @param phi
+ * @param pol
+ * @param fp
+ * @param fc
+ */
 void calc_Response(double D[3][3], double dec, double phi, double pol,
 		double *fp, double *fc) {
 	int i;
@@ -115,6 +138,11 @@ void calc_Response(double D[3][3], double dec, double phi, double pol,
 	}
 }
 
+/**
+ * X
+ * @param GPSsec
+ * @return
+ */
 double GMST(double GPSsec)
 /* Derives the `Greenwich Mean Sidereal Time' (in radians!) */
 /* from GPS time (in seconds).                              */
@@ -146,6 +174,11 @@ double GMST(double GPSsec)
 	return result;
 }
 
+/**
+ * X
+ * @param det
+ * @param sys
+ */
 void calc_Response_For_Detector(detector det, binary_System *sys) {
 	double rm[3][3];
 	detector_table dettable;

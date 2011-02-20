@@ -20,6 +20,9 @@ double amp = 0.998;
 
 void multi_Match(program_Params *params, binary_System *act, long num,
 		char dir[50]) {
+	assert(params);
+	assert(act);
+	assert(num>0);
 	// saját
 	signalStruct sig[M_NUM];
 	double *waves[2];
@@ -137,9 +140,7 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 				< waveform[1].f->data->length ? 0 : 1;
 		long min_Length = waveform[shorter].f->data->length;
 		long max_Length = waveform[!shorter].f->data->length;
-		act[i].coaTime[0] = (waveform[0].f->data->length - 1)
-				* params->time_Sampling;
-		act[i].coaTime[1] = (waveform[1].f->data->length - 1)
+		act[i].coaTime = (waveform[0].f->data->length - 1)
 				* params->time_Sampling;
 		f0 = waveform[0].f->data->data[waveform[0].f->data->length - 1];
 		f1 = waveform[1].f->data->data[waveform[1].f->data->length - 1];
@@ -204,17 +205,14 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 			maxfr++;
 		}
 		//		printf("Simp = "PREC"\n", match_Simple(&simp, minfr, maxfr));fflush(stdout);
-		params->match_Typ = match_Typical(&sig[0], minfr, maxfr, NONE);
-		params->match_TypT = match_Typical(&sig[1], minfr, maxfr, TIME);
+		params->match_Typ = match_Typical(&sig[0], minfr, maxfr);
 		//printf("%ld %d: %lg %lg\n", i, maxTindex, maxT, params->match_TypT);
-		if (params->match_TypT > maxT && params->match_TypT < 1.) {
-			maxT = params->match_TypT;
+		if (params->match_Typ > maxT && params->match_Typ < 1.) {
+			maxT = params->match_Typ;
 			maxTindex = i;
 			printf("%d: % 20.15lg %lg\n", maxTindex, maxT, act[i].bh[0].chi_Amp);
 		}
-		calc_Overlap(&params->match_Best, &params->match_Worst, &sig[2], minfr,
-				maxfr);
-		calc_Overlap_Time(&params->match_BestT, &params->match_WorstT, &sig[3],
+		calc_Overlap_Time(&params->match_Best, &params->match_Worst, &sig[3],
 				minfr, maxfr);
 		sprintf(file_Name, "%s%dgen%04ld.dat", dir, (int) act[i].bh[0].m, i);
 		file = fopen(file_Name, "w");
@@ -275,6 +273,7 @@ void destroySTWave(CoherentGW waveform) {
 }
 
 double calc_Periods(double *per1, double *per2, signalStruct *signal) {
+	assert(signal);
 	double prev, act;
 	*per1 = *per2 = 0;
 	long i;

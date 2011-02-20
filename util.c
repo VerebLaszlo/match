@@ -10,6 +10,8 @@ extern char * program_invocation_short_name;
 extern char * program_invocation_name;
 
 FILE * sfopen(char *name, char *mode) {
+	assert(strcmp(name, ""));
+	assert(strcmp(mode, ""));
 	FILE *stream;
 	errno = 0;
 	stream = fopen (name, mode);
@@ -20,6 +22,7 @@ FILE * sfopen(char *name, char *mode) {
 }
 
 FILE * sfopen_read(char *name) {
+	assert(strcmp(name, ""));
 	FILE *stream;
 	errno = 0;
 	stream = fopen (name, "r");
@@ -30,6 +33,7 @@ FILE * sfopen_read(char *name) {
 }
 
 FILE * sfopen_write(char *name) {
+	assert(strcmp(name, ""));
 	FILE *stream;
 	errno = 0;
 	stream = fopen (name, "w");

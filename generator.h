@@ -1,4 +1,4 @@
-/*
+/**
  * @file generator.h
  * @author László Veréb
  * @date 2010.03.26.
@@ -14,47 +14,71 @@
 #include "variables.h"
 #include "detector.h"
 
-#define PREC "% -14.8lg "
-#define PREC_PL "% 10.4lg "
+#define PREC "% -14.8lg "///<a
+#define PREC_PL "% 10.4lg "///<a
 
+/**
+ * Sx
+ */
 typedef enum {
 	FROM_XYZ = 0, FROM_THETA_VPHI, FROM_CTHETA_VPHI, FROM_THETA_PHI, FROM_CTHETA_PHI, FROM_KAPPA_PSI,
-} conversion_Mode_Spins;
+} conversion_Mode_Spins;///<a
 
+/**
+ * Sx
+ */
 typedef enum {
 	FROM_M1M2 = 0, FROM_ETAM, FROM_ETACHIRP,
-} conversion_Mode_Masses;
+} conversion_Mode_Masses;///<a
 
+/**
+ * Sx
+ */
 typedef enum {
 	ETAM = 0, ETACHRIP, M1M2,
-} gen_Mode_Masses;
+} gen_Mode_Masses;///<a
 
+/**
+ * Sx
+ */
 typedef enum {
 	XYZ = 0, THETA_VPHI, THETA_PHI, KAPPA_PSI,
-} gen_Mode_Spin;
+} gen_Mode_Spin;///<a
 
+///
 void init_Binary_System(binary_System *min, binary_System *max);
 
+///
 void print_Binary_System(binary_System *sys, program_Params *params,
 		FILE *stream, double fE1, double fE2);
 
+///
 void convert_Spins(binary_System *sys, conversion_Mode_Spins mode);
 
+///
 void convert_Masses(binary_System *sys, conversion_Mode_Masses mode);
 
+/**
+ * Y
+ */
 void calc_Antenna_Function(binary_System *sys);
 
-// generator functions
-
+/**
+ * X
+ */
 void check_Borders(binary_System *min, binary_System *max);
 
+///
 void gen_Mass(binary_System *sys, binary_System *min, binary_System *max,
 		gen_Mode_Masses mode);
 
+///
 void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mode_Spin);
 
+///
 void gen_Sys(binary_System *sys, binary_System *min, binary_System *max);
 
+///
 void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
 		gen_Mode_Masses mass, gen_Mode_Spin spin);
 

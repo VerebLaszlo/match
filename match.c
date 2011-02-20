@@ -6,9 +6,10 @@
 
 #include "match.h"
 
-double pi;
+double pi;///<a
 
 int create_Signal_Struct(signalStruct *signal, long size) {
+	assert(size>0);
 	signal->size = size;
 	short i;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
@@ -25,6 +26,7 @@ int create_Signal_Struct(signalStruct *signal, long size) {
 }
 
 void destroy_Signal_Struct(signalStruct *signal) {
+	assert(signal);
 	short i;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		if (signal->signal[i]) {
@@ -44,6 +46,8 @@ void destroy_Signal_Struct(signalStruct *signal) {
 
 double inner_Product(fftw_complex left[], fftw_complex right[], double norm[],
 		long minfr, long maxfr) {
+	assert(minfr>0);
+	assert(minfr< maxfr);
 	double scalar = 0.;
 	long i;
 	for (i = minfr; i < maxfr; i++) {
@@ -55,6 +59,8 @@ double inner_Product(fftw_complex left[], fftw_complex right[], double norm[],
 
 void product(fftw_complex out[], fftw_complex left[], fftw_complex right[],
 		double norm[], long minfr, long maxfr) {
+	assert(minfr>0);
+	assert(minfr< maxfr);
 	long i;
 	for (i = minfr; i < maxfr; i++) {
 		if (norm[i] != 0.) {
@@ -69,6 +75,10 @@ void product(fftw_complex out[], fftw_complex left[], fftw_complex right[],
 }
 
 void normalise(signalStruct *out, signalStruct *in, long minfr, long maxfr) {
+	assert(out);
+	assert(in);
+	assert(minfr>0);
+	assert(minfr< maxfr);
 	double prod;
 	short i;
 	long j;
@@ -97,6 +107,10 @@ void normalise(signalStruct *out, signalStruct *in, long minfr, long maxfr) {
 }
 
 void orthogonise(signalStruct *out, signalStruct *in, long minfr, long maxfr) {
+	assert(out);
+	assert(in);
+	assert(minfr>0);
+	assert(minfr< maxfr);
 	double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS];
 	short i, j;
 	long k;
@@ -140,6 +154,9 @@ void orthogonise(signalStruct *out, signalStruct *in, long minfr, long maxfr) {
 }
 
 void orthonormalise(signalStruct *out, signalStruct *in, long minfr, long maxfr) {
+	assert(in);
+	assert(minfr>0);
+	assert(minfr< maxfr);
 	double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS];
 	short i, j;
 	long k;
@@ -204,27 +221,10 @@ void orthonormalise(signalStruct *out, signalStruct *in, long minfr, long maxfr)
 	}
 }
 
-double match_Simple(signalStruct *in, long minfrfr, long maxfr) {
-	short i;
-	long j;
-	for (i = 0; i < 2; i++) {
-		for (j = 0; j < in->size; j++) {
-			in->signal[2 * i][j] += in->signal[2 * i + 1][j];
-		}
-		fftw_execute(in->plan[2 * i]);
-	}
-	double prod12, prod11, prod22;
-	prod12 = inner_Product(in->csignal[0], in->csignal[2], in->psd, minfrfr,
-			maxfr);
-	prod11 = inner_Product(in->csignal[0], in->csignal[0], in->psd, minfrfr,
-			maxfr);
-	prod22 = inner_Product(in->csignal[2], in->csignal[2], in->psd, minfrfr,
-			maxfr);
-	return prod12 / sqrt(prod11 * prod22);
-}
-
-double match_Typical(signalStruct *in, long minfr, long maxfr,
-		maxMethods method) {
+double match_Typical(signalStruct *in, long minfr, long maxfr) {
+	assert(in);
+	assert(minfr>0);
+	assert(minfr< maxfr);
 	short i, j;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		fftw_execute(in->plan[i]);
@@ -237,7 +237,6 @@ double match_Typical(signalStruct *in, long minfr, long maxfr,
 					minfr, maxfr);
 		}
 	}
-	if (method == TIME) {
 		long k;
 		double M, Mmax = 0.;
 		fftw_complex * new;
@@ -263,36 +262,13 @@ double match_Typical(signalStruct *in, long minfr, long maxfr,
 			Mmax = Mmax > M ? Mmax : M;
 		}
 		return Mmax / 2.; /// az IFFT f_min...f_max és -f_max...-f_min közötti tartományt is transzformálja
-	} else {
-		return sqrt(SQR(prod[H1P][H2P]) / (prod[H1P][H1P] * prod[H2P][H2P])
-				+ SQR(prod[H1P][H2C]) / (prod[H1P][H1P] * prod[H2C][H2C]));
-	}
-}
-
-void calc_Overlap(double *best, double *worst, signalStruct *in, long minfr,
-		long maxfr) {
-	short i, j;
-	for (i = 0; i < NUM_OF_SIGNALS; i++) {
-		fftw_execute(in->plan[i]);
-	}
-	orthonormalise(NULL, in, minfr, maxfr);
-	double prod[4][4];
-	for (i = 0; i < NUM_OF_SIGNALS; i++) {
-		for (j = 0; j < NUM_OF_SIGNALS; j++) {
-			prod[i][j] = inner_Product(in->csignal[i], in->csignal[j], in->psd,
-					minfr, maxfr);
-		}
-	}
-	double A = SQR(prod[H1P][H2P]) + SQR(prod[H1P][H2C]);
-	double B = SQR(prod[H1C][H2P]) + SQR(prod[H1C][H2C]);
-	double C = (prod[H1P][H2P] * prod[H1C][H2P] + prod[H1P][H2C]
-			* prod[H1C][H2C]);
-	*best = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
-	*worst = sqrt((A + B) / 2. - sqrt(SQR(A - B) / 4. + SQR(C)));
 }
 
 void calc_Overlap_Time(double *best, double *worst, signalStruct *in,
 		long minfr, long maxfr) {
+	assert(in);
+	assert(minfr>0);
+	assert(minfr< maxfr);
 	short i, j;
 	long k;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
@@ -328,6 +304,7 @@ void calc_Overlap_Time(double *best, double *worst, signalStruct *in,
 }
 
 double match_Best(signalStruct *in, double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS]) {
+	assert(in);
 	double A, B, C, M, maxfr_Match = 0.;
 	long i;
 	for (i = 0; i < in->size; i++) {
@@ -343,6 +320,7 @@ double match_Best(signalStruct *in, double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS])
 
 double match_Worst(signalStruct *in,
 		double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS]) {
+	assert(in);
 	double A, B, C, M, maxfr_Match = 0.;
 	long i;
 	for (i = 0; i < in->size; i++) {
@@ -355,68 +333,3 @@ double match_Worst(signalStruct *in,
 	}
 	return maxfr_Match / 2.; /// az IFFT f_min...f_max és -f_max...-f_min közötti tartományt is transzformálja
 }
-
-// Old Version Starts
-
-void blackman(double array[], long length, double wn[]) {
-	double w, swss = 0.;
-	double n = length;
-	long i;
-	for (i = 0; i < length; i++) {
-		w = 0.42 - 0.5 * cos(2. * pi * (double) i / n) + 0.08 * cos(4. * pi
-				* (double) i / n);
-		wn[i] = array[i] * w;
-		swss += (w * w);
-	}
-	swss = sqrt(swss / n);
-	for (i = 0; i < length; i++) {
-		wn[i] /= swss;
-	}
-}
-
-double* psd(double n[], long length, double dt, void(*winf)(double array[],
-		long length, double wn[])) {
-	winf(n, 0, n);
-	double * wn = fftw_malloc(length * sizeof(double));
-	fftw_complex *cn = fftw_malloc(length * sizeof(fftw_complex));
-	fftw_plan pn = fftw_plan_dft_r2c_1d(length, wn, cn, FFTW_ESTIMATE);
-	blackman(n, length, wn);
-	fftw_execute(pn);
-	long i;
-	for (i = 0; i < length; i++) {
-		wn[i] = (cn[i][0] * cn[i][0] + cn[i][1] * cn[i][1]) * 2. * dt / length;
-	}
-	fftw_destroy_plan(pn);
-	fftw_free(cn);
-	return wn;
-}
-
-void calc_Time_Corr(double h1[], double h2[], double dest[], long length) {
-	long i, j;
-	long x = length - 1;
-	for (i = 0; i < 2 * length; i++) {
-		dest[i] = 0.;
-	}
-	for (i = 0; i < length; i++) {
-		for (j = 0; j < length - i; j++) {
-			dest[i + length] = (dest[x] += (h2[j] * h1[j + i]));
-		}
-		x--;
-	}
-}
-
-void copy_Detector(detector_Struct source, detector_Struct *dest) {
-	dest->length = source.length;
-	dest->det = source.det;
-	dest->t = source.t;
-	dest->s = source.s;
-	dest->n = source.n;
-	dest->ct = source.ct;
-	dest->cs = source.cs;
-	dest->cn = source.cn;
-	dest->pt = source.pt;
-	dest->ps = source.ps;
-	dest->pn = source.pn;
-}
-
-// Old Version Ends

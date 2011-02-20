@@ -7,25 +7,30 @@
 #ifndef VARIABLES_H_
 #define VARIABLES_H_
 
+#include <assert.h>
+
+/**
+ * X
+ */
 typedef struct {
-	long index;
-	double time_Sampling;
-	double freq_Sampling;
-	double freq_Initial;
-	double freq_Final;
-	double periods[2];
-	double periodsD;
-	char order[50];
-	char spin_Cont[10];
-	char name[50];
-	double match_Typ;
-	double match_TypT;
-	double match_Best;
-	double match_Worst;
-	double match_BestT;
-	double match_WorstT;
+	long index;///<a
+	double time_Sampling;///<a
+	double freq_Sampling;///<a
+	double freq_Initial;///<a
+	double freq_Final;///<a
+	double periods[2];///<a
+	double periodsD;///<a
+	char order[50];///<a
+	char spin_Cont[10];///<a
+	char name[50];///<a
+	double match_Typ;///<a
+	double match_Best;///<a
+	double match_Worst;///<a
 } program_Params;
 
+/**
+ * X
+ */
 typedef struct {
 	double m; ///< mass in \f$M_\odot\f$
 	double theta; ///< inclination in the \f$x,y,z\f$ radiation and in \f$l,k,z\f$ frame #l=y
@@ -47,20 +52,23 @@ typedef struct {
 	double dec; ///< declination
 	double pol; ///< polarisation
 	double alpha; ///< right ascension
-	double gmst;
+	double gmst;///<a
 	double F[2]; ///< antenna functions: \f$F_+, F_\times\f$
 } antenna_Func;
 
+/**
+ * X
+ */
 typedef struct {
 	black_Hole bh[2]; ///< parameters of the BHs
 	double M; ///< the total mass of the system
 	double chirpM; ///< the chirp mass of the system
 	double eta; ///< symmetric mass ratio of the system
-	double mu;
+	double mu;///<a
 	double incl; ///< inlination of the system
 	double dist; ///< distance of the system
-	double coaPhase;
-	double coaTime[2];
+	double coaPhase;///<a
+	double coaTime;///<a
 	antenna_Func F; ///< antenna functions
 } binary_System;
 
@@ -71,10 +79,15 @@ typedef enum detector_Enum {
 	LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT
 } detector;
 
+/**
+ * X
+ */
 typedef struct detector_table {
-	enum detector_Enum id;
-	char* name;
-	double nx[3], ny[3], x[3];
+	enum detector_Enum id;///<a
+	char* name;///<a
+	double nx[3];///<a
+	double ny[3];///<a
+	double x[3];///<a
 } detector_table;
 
 #endif /* VARIABLES_H_ */

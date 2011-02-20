@@ -1,6 +1,3 @@
-################################################################################
-# Automatically-generated file. Do not edit!
-################################################################################
 
 -include ../makefile.init
 
@@ -28,7 +25,7 @@ all: match
 match: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -L/usr/lib/ $(SHARED) -o"match" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"test" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

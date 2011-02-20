@@ -16,10 +16,12 @@ double randn(double n) {
 }
 
 double randnk(double lower, double upper) {
+	assert(lower<upper);
 	return (lower + upper) * (double)rand() / ((double)RAND_MAX + 1.) - lower;
 }
 
 long ceil_po2(double num) {
+	assert(num>0.);
 	register double temp = log(num) / M_LN2;
 #ifdef __USE_ISOC99
 	return (long) exp2(ceil(temp));

@@ -48,11 +48,7 @@ double GMST(double GPSsec);
  *		The function calulates the given detectors response-function. Currentli supports only three.
  *	\bug	Még be kell fejezni a többi detektorra
  * @param[in]	det	: the detectors ID from the enumeration, (LL : Livingston, LH : Hanford, VIRGO: Virgo)
- * @param[in]	dec	: the declination of the source
- * @param[in]	phi	: \todo ez mi
- * @param[in]	pol	: the sources polarization angle
- * @param[out] fp	: F+
- * @param[out] fc	: Fx
+ * @param[out]	sys
  */
 void calc_Response_For_Detector(detector det, binary_System *sys);
 
