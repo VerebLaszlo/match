@@ -5,12 +5,15 @@ match
 
 # generated
 
+# hidden files
+*~
+*.autosave
+
 # folders
+doc
 
 # Ignore the folders
 
 # Ignore everything starting with dot, exept .gitignore
-*~
-*.autosave
 .*
 !.gitignore

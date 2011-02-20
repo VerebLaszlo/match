@@ -32,6 +32,11 @@ match: $(OBJS) $(USER_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
+doxy: ../*.h
+	@echo 'Generating documentation'
+	doxygen ../Doxyfile
+	@echo 'Finished generating documentation'
+
 # Other Targets
 clean:
 	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match

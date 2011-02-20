@@ -1,8 +1,7 @@
 /*
- * variables.h
- *
- *  Created on: 2010.10.24.
- *      Author: vereb
+ * @file variables.h
+ * @author Veréb László
+ * @date 2010.10.24.
  */
 
 #ifndef VARIABLES_H_
@@ -73,9 +72,9 @@ typedef enum detector_Enum {
 } detector;
 
 typedef struct detector_table {
-    enum detector_Enum id;
-    char* name;
-    double nx[3],ny[3],x[3];
+	enum detector_Enum id;
+	char* name;
+	double nx[3], ny[3], x[3];
 } detector_table;
 
 #endif /* VARIABLES_H_ */

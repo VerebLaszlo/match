@@ -56,8 +56,8 @@ void destroy_Signal_Struct(signalStruct *s);
  *		Calculates the normalized scalar product in frequency domain using the
  * values between the two given frequency bins. The used formulae is:
  * \f[
- *		\newcommand{\in_prod}[2]{\langle#1|#2\rangle}
- * 		\in_prod{s_1}{s_2}=4\Re\int_{f_minfr}^{f_maxfr}
+ *		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
+ * 		\inProd{s_1}{s_2}=4\Re\int_{f_minfr}^{f_maxfr}
  * 			\frac{\tilde s_1\left(f\right)\tilde s_2^*\left(f\right)}
  * 			{S_h\left(f\right)}df
  * \f]
@@ -77,8 +77,8 @@ void product(fftw_complex out[], fftw_complex left[], fftw_complex right[],
 /**	Normalise the given signals.
  *		The function normalise the signals according to the formula
  * \f[
- * 		\newcommand{\in_prod}[2]{\langle#1|#2\rangle}
- * 		\tilde e=\frac{\tilde s}{\sqrt{\in_prod{s}{s}}}
+ * 		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
+ * 		\tilde e=\frac{\tilde s}{\sqrt{\inProd{s}{s}}}
  * \f]
  * You can give a signalStruct, to store the normalised signals in, or a NULL
  * pointer, to overwrite the original signals.
@@ -94,9 +94,9 @@ void normalise(signalStruct *out, signalStruct *in, long minfr, long maxfr);
 /** Orthogonisate the given signals.
  *		The function orthogonise the signals according to the formula
  * \f[
- * 		\newcommand{\in_prod}[2]{\langle#1|#2\rangle}
+ * 		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
  * 		\tilde e_\perp=\tilde e_\times-e_+
- * 			\frac{\in_prod{e_+}{e_\times}}{\in_prod{e_+}{e_+}}
+ * 			\frac{\inProd{e_+}{e_\times}}{\inProd{e_+}{e_+}}
  * \f]
  * You can give a signalStruct, to store the orthogonised signals in, or a NULL
  * pointer, to overwrite the original signals.
@@ -125,9 +125,9 @@ void orthonormalise(signalStruct *out, signalStruct *s, long minfr, long maxfr);
 
 /** Calculates the simplest overlap.
  * \f[
- * 		\newcommand{\in_prod}[2]{\langle#1|#2\rangle}
+ * 		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
  * 		s=s_+F_++s_\timesF_\times
- * 		O=\frac{in_prod{s_1}{s_2}}{sqrt{in_prod{s_1}{s_1}in_prod{s_2}{s_2}}}
+ * 		O=\frac{inProd{s_1}{s_2}}{sqrt{inProd{s_1}{s_1}inProd{s_2}{s_2}}}
  * \f]
  * @param[in] in    : structure containing the signals
  * @param[in] minfr : starting index
