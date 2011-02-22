@@ -9,24 +9,24 @@
 #include "match.h"
 #include "util.h"
 #include "detector.h"
-#include "match_Multi.h"
+//#include "match_Multi.h"
 
 #include <stdio.h>
 
 #define MOD_SPIN_INDEX 0///<C
-/*
- #include <lal/LALSQTPNWaveformInterface.h>
- #include <lal/LALNoiseModelsInspiral.h>
- #include <lal/GeneratePPNInspiral.h>
- #include <lal/SimulateCoherentGW.h>	// CoherentGW
- #include <lal/LIGOMetadataTables.h>		// SimInspiralTable
- #include <lal/GenerateInspiral.h>
- #include <lal/LALInspiralBank.h>
- #include <lal/LALDatatypes.h>		// LALStatus)
- #include <lal/LALInspiral.h>
- #include <lal/LALStdlib.h>
- #include <lal/RealFFT.h>
- */
+#include <lal/LALSQTPNWaveformInterface.h>
+#include <lal/LALNoiseModelsInspiral.h>
+#include <lal/GeneratePPNInspiral.h>
+#include <lal/SimulateCoherentGW.h>	// CoherentGW
+#include <lal/LIGOMetadataTables.h>		// SimInspiralTable
+#include <lal/GenerateInspiral.h>
+#include <lal/LALInspiralBank.h>
+#include <lal/LALDatatypes.h>		// LALStatus)
+#include <lal/LALInspiral.h>
+#include <lal/LALStdlib.h>
+#include <lal/RealFFT.h>
+
+short is_First;
 
 /**
  * X
@@ -68,6 +68,7 @@ typedef struct System_Parameters {
 	double freq_Max;///<a
 	double freq_Step;///<a
 	double min_Match;///<a
+	double critical_Match;///<a
 	double delta_Length;///<a
 	char approx[FILE_NAME_LENGTH];///<a
 	char phase[FILE_NAME_LENGTH];///<a
@@ -99,13 +100,13 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
 
 void generate_Parameters(System_Parameters *parameters, binary_System *limits);
 
-void incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters);
+short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters);
 
 void increment_Spin_Of_Binary_System(binary_System *system, double step);
 
 void increment_Spins(System_Parameters* parameters);
 
-void calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters);
+short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters);
 
 void initLALParameters(LALParameters *lalparams, System_Parameters *parameters);
 
@@ -137,7 +138,7 @@ int main(int argc, char *argv[]) {
 	System_Parameters parameters;
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
 	read_Parameters(limits_Of_Parameters, parameters_File_Name);
-	puts("1");
+	puts("Start!!");
 	run_Algorithm(&program_Parameters, &parameters, limits_Of_Parameters);
 	puts("Done!!!");
 	return 0;
@@ -216,9 +217,13 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
 	assert(limits);
 	assert(program_Parameters->number_Of_Runs > 0);
 	srand(86);
-	for (long i = 0; i < program_Parameters->number_Of_Runs; i++) {
+	short is_Good;
+	for (long i = 0; i < program_Parameters->number_Of_Runs;) {
 		generate_Parameters(parameters, limits);
-		incrementing_Spins(program_Parameters, parameters);
+		is_Good = incrementing_Spins(program_Parameters, parameters);
+		if (is_Good) {
+			i++;
+		}
 	}
 }
 
@@ -240,16 +245,27 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
  * @param prog
  * @param parameters
  */
-void incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters) {
+short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters) {
 	assert(prog);
 	assert(parameters);
 	char temp[FILE_NAME_LENGTH];
 	sprintf(temp, "%s", prog->folder);
+	is_First = 1;
+	short is_Good;
+	parameters->critical_Match = 0.0;
 	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < parameters->max_Spin; increment_Spin_Of_Binary_System(
 			&parameters->system[MOD_SPIN_INDEX], parameters->spin_Step)) {
-		calc_Matches_For_ParameterPair(prog, parameters);
+		is_Good = calc_Matches_For_ParameterPair(prog, parameters);
+		if (is_First) {
+			if (!is_Good) {
+				return is_Good;
+			}
+			parameters->critical_Match = parameters->match_Minimax;
+			is_First = 0;
+		}
 		sprintf(prog->folder, "%s", temp);
 	}
+	return is_Good;
 }
 
 /** Done
@@ -277,7 +293,7 @@ inline void increment_Spins(System_Parameters* parameters) {
  * @param prog
  * @param parameters
  */
-void calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters) {
+short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters) {
 	assert(prog);
 	assert(parameters);
 	static LALParameters lalparams;
@@ -328,14 +344,19 @@ void calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters 
 	}
 	parameters->match_Typ = match_Typical(&sig[0], minfr, maxfr);
 	calc_Overlap_Time(&parameters->match_Best, &parameters->match_Minimax, &sig[1], minfr, maxfr);
-	write_Waves_To_Files(prog, parameters, sig);
+	if (parameters->match_Minimax > parameters->min_Match) {
+		write_Waves_To_Files(prog, parameters, sig);
+	}
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
-	//XLALSQTPNDestroyCoherentGW(&waveform[1]);
 	destroy_Signal_Struct(&sig[0]);
 	destroy_Signal_Struct(&sig[1]);
 	destroy_Signal_Struct(&sig[2]);
 	XLALFree(lalparams.randIn.psd.data);
+	if (parameters->match_Minimax > parameters->min_Match) {
+		return 1;
+	}
+	return 0;
 }
 
 /**
@@ -404,23 +425,17 @@ void write_Waves_To_Files(Program_Parameters *prog, System_Parameters *parameter
 	static short index[3] = { 0, 0, 0 };
 	char temp[FILE_NAME_LENGTH];
 	sprintf(temp, "%s", prog->folder);
-	if (parameters->match_Minimax > parameters->min_Match && (parameters->max_Length
+	if (parameters->match_Minimax > parameters->critical_Match && (parameters->max_Length
 			- parameters->min_Length) * parameters->time_Sampling < parameters->delta_Length) {
 		puts("A");
 		sprintf(prog->folder, "%s/best", temp);
 		write_Wave_To_File(prog, parameters, sig, index[0]);
 		index[0]++;
-	} else if (parameters->match_Minimax > parameters->min_Match) {
+	} else if (parameters->match_Minimax > parameters->critical_Match) {
 		puts("B");
 		sprintf(prog->folder, "%s/match", temp);
 		write_Wave_To_File(prog, parameters, sig, index[1]);
 		index[1]++;
-	} else if ((parameters->max_Length - parameters->min_Length) * parameters->time_Sampling
-			< parameters->delta_Length) {
-		puts("C");
-		sprintf(prog->folder, "%s/length", temp);
-		write_Wave_To_File(prog, parameters, sig, index[2]);
-		index[2]++;
 	}
 }
 
@@ -478,7 +493,11 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 		fflush(stdout);
 		abort();
 	}
-	sprintf(file_Name, "%s/wave%d.txt", prog->folder, index);
+	if (is_First) {
+		sprintf(file_Name, "%s/wave%d.txtf", prog->folder, index);
+	} else {
+		sprintf(file_Name, "%s/wave%d.txt", prog->folder, index);
+	}
 	file = fopen(file_Name, "w");
 	sprintf(temp, "%%%d.%dlg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
 	sprintf(text, "%s%s%s", temp, temp, temp);
