@@ -342,8 +342,9 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 		fr += parameters->freq_Step;
 		maxfr++;
 	}
-	parameters->match_Typ = match_Typical(&sig[0], minfr, maxfr);
-	calc_Overlap_Time(&parameters->match_Best, &parameters->match_Minimax, &sig[1], minfr, maxfr);
+	calc_Matches(&sig[0], minfr, maxfr, &parameters->match_Typ, &parameters->match_Best, &parameters->match_Minimax);
+	//parameters->match_Typ = match_Typical(&sig[0], minfr, maxfr);
+	//calc_Overlap_Time(&parameters->match_Best, &parameters->match_Minimax, &sig[1], minfr, maxfr);
 	if (parameters->match_Minimax > parameters->min_Match) {
 		write_Waves_To_Files(prog, parameters, sig);
 	}

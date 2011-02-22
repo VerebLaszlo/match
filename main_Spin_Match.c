@@ -169,11 +169,11 @@ detector_Struct max_Det;
 			fr += freq_Step;
 			max_Final_Fr++;
 		}
-		double max_ts = inner_Product(max_Det.ct, max_Det.cs, max_PSD,
+		double max_ts = inner_Product_Old(max_Det.ct, max_Det.cs, max_PSD,
 				max_Init_Fr, max_Final_Fr);
-		double max_tt = inner_Product(max_Det.ct, max_Det.ct, max_PSD,
+		double max_tt = inner_Product_Old(max_Det.ct, max_Det.ct, max_PSD,
 				max_Init_Fr, max_Final_Fr);
-		double max_ss = inner_Product(max_Det.cs, max_Det.cs, max_PSD,
+		double max_ss = inner_Product_Old(max_Det.cs, max_Det.cs, max_PSD,
 				max_Init_Fr, max_Final_Fr);
 		printf("filling: % -15.5lg % -15.5lg % -15.5lg: % -15.5lg\n", max_ts, max_tt, max_ss, max_ts / sqrt(max_tt * max_ss));
 		fftw_free(max_PSD);

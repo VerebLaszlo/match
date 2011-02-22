@@ -263,11 +263,11 @@ int Calculate( SimInspiralTable injParams, PPNParamStruc ppnParams) {
                     fr += freq_step;
                     index_f++;
             }
-            ts = inner_Product(match.csignal[0], match.csignal[1], psd, freq_i,
+            ts = inner_Product_Old(match.csignal[0], match.csignal[1], psd, freq_i,
                             freq_f);
-            tt = inner_Product(match.csignal[0], match.csignal[0], psd, freq_i,
+            tt = inner_Product_Old(match.csignal[0], match.csignal[0], psd, freq_i,
                             freq_f);
-            ss = inner_Product(match.csignal[1], match.csignal[1], psd, freq_i,
+            ss = inner_Product_Old(match.csignal[1], match.csignal[1], psd, freq_i,
                             freq_f);
 //		printf("see: "PREC PREC PREC ", overlap: "PREC"\n", ts, tt, ss, ts
 //				/ sqrt(tt * ss));

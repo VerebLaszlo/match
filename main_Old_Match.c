@@ -166,12 +166,12 @@ int main(int argc, char *argv[]) {
 			fr += freq_Step;
 			maxfr++;
 		}
-		double ts_old = inner_Product(det_old.ct, det_old.cs, norm, minfr, maxfr);
-		double tt_old = inner_Product(det_old.ct, det_old.ct, norm, minfr, maxfr);
-		double ss_old = inner_Product(det_old.cs, det_old.cs, norm, minfr, maxfr);
-		double ts_new = inner_Product(det_new.ct, det_new.cs, wn, minfr, maxfr);
-		double tt_new = inner_Product(det_new.ct, det_new.ct, wn, minfr, maxfr);
-		double ss_new = inner_Product(det_new.cs, det_new.cs, wn, minfr, maxfr);
+		double ts_old = inner_Product_Old(det_old.ct, det_old.cs, norm, minfr, maxfr);
+		double tt_old = inner_Product_Old(det_old.ct, det_old.ct, norm, minfr, maxfr);
+		double ss_old = inner_Product_Old(det_old.cs, det_old.cs, norm, minfr, maxfr);
+		double ts_new = inner_Product_Old(det_new.ct, det_new.cs, wn, minfr, maxfr);
+		double tt_new = inner_Product_Old(det_new.ct, det_new.ct, wn, minfr, maxfr);
+		double ss_new = inner_Product_Old(det_new.cs, det_new.cs, wn, minfr, maxfr);
 		printf("old: %lg, new: %lg\n", ts_old / sqrt(tt_old * ss_old), ts_new / sqrt(tt_new * ss_new));
 		fftw_free(wn);
 		fftw_free(norm);

@@ -28,11 +28,84 @@ typedef enum {
  */
 typedef struct {
 	double *signal[NUM_OF_SIGNALS]; ///< the signals in time domain with the following order: \f$h_{1+}\f$, \f$h_{1\times}\f$, \f$h_{2+}\f$, \f$h_{2\times}\f$.
+	double *normalised_Signal[NUM_OF_SIGNALS];///<a
 	fftw_complex *csignal[NUM_OF_SIGNALS]; ///< the signals in frequency domain with the following order: \f$\tilde h_{1+}\f$, \f$\tilde h_{1\times}\f$, \f$\tilde h_{2+}\f$, \f$\tilde h_{2\times}\f$.
 	fftw_plan plan[NUM_OF_SIGNALS]; ///< FFT plans to calculate \f$\tilde h_{ij}=F\left(h_{ij}\right)\f$
 	double *psd;///<d
 	long size; ///< the allocated memory for the signals
 } signalStruct;
+
+/**
+ * Needs formulae.
+ * @param in
+ * @param min_Index
+ * @param max_Index
+ * @param typ
+ * @param best
+ * @param minimax
+ */
+void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best, double *minimax);
+
+/**
+ * Needs formulae.
+ * @param in
+ * @param out
+ * @param min_Index
+ * @param max_Index
+ */
+void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out);
+
+/**
+ * Needs formulae.
+ * @param in
+ * @param out
+ * @param min_Index
+ * @param max_Index
+ */
+void normalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out);
+
+/**
+ * Needs formulae.
+ * \f[
+ * 	\int_{min}^{max}\Re(\tilde h\tilde s)df
+ * \f]
+ * @param left
+ * @param right
+ * @param norm
+ * @param min_Index
+ * @param max_Index
+ * @return
+ */
+double inner_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index, long max_Index);
+
+/**
+ * Needs formulae.
+ * @param in
+ * @param out
+ * @param min_Index
+ * @param max_Index
+ */
+void orthogonise(signalStruct *in, long min_Index, long max_Index, signalStruct *out);
+
+/**
+ * Needs formulae.
+ * @param left
+ * @param right
+ * @param norm
+ * @param min_Index
+ * @param max_Index
+ * @param out
+ */
+void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index, long max_Index, fftw_complex out[]);
+
+/**
+ * Needs formulae.
+ * @param in
+ * @param typ
+ * @param best
+ * @param minimax
+ */
+void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best, double *minimax);
 
 /**	Allocates memory for the signals.
  * @param[in] s		: pointer to the structure containing the signals
@@ -62,7 +135,7 @@ void destroy_Signal_Struct(signalStruct *s);
  * @param[in] maxfr   : ending frequency bin
  * @return	the scalar product
  */
-double inner_Product(fftw_complex left[], fftw_complex right[], double norm[],
+double inner_Product_Old(fftw_complex left[], fftw_complex right[], double norm[],
 		long minfr, long maxfr);
 
 /**
@@ -71,7 +144,7 @@ double inner_Product(fftw_complex left[], fftw_complex right[], double norm[],
 void product(fftw_complex out[], fftw_complex left[], fftw_complex right[], double norm[], long minfr, long maxfr);
 
 /**	Normalise the given signals.
- *		The function normalise the signals according to the formula
+ *		The function normalise_Old the signals according to the formula
  * \f[
  * 		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
  * 		\tilde e=\frac{\tilde s}{\sqrt{\inProd{s}{s}}}
@@ -85,10 +158,10 @@ void product(fftw_complex out[], fftw_complex left[], fftw_complex right[], doub
  * @param[in]      minfr : the starting index
  * @param[in]      maxfr : the ending index
  */
-void normalise(signalStruct *out, signalStruct *in, long minfr, long maxfr);
+void normalise_Old(signalStruct *out, signalStruct *in, long minfr, long maxfr);
 
 /** Orthogonisate the given signals.
- *		The function orthogonise the signals according to the formula
+ *		The function orthogonise_Old the signals according to the formula
  * \f[
  * 		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
  * 		\tilde e_\perp=\tilde e_\times-e_+
@@ -103,11 +176,11 @@ void normalise(signalStruct *out, signalStruct *in, long minfr, long maxfr);
  * @param[in]      minfr : the starting index
  * @param[in]      maxfr : the ending index
  */
-void orthogonise(signalStruct *out, signalStruct *in, long minfr, long maxfr);
+void orthogonise_Old(signalStruct *out, signalStruct *in, long minfr, long maxfr);
 
 /** Orthonormalise the given signals.
- * 		The function orthonormalise the signals according to the formulae
- * given in the normalise() and orthogonise() functions.
+ * 		The function orthonormalise_Old the signals according to the formulae
+ * given in the normalise_Old() and orthogonise_Old() functions.
  * You can give a signalStruct, to store the orthogonised signals in, or a NULL
  * pointer, to overwrite the original signals.
  *
@@ -117,7 +190,7 @@ void orthogonise(signalStruct *out, signalStruct *in, long minfr, long maxfr);
  * @param[in]     minfr : the starting index
  * @param[in]     maxfr : the ending index
  */
-void orthonormalise(signalStruct *out, signalStruct *s, long minfr, long maxfr);
+void orthonormalise_Old(signalStruct *out, signalStruct *s, long minfr, long maxfr);
 
 /** Calculates the typical overlap.
  * @param[in] s   : structure containing the signals
