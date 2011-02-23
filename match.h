@@ -10,7 +10,6 @@
 #include <lal/LIGOMetadataTables.h>
 #include <lal/GeneratePPNInspiral.h>
 #include "generator.h"
-#include "detector.h"
 
 /**	sonstants for error reporting
  */
@@ -101,6 +100,8 @@ void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], lon
 /**
  * Needs formulae.
  * @param in
+ * @param min_Index
+ * @param max_Index
  * @param typ
  * @param best
  * @param minimax
@@ -118,111 +119,5 @@ int create_Signal_Struct(signalStruct *s, long size);
  * @param[in] s	: pointer to the structure containing the signals
  */
 void destroy_Signal_Struct(signalStruct *s);
-
-/**	Calculates the normalized scalar product in frequency domain.
- *		Calculates the normalized scalar product in frequency domain using the
- * values between the two given frequency bins. The used formulae is:
- * \f[
- *		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
- * 		\inProd{s_1}{s_2}=4\Re\int_{f_minfr}^{f_maxfr}
- * 			\frac{\tilde s_1\left(f\right)\tilde s_2^*\left(f\right)}
- * 			{S_h\left(f\right)}df
- * \f]
- * @param[in] left  : left vector
- * @param[in] right : right vector
- * @param[in] norm  : normalizing vector
- * @param[in] minfr   : starting frequency bin
- * @param[in] maxfr   : ending frequency bin
- * @return	the scalar product
- */
-double inner_Product_Old(fftw_complex left[], fftw_complex right[], double norm[],
-		long minfr, long maxfr);
-
-/**
- * D
- */
-void product(fftw_complex out[], fftw_complex left[], fftw_complex right[], double norm[], long minfr, long maxfr);
-
-/**	Normalise the given signals.
- *		The function normalise_Old the signals according to the formula
- * \f[
- * 		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
- * 		\tilde e=\frac{\tilde s}{\sqrt{\inProd{s}{s}}}
- * \f]
- * You can give a signalStruct, to store the normalised signals in, or a NULL
- * pointer, to overwrite the original signals.
- *
- * @param[out]     out : stores the normalised signals or NULL
- * @param[in, out] in  : as input contains the signals to be normalised,
- * as ouput contains the normalised signals, if was not specified where to store them
- * @param[in]      minfr : the starting index
- * @param[in]      maxfr : the ending index
- */
-void normalise_Old(signalStruct *out, signalStruct *in, long minfr, long maxfr);
-
-/** Orthogonisate the given signals.
- *		The function orthogonise_Old the signals according to the formula
- * \f[
- * 		\newcommand{\inProd}[2]{\langle#1|#2\rangle}
- * 		\tilde e_\perp=\tilde e_\times-e_+
- * 			\frac{\inProd{e_+}{e_\times}}{\inProd{e_+}{e_+}}
- * \f]
- * You can give a signalStruct, to store the orthogonised signals in, or a NULL
- * pointer, to overwrite the original signals.
- *
- * @param[out]     out : stores the orthogonised signals or NULL
- * @param[in, out] in  : as input contains the signals to be orthogonised,
- * as output contains the orthogonised signals, if was not specified where to store them
- * @param[in]      minfr : the starting index
- * @param[in]      maxfr : the ending index
- */
-void orthogonise_Old(signalStruct *out, signalStruct *in, long minfr, long maxfr);
-
-/** Orthonormalise the given signals.
- * 		The function orthonormalise_Old the signals according to the formulae
- * given in the normalise_Old() and orthogonise_Old() functions.
- * You can give a signalStruct, to store the orthogonised signals in, or a NULL
- * pointer, to overwrite the original signals.
- *
- * @param[out]    out : stores the orthonormalised signals
- * @param[in,out] s  : as input contains the signals to be orthonormalised,
- * as output contains the orthonormalised signals, if was not specified where to strore them
- * @param[in]     minfr : the starting index
- * @param[in]     maxfr : the ending index
- */
-void orthonormalise_Old(signalStruct *out, signalStruct *s, long minfr, long maxfr);
-
-/** Calculates the typical overlap.
- * @param[in] s   : structure containing the signals
- * @param[in] minfr : starting index
- * @param[in] maxfr : ending index
- * @return the overlap
- */
-double match_Typical(signalStruct *s, long minfr, long maxfr);
-
-/**	Calculates the M_best overlap
- * @param[in] s   : the structure containing the signals
- * @param[in] prod
- * @return the best match
- */
-double match_Best(signalStruct *s, double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS]);
-
-/**	Calculates the M_minfrimaxfr overlap
- * @param[in] s   : the structure containing the signals
- * @param[out] prod
- * @return the minfrimaxfr match
- */
-double match_Worst(signalStruct *s, double prod[NUM_OF_SIGNALS][NUM_OF_SIGNALS]);
-
-/** Calculates the two overlaps.
- * In the signalStruct structure only the signals must to be given and the length of the signals
- * @param[out] best  : the M_best overlap
- * @param[out] worst : the M_minfrimaxfr overlap
- * @param[in]  in     : the structure containing the signals
- * @param[in]  minfr   : the starting index
- * @param[in]  maxfr   : the endign index
- */
-void calc_Overlap_Time(double *best, double *worst, signalStruct *in,
-		long minfr, long maxfr);
 
 #endif

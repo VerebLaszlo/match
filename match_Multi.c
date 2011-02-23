@@ -205,15 +205,13 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 			maxfr++;
 		}
 		//		printf("Simp = "PREC"\n", match_Simple(&simp, minfr, maxfr));fflush(stdout);
-		params->match_Typ = match_Typical(&sig[0], minfr, maxfr);
+		calc_Matches(&sig[0], minfr, maxfr, &params->match_Typ, &params->match_Best, &params->match_Worst);
 		//printf("%ld %d: %lg %lg\n", i, maxTindex, maxT, params->match_TypT);
 		if (params->match_Typ > maxT && params->match_Typ < 1.) {
 			maxT = params->match_Typ;
 			maxTindex = i;
 			printf("%d: % 20.15lg %lg\n", maxTindex, maxT, act[i].bh[0].chi_Amp);
 		}
-		calc_Overlap_Time(&params->match_Best, &params->match_Worst, &sig[3],
-				minfr, maxfr);
 		sprintf(file_Name, "%s%dgen%04ld.dat", dir, (int) act[i].bh[0].m, i);
 		file = fopen(file_Name, "w");
 		print_Binary_System(&act[i], params, file, f0, f1);

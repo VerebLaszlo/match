@@ -8,10 +8,7 @@
 #define GENERATOR_H
 
 #include <float.h>
-#include <stdio.h>
-#include <string.h>
 #include "util_math.h"
-#include "variables.h"
 #include "detector.h"
 
 #define PREC "% -14.8lg "///<a

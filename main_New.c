@@ -5,20 +5,14 @@
  * @author vereb
  */
 
-#include "generator.h"
 #include "match.h"
-#include "util.h"
-#include "detector.h"
-//#include "match_Multi.h"
-
-#include <stdio.h>
 
 #define MOD_SPIN_INDEX 0///<C
 #include <lal/LALSQTPNWaveformInterface.h>
 #include <lal/LALNoiseModelsInspiral.h>
-#include <lal/GeneratePPNInspiral.h>
+//#include <lal/GeneratePPNInspiral.h>
 #include <lal/SimulateCoherentGW.h>	// CoherentGW
-#include <lal/LIGOMetadataTables.h>		// SimInspiralTable
+//#include <lal/LIGOMetadataTables.h>		// SimInspiralTable
 #include <lal/GenerateInspiral.h>
 #include <lal/LALInspiralBank.h>
 #include <lal/LALDatatypes.h>		// LALStatus)
@@ -26,7 +20,7 @@
 #include <lal/LALStdlib.h>
 #include <lal/RealFFT.h>
 
-short is_First;
+short is_First;///<a
 
 /**
  * X
@@ -221,6 +215,8 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
 	for (long i = 0; i < program_Parameters->number_Of_Runs;) {
 		generate_Parameters(parameters, limits);
 		is_Good = incrementing_Spins(program_Parameters, parameters);
+		puts("R");
+		exit(-1);
 		if (is_Good) {
 			i++;
 		}
@@ -237,13 +233,13 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
 	assert(limits);
 	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 	memcpy(&parameters->system[1], &parameters->system[0], sizeof(binary_System));
-	gen_Parameters(&parameters->system[1], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 }
 
 /**
- * Done
+ * Done.
  * @param prog
  * @param parameters
+ * @return
  */
 short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters) {
 	assert(prog);
@@ -292,6 +288,7 @@ inline void increment_Spins(System_Parameters* parameters) {
  * Done.
  * @param prog
  * @param parameters
+ * @return
  */
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters) {
 	assert(prog);
@@ -343,8 +340,6 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 		maxfr++;
 	}
 	calc_Matches(&sig[0], minfr, maxfr, &parameters->match_Typ, &parameters->match_Best, &parameters->match_Minimax);
-	//parameters->match_Typ = match_Typical(&sig[0], minfr, maxfr);
-	//calc_Overlap_Time(&parameters->match_Best, &parameters->match_Minimax, &sig[1], minfr, maxfr);
 	if (parameters->match_Minimax > parameters->min_Match) {
 		write_Waves_To_Files(prog, parameters, sig);
 	}
