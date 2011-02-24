@@ -103,15 +103,19 @@ void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index
 	assert(in);
 	assert(in->size);
 	double A, B, C;
-	double match_typ, max_Typ;
-	double match_best, max_Best;
-	double match_minimax, max_Minimax;
+	double match_typ, max_Typ = 0.0;
+	double match_best, max_Best = 0.0;
+	double match_minimax, max_Minimax = 0.0;
 	for (long i = 0; i < in->size; i++) {
 		A = SQR(in->normalised_Signal[H1P][i]) + SQR(in->normalised_Signal[H1C][i]);
 		B = SQR(in->normalised_Signal[H2P][i]) + SQR(in->normalised_Signal[H2C][i]);
 		C = in->normalised_Signal[H1P][i] * in->normalised_Signal[H2P][i]
 				+ in->normalised_Signal[H1C][i] * in->normalised_Signal[H2C][i];
 		match_typ = sqrt(A);
+		/*if (match_typ > 0.99) {
+		 printf("%ld, %ld, %ld: %lg\n", min_Index, max_Index, i, match_typ);
+		 fflush(stdout);
+		 }*/
 		max_Typ = max_Typ > match_typ ? max_Typ : match_typ;
 		match_best = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
 		max_Best = max_Best > match_best ? max_Best : match_best;

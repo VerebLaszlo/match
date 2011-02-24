@@ -1,4 +1,4 @@
-5
+1
 17
 5
 proba
@@ -8,8 +8,11 @@ proba
 10240.
 40.0
 0.01
-xx.
 SpinQuadTaylor
 twoPointFivePN
 100
 SOSSQM
+SpinQuadTaylor
+twoPointFivePN
+100
+SOSS

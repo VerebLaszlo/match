@@ -64,10 +64,10 @@ typedef struct System_Parameters {
 	double min_Match;///<a
 	double critical_Match;///<a
 	double delta_Length;///<a
-	char approx[FILE_NAME_LENGTH];///<a
-	char phase[FILE_NAME_LENGTH];///<a
-	char amp[FILE_NAME_LENGTH];///<a
-	char spin[FILE_NAME_LENGTH];///<a
+	char approx[2][FILE_NAME_LENGTH];///<a
+	char phase[2][FILE_NAME_LENGTH];///<a
+	char amp[2][FILE_NAME_LENGTH];///<a
+	char spin[2][FILE_NAME_LENGTH];///<a
 } System_Parameters;
 
 /**
@@ -163,10 +163,14 @@ void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *
 	params->time_Sampling = 1. / params->freq_Sampling;
 	fscanf(file, "%lg\n", &params->freq_Initial);
 	fscanf(file, "%lg\n", &params->delta_Length);
-	fscanf(file, "%s\n", params->approx);
-	fscanf(file, "%s\n", params->phase);
-	fscanf(file, "%s\n", params->amp);
-	fscanf(file, "%s\n", params->spin);
+	fscanf(file, "%s\n", params->approx[0]);
+	fscanf(file, "%s\n", params->phase[0]);
+	fscanf(file, "%s\n", params->amp[0]);
+	fscanf(file, "%s\n", params->spin[0]);
+	fscanf(file, "%s\n", params->approx[1]);
+	fscanf(file, "%s\n", params->phase[1]);
+	fscanf(file, "%s\n", params->amp[1]);
+	fscanf(file, "%s\n", params->spin[1]);
 	fclose(file);
 }
 
@@ -215,8 +219,6 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
 	for (long i = 0; i < program_Parameters->number_Of_Runs;) {
 		generate_Parameters(parameters, limits);
 		is_Good = incrementing_Spins(program_Parameters, parameters);
-		puts("R");
-		exit(-1);
 		if (is_Good) {
 			i++;
 		}
@@ -252,6 +254,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < parameters->max_Spin; increment_Spin_Of_Binary_System(
 			&parameters->system[MOD_SPIN_INDEX], parameters->spin_Step)) {
 		is_Good = calc_Matches_For_ParameterPair(prog, parameters);
+		break;
 		if (is_First) {
 			if (!is_Good) {
 				return is_Good;
@@ -295,7 +298,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	assert(parameters);
 	static LALParameters lalparams;
 	//	double f0, f1;
-	signalStruct sig[3];
+	signalStruct sig;
 	initLALParameters(&lalparams, parameters);
 	for (short i = 0; i < 2; i++) {
 		memset(&lalparams.status, 0, sizeof(LALStatus));
@@ -305,7 +308,8 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform\n", i);
 			continue;
 		}
-		parameters->system[i].coaPhase = lalparams.injParams[i].f_final;
+		parameters->system[i].coaPhase
+				= lalparams.waveform[i].phi->data->data[lalparams.waveform[i].phi->data->length];
 		parameters->system[i].coaTime = (lalparams.waveform[i].f->data->length - 1)
 				* parameters->time_Sampling;
 	}
@@ -317,16 +321,12 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 			= lalparams.waveform[!lalparams.shorter].f->data->length;
 	parameters->freq_Max = (lalparams.injParams[0].f_final + lalparams.injParams[1].f_final) / 2.;
 	parameters->freq_Step = 1. / (lalparams.ppnParams.deltaT * lalparams.max_Length);
-	create_Signal_Struct(&sig[0], lalparams.waveform[!lalparams.shorter].f->data->length);
-	create_Signal_Struct(&sig[1], lalparams.waveform[!lalparams.shorter].f->data->length);
-	create_Signal_Struct(&sig[2], lalparams.waveform[!lalparams.shorter].f->data->length);
-	createPSD(&lalparams, sig);
+	create_Signal_Struct(&sig, lalparams.waveform[!lalparams.shorter].f->data->length);
+	createPSD(&lalparams, &sig);
 	for (short i = 0; i < 2; i++) {
 		for (long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			sig[2].signal[2 * i][j] = sig[1].signal[2 * i][j] = sig[0].signal[2 * i][j]
-					= lalparams.waveform[i].h->data->data[2 * j];
-			sig[2].signal[2 * i + 1][j] = sig[1].signal[2 * i + 1][j] = sig[0].signal[2 * i + 1][j]
-					= lalparams.waveform[i].h->data->data[2 * j + 1];
+			sig.signal[2 * i][j] = lalparams.waveform[i].h->data->data[2 * j];
+			sig.signal[2 * i + 1][j] = lalparams.waveform[i].h->data->data[2 * j + 1];
 		}
 	}
 	double fr = 0.;
@@ -335,19 +335,24 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 		fr += parameters->freq_Step;
 		maxfr = ++minfr;
 	}
+	printf("%ld\n", sig.size);
+	printf("%ld, %lg\n", minfr, fr);
 	while (fr < parameters->freq_Max) {
 		fr += parameters->freq_Step;
 		maxfr++;
 	}
-	calc_Matches(&sig[0], minfr, maxfr, &parameters->match_Typ, &parameters->match_Best, &parameters->match_Minimax);
+	printf("%ld, %lg\n", maxfr, fr);
+	parameters->match_Typ = parameters->match_Best = parameters->match_Minimax = 0.0;
+	calc_Matches(&sig, minfr, maxfr, &parameters->match_Typ, &parameters->match_Best,
+			&parameters->match_Minimax);
+	printf("% 11.6lg% 11.6lg% 11.6lg\n", parameters->match_Typ, parameters->match_Best,
+			parameters->match_Minimax);
 	if (parameters->match_Minimax > parameters->min_Match) {
-		write_Waves_To_Files(prog, parameters, sig);
+		write_Waves_To_Files(prog, parameters, &sig);
 	}
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
-	destroy_Signal_Struct(&sig[0]);
-	destroy_Signal_Struct(&sig[1]);
-	destroy_Signal_Struct(&sig[2]);
+	destroy_Signal_Struct(&sig);
 	XLALFree(lalparams.randIn.psd.data);
 	if (parameters->match_Minimax > parameters->min_Match) {
 		return 1;
@@ -385,8 +390,8 @@ void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) 
 		lalparams->injParams[i].f_lower = parameters->freq_Initial;
 		lalparams->ppnParams.deltaT = 1. / parameters->freq_Sampling;
 		snprintf(lalparams->injParams[i].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
-				"%s%s%s%s", parameters->approx, parameters->phase, parameters->amp,
-				parameters->spin);
+				"%s%s%s%s", parameters->approx[i], parameters->phase[i], parameters->amp[i],
+				parameters->spin[i]);
 	}
 }
 
@@ -403,7 +408,7 @@ void createPSD(LALParameters *lalparams, signalStruct *sig) {
 	lalparams->randIn.psd.data = (REAL8*) LALMalloc(sizeof(REAL8) * lalparams->randIn.psd.length);
 	LALNoiseSpectralDensity(&lalparams->status, &lalparams->randIn.psd, &LALLIGOIPsd, df);
 	for (long j = 0; j < lalparams->randIn.psd.length; j++) {
-		sig[0].psd[j] = sig[1].psd[j] = lalparams->randIn.psd.data[j];
+		sig->psd[j] = lalparams->randIn.psd.data[j];
 	}
 }
 
@@ -480,6 +485,9 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 				parameters->system[0].coaTime);
 		fprintf(file, text, parameters->system[1].coaTime, parameters->system[0].F.F[0],
 				parameters->system[0].F.F[0]);
+		fprintf(file, "%s %s ", parameters->phase[0], parameters->phase[1]);
+		fprintf(file, "%s %s ", parameters->amp[0], parameters->amp[1]);
+		fprintf(file, "%8s %8s ", parameters->spin[0], parameters->spin[1]);
 		fprintf(file, text, parameters->match_Typ, parameters->match_Best,
 				parameters->match_Minimax);
 		fprintf(file, "%d\n", index);
@@ -506,26 +514,27 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 			parameters->system[0].bh[0].kappa);
 	fprintf(file, text, parameters->system[0].bh[0].psi, parameters->system[0].bh[1].kappa,
 			parameters->system[0].bh[1].psi);
+	fprintf(file, "%s %s ", parameters->phase[0], parameters->phase[1]);
+	fprintf(file, "%s %s ", parameters->amp[0], parameters->amp[1]);
+	fprintf(file, "%8s %8s ", parameters->spin[0], parameters->spin[1]);
 	fprintf(file, text, parameters->match_Typ, parameters->match_Best, parameters->match_Minimax);
 	fprintf(file, "\n");
 	long i;
 	for (i = 0; i < parameters->min_Length; i++) {
 		fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
 				(double) i * parameters->time_Sampling);
-		fprintf(file, text, sig[2].signal[H1P][i], sig[2].signal[H1C][i], sig[2].signal[H1P][i]
-				* parameters->system[0].F.F[0] + sig[2].signal[H1C][i]
-				* parameters->system[0].F.F[1]);
-		fprintf(file, text, sig[2].signal[H2P][i], sig[2].signal[H2C][i], sig[2].signal[H2P][i]
-				* parameters->system[0].F.F[0] + sig[2].signal[H2C][i]
-				* parameters->system[0].F.F[1]);
+		fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
+				* parameters->system[0].F.F[0] + sig->signal[H1C][i] * parameters->system[0].F.F[1]);
+		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
+				* parameters->system[0].F.F[0] + sig->signal[H2C][i] * parameters->system[0].F.F[1]);
 		fprintf(file, "\n");
 	}
 	if (parameters->shorter) {
 		for (; i < parameters->max_Length; i++) {
 			fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
 					(double) i * parameters->time_Sampling);
-			fprintf(file, text, sig[2].signal[H1P][i], sig[2].signal[H1C][i], sig[2].signal[H1P][i]
-					* parameters->system[0].F.F[0] + sig[2].signal[H1C][i]
+			fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
+					* parameters->system[0].F.F[0] + sig->signal[H1C][i]
 					* parameters->system[0].F.F[1]);
 			fprintf(file, "\n");
 		}
@@ -534,9 +543,8 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 				(double) i * parameters->time_Sampling);
 		fprintf(file, "%*s\t%*s\t%*s\t", prog->width_Of_Number_To_Plot, "",
 				prog->width_Of_Number_To_Plot, "", prog->width_Of_Number_To_Plot, "");
-		fprintf(file, text, sig[2].signal[H2P][i], sig[2].signal[H2C][i], sig[2].signal[H2P][i]
-				* parameters->system[0].F.F[0] + sig[2].signal[H2C][i]
-				* parameters->system[0].F.F[1]);
+		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
+				* parameters->system[0].F.F[0] + sig->signal[H2C][i] * parameters->system[0].F.F[1]);
 		fprintf(file, "\n");
 	}
 	fclose(file);
