@@ -11,15 +11,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#ifndef NDEBUG
 #include <string.h>
-#include <math.h>
+#endif
+
+#define CALLER_LENGTHS 100
+
+extern char caller_Function[CALLER_LENGTHS];
+extern char caller_Function_Pretty[CALLER_LENGTHS];
+extern char caller_File[CALLER_LENGTHS];
+extern short caller_Line;
 
 //typedef double * const dpc;
 
 /**	logikai változótípus definiálása ismeretlen értékkel is
  */
 typedef enum {
-	null = -1, false = 0, true = 1
+	false = 0, true = 1
 } bool;
 
 /**

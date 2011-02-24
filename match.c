@@ -1,12 +1,10 @@
-/**
+/*
  * @file match.c
  * @author László Veréb
- * @date 2010.04.09.
+ * @date 2010.04.08.
  */
 
 #include "match.h"
-
-double pi;///<a
 
 void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
 		double *minimax) {
@@ -20,7 +18,7 @@ void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
 	fftw_complex *product = fftw_malloc(in->size * sizeof(fftw_complex));
 	fftw_plan iplan;
 	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
-		iplan = fftw_plan_dft_c2r_1d(in->size, product, in->normalised_Signal[i], FFTW_ESTIMATE);
+		iplan = fftw_plan_dft_c2r_1d(in->size, product, in->product_Signal[i], FFTW_ESTIMATE);
 		cross_Product(in->csignal[i / 2], in->csignal[i % 2 + 2], in->psd, min_Index, max_Index,
 				product);
 		fftw_execute(iplan);
@@ -107,15 +105,11 @@ void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index
 	double match_best, max_Best = 0.0;
 	double match_minimax, max_Minimax = 0.0;
 	for (long i = 0; i < in->size; i++) {
-		A = SQR(in->normalised_Signal[H1P][i]) + SQR(in->normalised_Signal[H1C][i]);
-		B = SQR(in->normalised_Signal[H2P][i]) + SQR(in->normalised_Signal[H2C][i]);
-		C = in->normalised_Signal[H1P][i] * in->normalised_Signal[H2P][i]
-				+ in->normalised_Signal[H1C][i] * in->normalised_Signal[H2C][i];
+		A = SQR(in->product_Signal[HPP][i]) + SQR(in->product_Signal[HPC][i]);
+		B = SQR(in->product_Signal[HCP][i]) + SQR(in->product_Signal[HCC][i]);
+		C = in->product_Signal[HPP][i] * in->product_Signal[HCP][i]
+				+ in->product_Signal[HPC][i] * in->product_Signal[HCC][i];
 		match_typ = sqrt(A);
-		/*if (match_typ > 0.99) {
-		 printf("%ld, %ld, %ld: %lg\n", min_Index, max_Index, i, match_typ);
-		 fflush(stdout);
-		 }*/
 		max_Typ = max_Typ > match_typ ? max_Typ : match_typ;
 		match_best = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
 		max_Best = max_Best > match_best ? max_Best : match_best;
@@ -127,17 +121,15 @@ void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index
 	*minimax = max_Minimax / 2.;
 }
 
-// old
-
-int create_Signal_Struct(signalStruct *signal, long size) {
+void create_Signal_Struct(signalStruct *signal, long size) {
 	assert(size>0);
 	signal->size = size;
 	short i;
 	for (i = 0; i < NUM_OF_SIGNALS; i++) {
 		signal->signal[i] = fftw_malloc(signal->size * sizeof(double));
 		memset(signal->signal[i], 0, signal->size * sizeof(double));
-		signal->normalised_Signal[i] = fftw_malloc(signal->size * sizeof(double));
-		memset(signal->normalised_Signal[i], 0, signal->size * sizeof(double));
+		signal->product_Signal[i] = fftw_malloc(signal->size * sizeof(double));
+		memset(signal->product_Signal[i], 0, signal->size * sizeof(double));
 		signal->csignal[i] = fftw_malloc(signal->size * sizeof(fftw_complex));
 		memset(signal->csignal[i], 0, signal->size * sizeof(fftw_complex));
 		signal->plan[i] = fftw_plan_dft_r2c_1d(signal->size, signal->signal[i], signal->csignal[i],
@@ -145,7 +137,6 @@ int create_Signal_Struct(signalStruct *signal, long size) {
 	}
 	signal->psd = fftw_malloc(signal->size * sizeof(double));
 	memset(signal->psd, 0, signal->size * sizeof(double));
-	return MATCH_SUCCES;
 }
 
 void destroy_Signal_Struct(signalStruct *signal) {
@@ -155,8 +146,8 @@ void destroy_Signal_Struct(signalStruct *signal) {
 		if (signal->signal[i]) {
 			fftw_free(signal->signal[i]);
 		}
-		if (signal->normalised_Signal[i]) {
-			fftw_free(signal->normalised_Signal[i]);
+		if (signal->product_Signal[i]) {
+			fftw_free(signal->product_Signal[i]);
 		}
 		if (signal->csignal[i]) {
 			fftw_free(signal->csignal[i]);

@@ -19,10 +19,10 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: match
+all: test
 
 # Tool invocations
-match: $(OBJS) $(USER_OBJS)
+test: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
 	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"test" $(OBJS) $(USER_OBJS) $(LIBS)
