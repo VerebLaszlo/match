@@ -36,6 +36,16 @@ typedef struct {
 
 /**
  * Needs formulae.
+ * \f{gather*}{
+ * 	M_{best}=\max_{t_0}\left(\frac{A+B}{2}+\left[\left(\frac{A-B}{2}\right)^2+C^2\right]^{0.5}\right)^{0.5}\;
+ * 	M_{minimax}=\max_{t_0}\left(\frac{A+B}{2}-\left[\left(\frac{A-B}{2}\right)^2+C^2\right]^{0.5}\right)^{0.5}\\
+ * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
+ *	A=\inProd{\tilde{e}_{1+}}{\tilde{e}_{2+}}^2+\inProd{\tilde{e}_{1+}}{\tilde{e}_{2\bot}}^2\\
+ * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
+ *	B=\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2+}}^2+\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2\bot}}^2\\
+ * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
+ *	C=\inProd{\tilde{e}_{1+}}{\tilde{e}_{2+}}+\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2+}}+\inProd{\tilde{e}_{1+}}{\tilde{e}_{2\bot}}^2+\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2\bot}}^2\\
+ * \f}
  * @param in
  * @param min_Index
  * @param max_Index
@@ -43,7 +53,8 @@ typedef struct {
  * @param best
  * @param minimax
  */
-void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best, double *minimax);
+void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
+		double *minimax);
 
 /**
  * Needs formulae.
@@ -55,7 +66,11 @@ void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
 void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out);
 
 /**
- * Needs formulae.
+ * Formulae given.
+ * \f{gather*}{
+ * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
+ * 	\tilde{e}=\frac{\tilde{h}}{\sqrt{\inProd{\tilde{h}}{\tilde{h}}}}
+ * \f}
  * @param in
  * @param out
  * @param min_Index
@@ -64,10 +79,11 @@ void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStru
 void normalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out);
 
 /**
- * Needs formulae.
- * \f[
- * 	\int_{min}^{max}\Re(\tilde h\tilde s)df
- * \f]
+ * Formulae given.
+ * \f{gather*}{
+ * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
+ * 	\inProd{h_1}{h_2}=4\Re\int_{f_{min}}^{f_{max}}\frac{\tilde{h}_1(f)\tilde{h}_2^*(f)}{S_h(f)}df
+ * \f}
  * @param left
  * @param right
  * @param norm
@@ -75,10 +91,15 @@ void normalise(signalStruct *in, long min_Index, long max_Index, signalStruct *o
  * @param max_Index
  * @return
  */
-double inner_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index, long max_Index);
+double inner_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index,
+		long max_Index);
 
 /**
  * Needs formulae.
+ * \f{gather*}{
+ * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
+ * 	\tilde{e}_\bot=\tilde{e}_\times-\tilde{e}_+\frac{\inProd{\tilde{e}_+}{\tilde{e}_\times}}{\inProd{\tilde{e}_+}{\tilde{e}_+}}
+ * \f}
  * @param in
  * @param out
  * @param min_Index
@@ -95,7 +116,8 @@ void orthogonise(signalStruct *in, long min_Index, long max_Index, signalStruct 
  * @param max_Index
  * @param out
  */
-void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index, long max_Index, fftw_complex out[]);
+void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index,
+		long max_Index, fftw_complex out[]);
 
 /**
  * Needs formulae.
@@ -106,7 +128,8 @@ void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], lon
  * @param best
  * @param minimax
  */
-void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best, double *minimax);
+void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
+		double *best, double *minimax);
 
 /**	Allocates memory for the signals.
  * @param[in] s		: pointer to the structure containing the signals
