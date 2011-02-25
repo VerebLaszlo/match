@@ -12,24 +12,40 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-
-#ifdef FGV_MACRO
-	#define scalarProduct SCALAR_PRODUCT
-	#define vectorProduct VECTOR_PRODUCT
-	#define addVector ADD_VECTOR
-	#define lengthVector LENGTH_VECTOR
-	#define angleVector ANGLE_VECTOR
-	#define tripleProduct TRIPLE_PRODUCT
-#else
-	#define scalarProduct scalar_Product///<a
-	#define vectorProduct vector_Product///<a
-	#define addVector add_Vector///<a
-	#define lengthVector length_Vector///<a
-	#define angleVector angle_Vector///<a
-	#define tripleProduct triple_Product///<a
-#endif
+#include "util.h"
 
 #define SQR(A) ((A)*(A))///<a
+typedef struct {
+	const double MINUTE_TO_SECOND;
+	const double SECOND_TO_MINUTE;
+	const double HOUR_TO_MINUTE;
+	const double MINUTE_TO_HOUR;
+	const double HOUR_TO_SECOND;
+	const double SECOND_TO_HOUR;
+	const double DAY_TO_HOUR;
+	const double HOUR_TO_DAY;
+	const double DAY_TO_MINUTE;
+	const double MINUTE_TO_DAY;
+	const double DAY_TO_SECOND;
+	const double SECOND_TO_DAY;
+} TIME_CONVERSION_CONSTANTS;
+
+typedef struct {
+	const double RADIAN_TO_DEGREE;
+	const double DEGREE_TO_RADIAN;
+	const double HOUR_TO_RADIAN;
+	const double RADIAN_TO_HOUR;
+	const double HOUR_TO_DEGREE;
+	const double DEGREE_TO_HOUR;
+	const double MINUTE_TO_RADIAN;
+	const double RADIAN_TO_MINUTE;
+	const double SECOND_TO_RADIAN;
+	const double RADIAN_TO_SECOND;
+} CONVERSION_CONSTANTS;
+
+extern const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT;
+
+extern const CONVERSION_CONSTANTS CONVERSION_CONSTANT;
 
 /**  	Returns a random number between [0,1).
  * Use srand() beforhand.
@@ -70,20 +86,9 @@ long floor_po2(double num);
  */
 long round_po2(double num);
 
-double deg_To_Rad(double deg);///<a
-#define DEG_TO_RAD(deg) ((deg) * M_PI / 180.)///<a
+double time_To_Radian(double hour, double minute, double second);
 
-double rad_To_Deg(double rad);///<a
-#define RAD_TO_DEG(rad) ((rad) * 180. / M_PI)///<a
-
-#define HOUR_TO_DEG(H) (15. * H)///<a
-#define HOUR_TO_RAD(H) (DEG_TO_RAD(HOUR_TO_DEG(H)))///<a
-
-#define SEC_TO_DEG(S) (15. * H / 3600.)///<a
-#define SEC_TO_RAD(S) (DEG_TO_RAD(SEC_TO_DEG(S)))///<a
-
-#define TIME_TO_DEG(H,M,S) (SEC_TO_DEG(S+60.*(M+60.*H)))///<a
-#define TIME_TO_RAD(H,M,S) (DEG_TO_RAD(TIME_TO_DEG(H,M,S)))///<a
+double time_To_Degree(double hour, double minute, double second);
 
 //	vector functions
 
@@ -151,6 +156,5 @@ double triple_Product(double vec1[], double vec2[], double vec3[]);
 	vec1[0]*vec2[1]*vec3[2] + vec1[1]*vec2[2]*vec3[0] + \
 	vec1[2]*vec2[0]*vec3[1] - vec1[0]*vec2[2]*vec3[1] - \
 	vec1[1]*vec2[0]*vec3[2] - vec1[2]*vec2[1]*vec3[0];///<a
-
 
 #endif	// UTIL_MATH_H

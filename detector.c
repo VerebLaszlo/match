@@ -182,8 +182,7 @@ double GMST(double GPSsec)
 void calc_Response_For_Detector(detector det, binary_System *sys) {
 	double rm[3][3];
 	detector_table dettable;
-	double phi = sys->F.alpha - sys->F.gmst;
-	phi = DEG_TO_RAD(phi *15. / 3600.);// sec -> deg -> rad
+	double phi = (sys->F.alpha - sys->F.gmst)* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 	dettable = GetDetectorTable(det);
 	calc_Response_Matrix(dettable.nx, dettable.ny, rm);
 	calc_Response(rm, sys->F.dec, phi, sys->F.pol, &(sys->F.F[0]),

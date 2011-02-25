@@ -7,6 +7,19 @@
 
 #include "util_math.h"
 
+const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT = { 60.0, 1.0 / 60.0, //
+		60.0, 1.0 / 60.0,//
+		60.0 * 60.0, 1.0 / (60.0 * 60.0),//
+		24.0, 1.0 / 24.0,//
+		24.0 * 60.0, 1.0 / (24.0 * 60.0),//
+		24.0 * 60.0 * 60.0, 1.0 / (24.0 * 60.0 * 60.0), };
+
+const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0,//
+		15.0 * M_PI / 180.0, 1.0 / (15.0 * M_PI / 180.0),//
+		15.0, 1.0 / 15.0,//
+		15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0),//
+		15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
+
 inline double rand1(void) {
 	return (double) rand() / ((double) RAND_MAX + 1.);
 }
@@ -29,12 +42,14 @@ long ceil_po2(double num) {
 	return (long) exp(ceil(temp) * M_LN2);
 }
 
-double deg_To_Rad(double deg) {
-	return deg * M_PI / 180.;
+inline double time_To_Radian(double hour, double minute, double second) {
+	return (hour * TIME_CONVERSION_CONSTANT.HOUR_TO_SECOND + minute
+			* TIME_CONVERSION_CONSTANT.MINUTE_TO_SECOND + second)
+			* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 }
 
-double rad_To_Deg(double rad) {
-	return rad * 180. / M_PI;
+double time_To_Degree(double hour, double minute, double second) {
+	return time_To_Radian(hour, minute, second) * CONVERSION_CONSTANT.RADIAN_TO_DEGREE;
 }
 
 //	vector functions
