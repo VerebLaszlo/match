@@ -108,7 +108,6 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 				sys->bh[i].varphi -= M_PI;
 			}
 			sys->bh[i].phi = sys->bh[i].varphi - PHI; ///< kihasználva, hogy \f$\hat{L_N} x-z síkban van, álltalánosítani kell\f$
-			//temp = sin(sys->bh[i].theta) * cos(sys->bh[i].varphi) * sin(sys->incl) + cos(sys->bh[i].theta) * cos(sys->incl);
 			temp = cos(sys->bh[i].theta) * cos(sys->incl) - //
 					sin(sys->bh[i].theta) * sin(sys->bh[i].phi) * //
 							sin(sys->incl);
@@ -121,29 +120,8 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 			if (fabs(temp) < 1.e-10) {
 				temp = 0.;
 			}
-			/*				printf("T: %20.15lg %20.15lg %20.15lg\n", temp, cos(
-			 sys->bh[i].theta) * cos(sys->incl)//
-			 , -sin(sys->bh[i].theta) * sin(sys->bh[i].phi) * sin(
-			 sys->incl));*/
 			sys->bh[i].kappa = acos(temp);
-			//temp = tan(sys->bh[i].phi) * cos(sys->incl) - sin(sys->incl) / (sin(sys->bh[i].varphi) * tan(sys->bh[i].theta));
-			/*temp = (sin(sys->bh[i].theta) * cos(sys->bh[i].phi) * //
-			 cos(sys->incl) + cos(sys->bh[i].theta) * //
-			 sin(sys->incl)) / sin(sys->bh[i].kappa);
-			 printf("psi = %20.15lg\n", temp);
-			 if (fabs(temp) < 1.e-15) {
-			 temp = 0.;
-			 }*/
-			//sys->bh[i].psi = atan(temp);
-			//sys->bh[i].psi = acos(temp);
 			sys->bh[i].psi = sys->bh[i].phi;
-			/*temp = (sin(sys->bh[i].theta) * sin(sys->bh[i].phi) * cos(
-			 sys->incl) + cos(sys->bh[i].theta) * sin(sys->incl))
-			 / sin(sys->bh[i].kappa);
-			 if (fabs(temp) < 1.e-15) {
-			 temp = 0.;
-			 }
-			 sys->bh[i].psi = asin(temp);*/
 		}
 		break;
 	case FROM_THETA_VPHI:
@@ -288,8 +266,8 @@ void gen_Mass(binary_System *sys, binary_System *min, binary_System *max, gen_Mo
 	switch (mode) {
 	case ETAM:
 		do {
-			sys->M = RANDNK(min->M, max->M);
-			sys->eta = RANDNK(min->eta, max->eta);
+			sys->M = randnk(min->M, max->M);
+			sys->eta = randnk(min->eta, max->eta);
 			sys->bh[0].m = (1. + sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 			sys->bh[1].m = (1. - sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 		} while (min->bh[0].m > sys->bh[0].m || sys->bh[0].m > max->bh[0].m || min->bh[1].m
@@ -300,8 +278,8 @@ void gen_Mass(binary_System *sys, binary_System *min, binary_System *max, gen_Mo
 		break;
 	case M1M2:
 		do {
-			sys->bh[0].m = RANDNK(min->bh[0].m, max->bh[0].m);
-			sys->bh[1].m = RANDNK(min->bh[1].m, max->bh[1].m);
+			sys->bh[0].m = randnk(min->bh[0].m, max->bh[0].m);
+			sys->bh[1].m = randnk(min->bh[1].m, max->bh[1].m);
 			sys->M = sys->bh[0].m + sys->bh[1].m;
 			sys->eta = sys->bh[0].m * sys->bh[1].m / SQR(sys->M);
 		} while (min->M > sys->M || sys->M > max->M || min->eta > sys->eta || sys->eta > max->eta);
@@ -341,25 +319,25 @@ void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mod
 		break;
 	case THETA_VPHI:
 		for (i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = RANDNK(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].theta = acos(RANDNK(cos(min->bh[i].theta), cos(max->bh[i].theta)));
-			sys->bh[i].varphi = RANDNK(min->bh[i].varphi, max->bh[i].varphi);
+			sys->bh[i].chi_Amp = randnk(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].theta = acos(randnk(cos(min->bh[i].theta), cos(max->bh[i].theta)));
+			sys->bh[i].varphi = randnk(min->bh[i].varphi, max->bh[i].varphi);
 		}
 		convert_Spins(sys, FROM_THETA_VPHI);
 		break;
 	case THETA_PHI:
 		for (i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = RANDNK(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].theta = acos(RANDNK(cos(min->bh[i].theta), cos(max->bh[i].theta)));
-			sys->bh[i].phi = RANDNK(min->bh[i].phi, max->bh[i].phi);
+			sys->bh[i].chi_Amp = randnk(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].theta = acos(randnk(cos(min->bh[i].theta), cos(max->bh[i].theta)));
+			sys->bh[i].phi = randnk(min->bh[i].phi, max->bh[i].phi);
 		}
 		convert_Spins(sys, FROM_THETA_PHI);
 		break;
 	case KAPPA_PSI:
 		for (i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = RANDNK(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].kappa = acos(RANDNK(cos(min->bh[i].kappa), cos(max->bh[i].kappa)));
-			sys->bh[i].psi = RANDNK(min->bh[i].psi, max->bh[i].psi);
+			sys->bh[i].chi_Amp = randnk(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].kappa = acos(randnk(cos(min->bh[i].kappa), cos(max->bh[i].kappa)));
+			sys->bh[i].psi = randnk(min->bh[i].psi, max->bh[i].psi);
 		}
 		convert_Spins(sys, FROM_KAPPA_PSI);
 		break;
@@ -381,13 +359,13 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 	assert(sys);
 	assert(min);
 	assert(max);
-	sys->dist = RANDNK(min->dist, max->dist);
-	sys->coaPhase = RANDNK(min->coaPhase, max->coaPhase);
-	sys->incl = RANDNK(min->incl, max->incl);
-	sys->F.dec = RANDNK(min->F.dec, max->F.dec);
-	sys->F.pol = RANDNK(min->F.pol, max->F.pol);
-	sys->F.alpha = RANDNK(min->F.alpha, max->F.alpha);
-	sys->F.gmst = RANDNK(min->F.gmst, max->F.gmst);
+	sys->dist = randnk(min->dist, max->dist);
+	sys->coaPhase = randnk(min->coaPhase, max->coaPhase);
+	sys->incl = randnk(min->incl, max->incl);
+	sys->F.dec = randnk(min->F.dec, max->F.dec);
+	sys->F.pol = randnk(min->F.pol, max->F.pol);
+	sys->F.alpha = randnk(min->F.alpha, max->F.alpha);
+	sys->F.gmst = randnk(min->F.gmst, max->F.gmst);
 	calc_Response_For_Detector(LH, sys);
 }
 

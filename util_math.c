@@ -1,4 +1,4 @@
-/**
+/*
  * @file util_math.c
  * @date 2010-08-16 10.27.00
  * @author László Veréb
@@ -7,17 +7,16 @@
 
 #include "util_math.h"
 
-double rand1(void) {
-	return (double)rand() / ((double)RAND_MAX + 1.);
+inline double rand1(void) {
+	return (double) rand() / ((double) RAND_MAX + 1.);
 }
 
-double randn(double n) {
-	return n * (double)rand() / ((double)RAND_MAX + 1.);
+inline double randn(double n) {
+	return n * rand1();
 }
 
-double randnk(double lower, double upper) {
-	assert(lower<upper);
-	return (lower + upper) * (double)rand() / ((double)RAND_MAX + 1.) - lower;
+inline double randnk(double lower, double upper) {
+	return (upper - lower) * rand1() + lower;
 }
 
 long ceil_po2(double num) {
