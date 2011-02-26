@@ -10,7 +10,7 @@ C_SRCS += \
 ../generator.c \
 ../main_New.c \
 ../match.c \
-../match_Multi.c \
+../match_qmss.c \
 ../util.c \
 ../util_math.c 
 
@@ -19,7 +19,7 @@ OBJS += \
 ./generator.o \
 ./main_New.o \
 ./match.o \
-./match_Multi.o \
+./match_qmss.o \
 ./util.o \
 ./util_math.o 
 
@@ -28,7 +28,7 @@ C_DEPS += \
 ./generator.d \
 ./main_New.d \
 ./match.d \
-./match_Multi.d \
+./match_qmss.d \
 ./util.d \
 ./util_math.d 
 

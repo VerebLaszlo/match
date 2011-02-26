@@ -55,13 +55,13 @@ double time_To_Degree(double hour, double minute, double second) {
 //	vector functions
 
 double scalar_Product(double vec1[], double vec2[]) {
-	return vec1[0]*vec2[0] + vec1[1]*vec2[1] + vec1[2]*vec2[2];
+	return vec1[0] * vec2[0] + vec1[1] * vec2[1] + vec1[2] * vec2[2];
 }
 
 void vector_Product(double vec[], double vec1[], double vec2[]) {
-	vec[0] = vec1[1]*vec2[2] - vec1[2]*vec2[1];
-	vec[1] = vec1[2]*vec2[0] - vec1[0]*vec2[2];
-	vec[2] = vec1[0]*vec2[1] - vec1[1]*vec2[0];
+	vec[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
+	vec[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
+	vec[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
 }
 
 double unity_Vector(double uni[], double vec[]) {
@@ -83,13 +83,12 @@ double length_Vector(double vec[]) {
 }
 
 double angle_Vector(double vec1[], double vec2[]) {
-	return acos(scalar_Product(vec1, vec2) /
-			(length_Vector(vec1), length_Vector(vec2)));
+	return acos(scalar_Product(vec1, vec2) / (length_Vector(vec1), length_Vector(vec2)));
 }
 
 double triple_Product(double vec1[], double vec2[], double vec3[]) {
-	return	vec1[0]*vec2[1]*vec3[2] + vec1[1]*vec2[2]*vec3[0] +
-			vec1[2]*vec2[0]*vec3[1] - vec1[0]*vec2[2]*vec3[1] -
-			vec1[1]*vec2[0]*vec3[2] - vec1[2]*vec2[1]*vec3[0];
+	return vec1[0] * vec2[1] * vec3[2] + vec1[1] * vec2[2] * vec3[0] + vec1[2] * vec2[0] * vec3[1]
+			- vec1[0] * vec2[2] * vec3[1] - vec1[1] * vec2[0] * vec3[2] - vec1[2] * vec2[1]
+			* vec3[0];
 }
 

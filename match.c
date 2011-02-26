@@ -6,8 +6,9 @@
 
 #include "match.h"
 
-void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
-		double *minimax) {
+
+void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
+		double *best, double *minimax) {
 	assert(in);
 	assert(in->size);
 	assert(0<min_Index && min_Index< max_Index);
@@ -19,6 +20,7 @@ void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
 	fftw_plan iplan;
 	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
 		iplan = fftw_plan_dft_c2r_1d(in->size, product, in->product_Signal[i], FFTW_ESTIMATE);
+		memset(product, 0, in->size * sizeof(fftw_complex));
 		cross_Product(in->csignal[i / 2], in->csignal[i % 2 + 2], in->psd, min_Index, max_Index,
 				product);
 		fftw_execute(iplan);
@@ -28,7 +30,8 @@ void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
 	calc_Timemaximised_Matches(in, min_Index, max_Index, typ, best, minimax);
 }
 
-void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
+void orthonormalise(signalStruct *in, long min_Index, long max_Index,
+		signalStruct *out) {
 	assert(in);
 	assert(out);
 	assert(in->size >0 && out->size == in->size);
@@ -107,8 +110,8 @@ void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index
 	for (long i = 0; i < in->size; i++) {
 		A = SQR(in->product_Signal[HPP][i]) + SQR(in->product_Signal[HPC][i]);
 		B = SQR(in->product_Signal[HCP][i]) + SQR(in->product_Signal[HCC][i]);
-		C = in->product_Signal[HPP][i] * in->product_Signal[HCP][i]
-				+ in->product_Signal[HPC][i] * in->product_Signal[HCC][i];
+		C = in->product_Signal[HPP][i] * in->product_Signal[HCP][i] + in->product_Signal[HPC][i]
+				* in->product_Signal[HCC][i];
 		match_typ = sqrt(A);
 		max_Typ = max_Typ > match_typ ? max_Typ : match_typ;
 		match_best = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
