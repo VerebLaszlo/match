@@ -1,0 +1,6 @@
+mkdir -p doc/latex
+mkdir -p doc/html
+ln style.sty doc/latex/style.sty
+ln style.sty doc/html/style.sty
+doxygen
+make -C doc/latex pdf

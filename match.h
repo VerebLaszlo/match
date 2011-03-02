@@ -44,11 +44,8 @@ typedef struct {
  * \f{gather*}{
  * 	M_{best}=\max_{t_0}\left(\frac{A+B}{2}+\left[\left(\frac{A-B}{2}\right)^2+C^2\right]^{0.5}\right)^{0.5}\;
  * 	M_{minimax}=\max_{t_0}\left(\frac{A+B}{2}-\left[\left(\frac{A-B}{2}\right)^2+C^2\right]^{0.5}\right)^{0.5}\\
- * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
  *	A=\inProd{\tilde{e}_{1+}}{\tilde{e}_{2+}}^2+\inProd{\tilde{e}_{1+}}{\tilde{e}_{2\bot}}^2\\
- * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
  *	B=\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2+}}^2+\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2\bot}}^2\\
- * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
  *	C=\inProd{\tilde{e}_{1+}}{\tilde{e}_{2+}}+\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2+}}+\inProd{\tilde{e}_{1+}}{\tilde{e}_{2\bot}}+\inProd{\tilde{e}_{1\bot}}{\tilde{e}_{2\bot}}
  * \f}
  * @param in
@@ -73,7 +70,6 @@ void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStru
 /**
  * Formulae given.
  * \f{gather*}{
- * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
  * 	\tilde{e}=\frac{\tilde{h}}{\sqrt{\inProd{\tilde{h}}{\tilde{h}}}}
  * \f}
  * @param in
@@ -86,7 +82,6 @@ void normalise(signalStruct *in, long min_Index, long max_Index, signalStruct *o
 /**
  * Formulae given.
  * \f{gather*}{
- * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
  * 	\inProd{h_1}{h_2}=4\Re\int_{f_{min}}^{f_{max}}\frac{\tilde{h}_1(f)\tilde{h}_2^*(f)}{S_h(f)}df
  * \f}
  * @param left
@@ -102,7 +97,6 @@ double inner_Product(fftw_complex left[], fftw_complex right[], double norm[], l
 /**
  * Needs formulae.
  * \f{gather*}{
- * 	\newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
  * 	\tilde{e}_\bot=\tilde{e}_\times-\tilde{e}_+\frac{\inProd{\tilde{e}_+}{\tilde{e}_\times}}{\inProd{\tilde{e}_+}{\tilde{e}_+}}
  * \f}
  * @param in
