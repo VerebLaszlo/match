@@ -8,17 +8,6 @@
 #include "match_qmss.h"
 
 #define MOD_SPIN_INDEX 0///<C
-#include <lal/LALSQTPNWaveformInterface.h>
-#include <lal/LALNoiseModelsInspiral.h>
-//#include <lal/GeneratePPNInspiral.h>
-#include <lal/SimulateCoherentGW.h>	// CoherentGW
-//#include <lal/LIGOMetadataTables.h>		// SimInspiralTable
-#include <lal/GenerateInspiral.h>
-#include <lal/LALInspiralBank.h>
-#include <lal/LALDatatypes.h>		// LALStatus)
-#include <lal/LALInspiral.h>
-#include <lal/LALStdlib.h>
-#include <lal/RealFFT.h>
 
 short is_First;///<a
 
