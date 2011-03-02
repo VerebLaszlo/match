@@ -45,6 +45,10 @@ typedef struct Program_Parameters {
 	char folder[FILE_NAME_LENGTH];///<a
 } Program_Parameters;
 
+typedef enum {
+	AMP00 = 1, AMP05=2, AMP10 = 4,
+} ampContribution;
+
 /**
  * X
  */
@@ -67,9 +71,9 @@ typedef struct System_Parameters {
 	double min_Match;///<a
 	double critical_Match;///<a
 	double delta_Length;///<a
+	short amp_Code;
 	char approx[2][FILE_NAME_LENGTH];///<a
 	char phase[2][FILE_NAME_LENGTH];///<a
-	char amp[2][FILE_NAME_LENGTH];///<a
 	char spin[2][FILE_NAME_LENGTH];///<a
 } System_Parameters;
 
@@ -179,5 +183,8 @@ void write_Waves_To_Files(Program_Parameters *prog, System_Parameters *parameter
  */
 void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters, signalStruct *sig,
 		short index);
+
+void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameters,
+		 char *file_Name);
 
 #endif /* MATCH_QMSS_H_ */

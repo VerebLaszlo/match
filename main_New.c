@@ -48,8 +48,8 @@ int main(int argc, char *argv[]) {
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
 	read_Parameters(limits_Of_Parameters, parameters_File_Name);
 	puts("Start!!");
-	proba(&program_Parameters, &parameters, limits_Of_Parameters);
-	//run_Algorithm(&program_Parameters, &parameters, limits_Of_Parameters);
+	//proba(&program_Parameters, &parameters, limits_Of_Parameters);
+	run_Algorithm(&program_Parameters, &parameters, limits_Of_Parameters);
 	puts("Done!!!");
 	return 0;
 }
