@@ -64,7 +64,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 			sprintf(prog->folder, "%s", temp);
 		}
 	}
-	return is_Good;
+	return 1;
 }
 
 inline void increment_Spin_Of_Binary_System(binary_System *system, double step) {
@@ -126,6 +126,13 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	while (fr < parameters->freq_Max) {
 		fr += parameters->freq_Step;
 		maxfr++;
+	}
+	if (minfr == maxfr) {
+		fprintf(stderr, "The two frequencies are too close!!! %lg~%lg: %ld %ld\n",
+				parameters->freq_Min, parameters->freq_Max, minfr, maxfr);
+		XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
+		XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
+		return 1;
 	}
 	parameters->match_Typ = parameters->match_Best = parameters->match_Minimax = 0.0;
 	calc_Matches(&sig, minfr, maxfr, &parameters->match_Typ, &parameters->match_Best,
