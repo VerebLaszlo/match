@@ -95,6 +95,9 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 	double temp;
 	double PHI = M_PI / 2.0;
 	short i;
+	double theta1 = 0.0;
+	double theta2 = sys->incl;
+	double xyz[3];
 	switch (mode) {
 	case FROM_XYZ:
 		for (i = 0; i < 2; i++) {
@@ -102,26 +105,30 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 					+ SQR(sys->bh[i].chi[2]));
 			sys->bh[i].ctheta = sys->bh[i].chi[2] / sys->bh[i].chi_Amp;
 			sys->bh[i].theta = acos(sys->bh[i].ctheta);
-			sys->bh[i].varphi
-					= asin(sys->bh[i].chi[1] / sys->bh[i].chi_Amp / sin(sys->bh[i].theta));
-			if (sys->bh[i].chi[0] < 0.) {
-				sys->bh[i].varphi -= M_PI;
+			if (sys->bh[i].chi[1] < 0) {
+				sys->bh[i].varphi = -acos(sys->bh[i].chi[0] / sys->bh[i].chi_Amp / sin(
+						sys->bh[i].theta));
+			} else {
+				sys->bh[i].varphi = acos(sys->bh[i].chi[0] / sys->bh[i].chi_Amp / sin(
+						sys->bh[i].theta));
 			}
-			sys->bh[i].phi = sys->bh[i].varphi - PHI; ///< kihasználva, hogy \f$\hat{L_N} x-z síkban van, álltalánosítani kell\f$
-			temp = cos(sys->bh[i].theta) * cos(sys->incl) - //
-					sin(sys->bh[i].theta) * sin(sys->bh[i].phi) * //
-							sin(sys->incl);
-			if (fabs(1. - temp) < 1.e-10) {
-				temp = 1.;
+			if (!isfinite(sys->bh[i].varphi)) {
+				sys->bh[i].varphi = 0.0;
 			}
-			if (fabs(1. + temp) < 1.e-10) {
-				temp = -1.;
+			xyz[0] = sys->bh[i].chi[0] * cos(theta1) * cos(theta2) + sys->bh[i].chi[1]
+					* sin(theta1) * cos(theta2) - sys->bh[i].chi[2] * sin(theta2);
+			xyz[1] = -sys->bh[i].chi[0] * sin(theta1) + sys->bh[i].chi[1] * cos(theta1);
+			xyz[2] = sys->bh[i].chi[0] * cos(theta1) * sin(theta2) + sys->bh[i].chi[1]
+					* sin(theta1) * sin(theta2) + sys->bh[i].chi[2] * cos(theta2);
+			sys->bh[i].kappa = acos(xyz[2] / sys->bh[i].chi_Amp);
+			if (xyz[1] < 0) {
+				sys->bh[i].psi = -acos(xyz[0] / sys->bh[i].chi_Amp / sin(sys->bh[i].kappa));
+			} else {
+				sys->bh[i].psi = acos(xyz[0] / sys->bh[i].chi_Amp / sin(sys->bh[i].kappa));
 			}
-			if (fabs(temp) < 1.e-10) {
-				temp = 0.;
+			if (!isfinite(sys->bh[i].psi)) {
+				sys->bh[i].psi = 0.0;
 			}
-			sys->bh[i].kappa = acos(temp);
-			sys->bh[i].psi = sys->bh[i].phi;
 		}
 		break;
 	case FROM_THETA_VPHI:
@@ -130,33 +137,26 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 			sys->bh[i].chi[0] = sys->bh[i].chi_Amp * sin(sys->bh[i].theta) * cos(sys->bh[i].varphi);
 			sys->bh[i].chi[1] = sys->bh[i].chi_Amp * sin(sys->bh[i].theta) * sin(sys->bh[i].varphi);
 			sys->bh[i].chi[2] = sys->bh[i].chi_Amp * cos(sys->bh[i].theta);
-			//sys->bh[i].phi = sys->bh[i].varphi + M_PI / 2.; ///< kihasználva, hogy \f$\hat{L_N} x-z síkban van, álltalánosítani kell\f$
-			sys->bh[i].phi = sys->bh[i].varphi - PHI;
-			//sys->bh[i].kappa = acos(sin(sys->bh[i].theta) * cos(sys->bh[i].varphi) * sin(sys->incl) + cos(sys->bh[i].theta) * cos(sys->incl));
-			temp = cos(sys->bh[i].theta) * cos(sys->incl) - //
-					sin(sys->bh[i].theta) * cos(sys->bh[i].phi) * //
-							sin(sys->incl);
-			if (1. - temp < 1.e-10 || 1. + temp < 1.e-10)
-				temp = 1.;
-			if (temp < 1.e-10)
-				temp = 0.;
-			sys->bh[i].kappa = acos(temp);
-			//sys->bh[i].psi = atan(tan(sys->bh[i].phi) * cos(sys->incl) - sin(sys->incl) / (cos(sys->bh[i].phi) * tan(sys->bh[i].theta)));
-			temp = (sin(sys->bh[i].theta) * cos(sys->bh[i].phi) * //
-					cos(sys->incl) + cos(sys->bh[i].theta) * //
-					sin(sys->incl)) / sin(sys->bh[i].kappa);
-			if (fabs(temp) < 1.e-15) {
-				temp = 0.;
+			xyz[0] = sys->bh[i].chi[0] * cos(theta1) * cos(theta2) + sys->bh[i].chi[1]
+					* sin(theta1) * cos(theta2) - sys->bh[i].chi[2] * sin(theta2);
+			xyz[1] = -sys->bh[i].chi[0] * sin(theta1) + sys->bh[i].chi[1] * cos(theta1);
+			xyz[2] = sys->bh[i].chi[0] * cos(theta1) * sin(theta2) + sys->bh[i].chi[1]
+					* sin(theta1) * sin(theta2) + sys->bh[i].chi[2] * cos(theta2);
+			sys->bh[i].kappa = acos(xyz[2] / sys->bh[i].chi_Amp);
+			if (xyz[1] < 0) {
+				sys->bh[i].psi = -acos(xyz[0] / sys->bh[i].chi_Amp / sin(sys->bh[i].kappa));
+			} else {
+				sys->bh[i].psi = acos(xyz[0] / sys->bh[i].chi_Amp / sin(sys->bh[i].kappa));
 			}
-			sys->bh[i].psi = acos(temp);
+			if (!isfinite(sys->bh[i].psi)) {
+				sys->bh[i].psi = 0.0;
+			}
 		}
 		break;
 	case FROM_THETA_PHI:
 		for (i = 0; i < 2; i++) {
-			//sys->bh[i].varphi = sys->bh[i].phi - M_PI / 2.; ///< kihasználva, hogy \f$\hat{L_N} x-z síkban van, álltalánosítani kell\f$
 			sys->bh[i].varphi = sys->bh[i].phi - PHI;
 			sys->bh[i].ctheta = cos(sys->bh[i].theta);
-			//sys->bh[i].kappa = acos(sin(sys->bh[i].theta) * cos(sys->bh[i].varphi) * sin(sys->incl) + cos(sys->bh[i].theta) * cos(sys->incl));
 			temp = cos(sys->bh[i].theta) * cos(sys->incl) - //
 					sin(sys->bh[i].theta) * cos(sys->bh[i].phi) * //
 							sin(sys->incl);
@@ -165,7 +165,6 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 			if (temp < 1.e-10)
 				temp = 0.;
 			sys->bh[i].kappa = acos(temp);
-			//sys->bh[i].psi = atan(tan(sys->bh[i].phi) * cos(sys->incl) - sin(sys->incl) / (cos(sys->bh[i].phi) * tan(sys->bh[i].theta)));
 			temp = (sin(sys->bh[i].theta) * cos(sys->bh[i].phi) * //
 					cos(sys->incl) + cos(sys->bh[i].theta) * //
 					sin(sys->incl)) / sin(sys->bh[i].kappa);
@@ -180,29 +179,28 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 		break;
 	case FROM_KAPPA_PSI:
 		for (i = 0; i < 2; i++) {
-			//sys->bh[i].ctheta = cos(sys->bh[i].kappa) * cos(sys->incl)- sin(sys->bh[i].kappa) * sin(sys->bh[i].phi) * sin(sys->incl);
-			temp = cos(sys->bh[i].kappa) * cos(sys->incl) + //
-					sin(sys->bh[i].kappa) * cos(sys->bh[i].psi) * //
-							sin(sys->incl);
-			if (1. - temp < 1.e-10 || 1. + temp < 1.e-10)
-				temp = 1.;
-			if (temp < 1.e-10)
-				temp = 0.;
-			sys->bh[i].ctheta = temp;
+			theta1 *= -1.0;
+			theta2 *= -1.0;
+			xyz[0] = sin(sys->bh[i].kappa) * cos(sys->bh[i].psi);
+			xyz[1] = sin(sys->bh[i].kappa) * sin(sys->bh[i].psi);
+			xyz[2] = cos(sys->bh[i].kappa);
+			sys->bh[i].chi[0] = sys->bh[i].chi_Amp * (xyz[0] * cos(theta1) * cos(theta2) + xyz[1]
+					* sin(theta1) - xyz[2] * cos(theta1) * sin(theta2));
+			sys->bh[i].chi[1] = sys->bh[i].chi_Amp * (-xyz[0] * sin(theta1) * sin(theta2) + xyz[1]
+					* cos(theta1) + xyz[2] * sin(theta1) * sin(theta2));
+			sys->bh[i].chi[2] = sys->bh[i].chi_Amp * (xyz[0] * sin(theta2) + xyz[2] * cos(theta2));
+			sys->bh[i].ctheta = sys->bh[i].chi[2] / sys->bh[i].chi_Amp;
 			sys->bh[i].theta = acos(sys->bh[i].ctheta);
-			//sys->bh[i].phi = atan(tan(sys->bh[i].psi) * cos(sys->incl) + sin(sys->incl) / (cos(sys->bh[i].psi) * tan(sys->bh[i].kappa)));
-			temp = (sin(sys->bh[i].kappa) * cos(sys->bh[i].psi) * //
-					cos(sys->incl) - cos(sys->bh[i].kappa) * //
-					sin(sys->incl)) / sin(sys->bh[i].theta);
-			if (fabs(temp) < 1.e-15) {
-				temp = 0.;
+			if (sys->bh[i].chi[1] < 0) {
+				sys->bh[i].varphi = -acos(sys->bh[i].chi[0] / sys->bh[i].chi_Amp / sin(
+						sys->bh[i].theta));
+			} else {
+				sys->bh[i].varphi = acos(sys->bh[i].chi[0] / sys->bh[i].chi_Amp / sin(
+						sys->bh[i].theta));
 			}
-			sys->bh[i].phi = acos(temp);
-			//sys->bh[i].varphi = sys->bh[i].phi - M_PI / 2.; ///< kihasználva, hogy \f$\hat{L_N} x-z síkban van, álltalánosítani kell\f$
-			sys->bh[i].varphi = sys->bh[i].phi - PHI;
-			sys->bh[i].chi[0] = sys->bh[0].chi_Amp * sin(sys->bh[i].theta) * cos(sys->bh[i].varphi);
-			sys->bh[i].chi[1] = sys->bh[0].chi_Amp * sin(sys->bh[i].theta) * sin(sys->bh[i].varphi);
-			sys->bh[i].chi[2] = sys->bh[0].chi_Amp * cos(sys->bh[i].theta);
+			if (!isfinite(sys->bh[i].varphi)) {
+				sys->bh[i].varphi = 0.0;
+			}
 		}
 		break;
 	default:
