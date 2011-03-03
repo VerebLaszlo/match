@@ -8,9 +8,7 @@
 #define MATCH_H
 
 #include <fftw3.h>
-//#include <lal/LIGOMetadataTables.h>
-//#include <lal/GeneratePPNInspiral.h>
-#include "generator.h"
+#include "util_math.h"
 
 /**	An enum to contains the integer type constatns.
  */

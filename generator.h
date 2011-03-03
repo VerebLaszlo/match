@@ -65,11 +65,6 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode);
 void convert_Masses(binary_System *sys, conversion_Mode_Masses mode);
 
 /**
- * Y
- */
-void calc_Antenna_Function(binary_System *sys);
-
-/**
  * X
  */
 void check_Borders(binary_System *min, binary_System *max);

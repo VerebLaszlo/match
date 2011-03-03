@@ -9,6 +9,7 @@
 #define IO_HANDLER_H_
 
 #include "match.h"
+#include "generator.h"
 
 extern short is_First;///<a
 extern long db;
