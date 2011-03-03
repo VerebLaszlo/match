@@ -111,7 +111,7 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 	sprintf(temp, "%%%d.%dlg\t", prog->width_Of_Number, prog->precision);
 	sprintf(text, "%s%s%s", temp, temp, temp);
 	sprintf(file_Name, "%s/data.txt", prog->folder);
-	FILE *file = sfopen(file_Name, "a");
+	FILE *file = safely_Open_File(file_Name, "a");
 	if (file) {
 		fprintf(file, text, parameters->system[0].M, parameters->system[0].eta,
 				parameters->system[0].chirpM);
@@ -234,7 +234,7 @@ void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameter
 	static char text[FILE_NAME_LENGTH];
 	sprintf(temp, "%%%d.%dlg\t", prog->width_Of_Number, prog->precision);
 	sprintf(text, "%s%s%s", temp, temp, temp);
-	FILE *file = sfopen(file_Name, "w");
+	FILE *file = safely_Open_File(file_Name, "w");
 	if (file) {
 		fprintf(file, text, parameters->system[0].M, parameters->system[0].eta,
 				parameters->system[0].chirpM);

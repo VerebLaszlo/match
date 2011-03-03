@@ -2,6 +2,7 @@
  * @file util.h
  * @author László Veréb
  * @date 2010.03.27
+ * @brief Contains some useful functions.
  */
 
 #ifndef UTIL_H
@@ -15,41 +16,26 @@
 #include <string.h>
 #endif
 
-#define CALLER_LENGTHS 100
-
-extern char caller_Function[CALLER_LENGTHS];
-extern char caller_Function_Pretty[CALLER_LENGTHS];
-extern char caller_File[CALLER_LENGTHS];
-extern short caller_Line;
-
-//typedef double * const dpc;
-
-/**	logikai változótípus definiálása ismeretlen értékkel is
- */
-typedef enum {
-	false = 0, true = 1
-} bool;
-
-/**
- *		The function is a secured variant of the built-in fopen.
- * @param[in]	name	: name of the file
- * @param[in]	mode	: with wich mode to open it
+/**		Opens the file with the given access mode. On error it terminates the program and prints an
+ * error message.
+ * @param[in]	file_Name	: the file's path name relative to the program
+ * @param[in]	mode		: the mode with which the file is opened
  * @return	pointer to the opened file
  */
-FILE * sfopen(char *name, char * mode);
+FILE * safely_Open_File(char *file_Name, char * mode);
 
-/**
- *		The function is a secured read-only variant of the built-in fopen.
- * @param[in]	name	: name of the file
+/**		Opens the file just for reading. On error it terminates the program and prints an error
+ * message.
+ * @param[in]	file_Name	: the file's path name relative to the program
  * @return	pointer to the opened file
  */
-FILE * sfopen_read(char *name);
+FILE * safely_Open_File_For_Reading(char *file_Name);
 
-/**
- *		The function is a secured write-only variant of the built-in fopen.
- * @param[in]	name	: name of the file
+/**		Opens the file just for writing. On error it terminates the program and prints an error
+ * message.
+ * @param[in]	file_Name	: the file's path name relative to the program
  * @return	pointer to the opened file
  */
-FILE * sfopen_write(char *name);
+FILE * safely_Open_File_For_Writing(char *file_Name);
 
 #endif // UTIL_H
