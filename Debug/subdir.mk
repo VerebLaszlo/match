@@ -16,7 +16,7 @@ C_SRCS += \
 ../util_math.c 
 
 OBJS += \
-../io_handler.o \
+./io_handler.o \
 ./detector.o \
 ./generator.o \
 ./main_New.o \
@@ -26,7 +26,7 @@ OBJS += \
 ./util_math.o 
 
 C_DEPS += \
-../io_handler.d \
+./io_handler.d \
 ./detector.d \
 ./generator.d \
 ./main_New.d \

@@ -8,7 +8,31 @@
 #define DETECTOR_H_
 
 #include "util.h"
-#include "variables.h"
+
+typedef enum detector_Enum {
+	LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT
+} detector;
+
+typedef struct detector_table {
+	enum detector_Enum id;///<a
+	char* name;///<a
+	double nx[3];///<a
+	double ny[3];///<a
+	double x[3];///<a
+} detector_table;
+
+/**
+ * cos(theta) = det_z / r
+ * cos(phi) = x / (r * sin(theta))
+ * psi) =
+ */
+typedef struct {
+	double dec; ///< declination
+	double pol; ///< polarisation
+	double alpha; ///< right ascension
+	double gmst;///<a
+	double F[2]; ///< antenna functions: \f$F_+, F_\times\f$
+} antenna_Func;
 
 /**
  *		The function converts the detector-string to detector-enum value.
@@ -50,6 +74,6 @@ double GMST(double GPSsec);
  * @param[in]	det	: the detectors ID from the enumeration, (LL : Livingston, LH : Hanford, VIRGO: Virgo)
  * @param[out]	sys
  */
-void calc_Response_For_Detector(detector det, binary_System *sys);
+void calc_Response_For_Detector(detector det, antenna_Func *F);
 
 #endif /* DETECTOR_H_ */

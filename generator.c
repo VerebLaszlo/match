@@ -40,54 +40,6 @@ void init_Binary_System(binary_System *min, binary_System *max) {
 /**
  * XX
  * @param sys
- * @param params
- * @param stream
- * @param fE1
- * @param fE2
- */
-void print_Binary_System(binary_System *sys, program_Params *params, FILE *stream, double fE1,
-		double fE2) {
-	fprintf(
-			stream,
-			"#.............index,f_I,f_F,f_S,t_S,F+,Fx: % 10ld "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			params->index, params->freq_Initial, params->freq_Final, params->freq_Sampling,
-			params->time_Sampling, sys->F.F[0], sys->F.F[1]);
-	fprintf(
-			stream,
-			"#................M_{Chirp},M,eta,mu,m1,m2: "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			sys->chirpM, sys->M, sys->eta, sys->mu, sys->bh[0].m, sys->bh[1].m);
-	fprintf(
-			stream,
-			"#.........chi1,theta1,varphi1,kappa1,psi1: "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			sys->bh[0].chi_Amp, sys->bh[0].theta, sys->bh[0].varphi, sys->bh[0].kappa,
-			sys->bh[0].psi);
-	fprintf(
-			stream,
-			"#.........chi2,theta2,varphi2,kappa2,psi2: "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			sys->bh[1].chi_Amp, sys->bh[1].theta, sys->bh[1].varphi, sys->bh[1].kappa,
-			sys->bh[1].psi);
-	fprintf(
-			stream,
-			"#incl,d_L,t_C1,t_C2,phi_C,dec,pol,ra,gmst: "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			sys->incl, sys->dist, sys->coaTime, sys->coaPhase, sys->F.dec, sys->F.pol,
-			sys->F.alpha, sys->F.gmst);
-	fprintf(
-			stream,
-			"#.....chi1x,chi1y,chi1z,chi2x,chi2y,chi2z: "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			sys->bh[0].chi[0], sys->bh[0].chi[1], sys->bh[0].chi[2], sys->bh[1].chi[0],
-			sys->bh[1].chi[1], sys->bh[1].chi[2]);
-	fprintf(stream, "#........typ,best,worst: "PREC_PL PREC_PL PREC_PL"\n", params->match_Typ,
-			params->match_Best, params->match_Worst);
-	fprintf(
-			stream,
-			"#.......period1,period2,periodD,f_E1,f_E2: "PREC_PL PREC_PL PREC_PL PREC_PL PREC_PL"\n",
-			params->periods[0], params->periods[1], params->periodsD, fE1, fE2);
-	fflush(stream);
-}
-
-/**
- * XX
- * @param sys
  * @param mode
  */
 void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
@@ -364,7 +316,7 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 	sys->F.pol = randnk(min->F.pol, max->F.pol);
 	sys->F.alpha = randnk(min->F.alpha, max->F.alpha);
 	sys->F.gmst = randnk(min->F.gmst, max->F.gmst);
-	calc_Response_For_Detector(LH, sys);
+	calc_Response_For_Detector(LH, &(sys->F));
 }
 
 /**

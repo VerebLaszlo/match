@@ -179,12 +179,12 @@ double GMST(double GPSsec)
  * @param det
  * @param sys
  */
-void calc_Response_For_Detector(detector det, binary_System *sys) {
+void calc_Response_For_Detector(detector det, antenna_Func *F) {
 	double rm[3][3];
 	detector_table dettable;
-	double phi = (sys->F.alpha - sys->F.gmst)* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+	double phi = (F->alpha - F->gmst)* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 	dettable = GetDetectorTable(det);
 	calc_Response_Matrix(dettable.nx, dettable.ny, rm);
-	calc_Response(rm, sys->F.dec, phi, sys->F.pol, &(sys->F.F[0]),
-			&(sys->F.F[1]));
+	calc_Response(rm, F->dec, phi, F->pol, &(F->F[0]),
+			&(F->F[1]));
 }

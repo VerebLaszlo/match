@@ -8,7 +8,6 @@
 #ifndef UTIL_MATH_H
 #define UTIL_MATH_H
 
-#include <stdlib.h>
 #include <time.h>
 #include <math.h>
 #include "util.h"
