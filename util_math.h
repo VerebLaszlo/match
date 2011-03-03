@@ -46,8 +46,12 @@ typedef struct {
 	const double RADIAN_TO_SECOND;
 } CONVERSION_CONSTANTS;
 
+/** 	Contains constants to convert from and to various time measurement units.
+ */
 extern const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT;
 
+/** 	Contains constants to convert from and to various time and degree measurement units.
+ */
 extern const CONVERSION_CONSTANTS CONVERSION_CONSTANT;
 
 /**  	Returns a pseudo-random number in the range [0,1). Use srand() beforehand to initialize the
@@ -89,11 +93,15 @@ long least_Number_That_Greater_Than(double number);
  * @param[in] second	: seconds
  * @return the time value in radian
  */
-long round_po2(double num);
+double convert_Time_To_Radian(double hour, double minute, double second);
 
-double time_To_Radian(double hour, double minute, double second);
-
-double time_To_Degree(double hour, double minute, double second);
+/**		Converts time into degree.
+ * @param[in] hour		: hours
+ * @param[in] minute	: minutes
+ * @param[in] second	: seconds
+ * @return the time value in degree
+ */
+double convert_Time_To_Degree(double hour, double minute, double second);
 
 //	vector functions
 

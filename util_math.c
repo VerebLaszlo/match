@@ -37,14 +37,19 @@ inline long greatest_Number_That_Less_Than(double number) {
 	return (long) exp2(ceil(log(number) / M_LN2));
 }
 
-inline double time_To_Radian(double hour, double minute, double second) {
+inline long least_Number_That_Greater_Than(double number) {
+	assert(number>0.);
+	return (long) exp2(floor(log(number) / M_LN2));
+}
+
+inline double convert_Time_To_Radian(double hour, double minute, double second) {
 	return (hour * TIME_CONVERSION_CONSTANT.HOUR_TO_SECOND + minute
 			* TIME_CONVERSION_CONSTANT.MINUTE_TO_SECOND + second)
 			* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 }
 
-double time_To_Degree(double hour, double minute, double second) {
-	return time_To_Radian(hour, minute, second) * CONVERSION_CONSTANT.RADIAN_TO_DEGREE;
+inline double convert_Time_To_Degree(double hour, double minute, double second) {
+	return convert_Time_To_Radian(hour, minute, second) * CONVERSION_CONSTANT.RADIAN_TO_DEGREE;
 }
 
 //	vector functions
