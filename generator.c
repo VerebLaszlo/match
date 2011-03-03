@@ -216,8 +216,8 @@ void gen_Mass(binary_System *sys, binary_System *min, binary_System *max, gen_Mo
 	switch (mode) {
 	case ETAM:
 		do {
-			sys->M = randnk(min->M, max->M);
-			sys->eta = randnk(min->eta, max->eta);
+			sys->M = random_Between(min->M, max->M);
+			sys->eta = random_Between(min->eta, max->eta);
 			sys->bh[0].m = (1. + sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 			sys->bh[1].m = (1. - sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 		} while (min->bh[0].m > sys->bh[0].m || sys->bh[0].m > max->bh[0].m || min->bh[1].m
@@ -228,8 +228,8 @@ void gen_Mass(binary_System *sys, binary_System *min, binary_System *max, gen_Mo
 		break;
 	case M1M2:
 		do {
-			sys->bh[0].m = randnk(min->bh[0].m, max->bh[0].m);
-			sys->bh[1].m = randnk(min->bh[1].m, max->bh[1].m);
+			sys->bh[0].m = random_Between(min->bh[0].m, max->bh[0].m);
+			sys->bh[1].m = random_Between(min->bh[1].m, max->bh[1].m);
 			sys->M = sys->bh[0].m + sys->bh[1].m;
 			sys->eta = sys->bh[0].m * sys->bh[1].m / SQR(sys->M);
 		} while (min->M > sys->M || sys->M > max->M || min->eta > sys->eta || sys->eta > max->eta);
@@ -269,25 +269,25 @@ void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mod
 		break;
 	case THETA_VPHI:
 		for (i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = randnk(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].theta = acos(randnk(cos(min->bh[i].theta), cos(max->bh[i].theta)));
-			sys->bh[i].varphi = randnk(min->bh[i].varphi, max->bh[i].varphi);
+			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].theta = acos(random_Between(cos(min->bh[i].theta), cos(max->bh[i].theta)));
+			sys->bh[i].varphi = random_Between(min->bh[i].varphi, max->bh[i].varphi);
 		}
 		convert_Spins(sys, FROM_THETA_VPHI);
 		break;
 	case THETA_PHI:
 		for (i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = randnk(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].theta = acos(randnk(cos(min->bh[i].theta), cos(max->bh[i].theta)));
-			sys->bh[i].phi = randnk(min->bh[i].phi, max->bh[i].phi);
+			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].theta = acos(random_Between(cos(min->bh[i].theta), cos(max->bh[i].theta)));
+			sys->bh[i].phi = random_Between(min->bh[i].phi, max->bh[i].phi);
 		}
 		convert_Spins(sys, FROM_THETA_PHI);
 		break;
 	case KAPPA_PSI:
 		for (i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = randnk(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].kappa = acos(randnk(cos(min->bh[i].kappa), cos(max->bh[i].kappa)));
-			sys->bh[i].psi = randnk(min->bh[i].psi, max->bh[i].psi);
+			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].kappa = acos(random_Between(cos(min->bh[i].kappa), cos(max->bh[i].kappa)));
+			sys->bh[i].psi = random_Between(min->bh[i].psi, max->bh[i].psi);
 		}
 		convert_Spins(sys, FROM_KAPPA_PSI);
 		break;
@@ -309,13 +309,13 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 	assert(sys);
 	assert(min);
 	assert(max);
-	sys->dist = randnk(min->dist, max->dist);
-	sys->coaPhase = randnk(min->coaPhase, max->coaPhase);
-	sys->incl = randnk(min->incl, max->incl);
-	sys->F.dec = randnk(min->F.dec, max->F.dec);
-	sys->F.pol = randnk(min->F.pol, max->F.pol);
-	sys->F.alpha = randnk(min->F.alpha, max->F.alpha);
-	sys->F.gmst = randnk(min->F.gmst, max->F.gmst);
+	sys->dist = random_Between(min->dist, max->dist);
+	sys->coaPhase = random_Between(min->coaPhase, max->coaPhase);
+	sys->incl = random_Between(min->incl, max->incl);
+	sys->F.dec = random_Between(min->F.dec, max->F.dec);
+	sys->F.pol = random_Between(min->F.pol, max->F.pol);
+	sys->F.alpha = random_Between(min->F.alpha, max->F.alpha);
+	sys->F.gmst = random_Between(min->F.gmst, max->F.gmst);
 	calc_Response_For_Detector(LH, &(sys->F));
 }
 

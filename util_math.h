@@ -8,11 +8,16 @@
 #ifndef UTIL_MATH_H
 #define UTIL_MATH_H
 
-#include <time.h>
 #include <math.h>
 #include "util.h"
 
-#define SQR(A) ((A)*(A))///<a
+/**		Calculates the square of the parameter.
+ * The argument evaluates only once, so there is no undefined side effect
+ * @todo examine the side effects
+ * @param[in] number
+ */
+#define SQR(number) ({ typeof(number) _number = (number); _number*_number; })
+
 typedef struct {
 	const double MINUTE_TO_SECOND;
 	const double SECOND_TO_MINUTE;
@@ -45,42 +50,44 @@ extern const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT;
 
 extern const CONVERSION_CONSTANTS CONVERSION_CONSTANT;
 
-/**  	Returns a random number between [0,1).
- * Use srand() beforhand.
- * @return the random number
+/**  	Returns a pseudo-random number in the range [0,1). Use srand() beforehand to initialize the
+ * random number generator.
+ * @return a random number
  */
-double rand1(void);
+double random_From_Zero_To_One(void);
 
-/**		Returns a random number between [0, n).
- * Use srand() beforhand.
- * @param[in]	n	: the upper limit of the generated numbers.
- * @return the random number.
+/**  	Returns a pseudo-random number in the range [0,top). Use srand() beforehand to initialize
+ * the random number generator.
+ * @param[in]	top	: the upper limit of the generated number.
+ * @return a random number.
  */
-double randn(double n);
+double random_From_Zero_To(double top);
 
-/**		Returns a random number between [lower, upper).
- * Use srand() beforhand.
- * @param[in]	lower	: the lowest possible number
- * @param[in]	upper	: the upper limit of the generated numbers.
- * @return the random number.
+/**  	Returns a pseudo-random number in the range [bottom,top). Use srand() beforehand to
+ * initialize the random number generator. It works when bottom is greater than top, too.
+ * @param[in]	bottom	: the lowest possible number
+ * @param[in]	top		: the upper limit of the generated numbers.
+ * @return a random number.
  */
-double randnk(double lower, double upper);
+double random_Between(double bottom, double top);
 
-/**		Returns the smallest power of two no less than num.
- * @param[in]	num	:
+/**		Returns the smallest integral value that is not less than number and is the power of two.
+ * @param[in]	number	: the number in question
  * @return
  */
-long ceil_po2(double num);
+long greatest_Number_That_Less_Than(double number);
 
-/**		Returns the largest power of two not greater than num.
- * @param[in]	num	:
+/**		Returns the smallest integral value that is not less than number and is the power of two.
+ * @param[in]	number	: the number in question
  * @return
  */
-long floor_po2(double num);
+long least_Number_That_Greater_Than(double number);
 
-/**		Rounds to power of two.
- * @param[in]	num	:
- * @return
+/**		Converts time into radian.
+ * @param[in] hour		: hours
+ * @param[in] minute	: minutes
+ * @param[in] second	: seconds
+ * @return the time value in radian
  */
 long round_po2(double num);
 

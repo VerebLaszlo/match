@@ -20,26 +20,21 @@ const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0,//
 		15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0),//
 		15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
 
-inline double rand1(void) {
+inline double random_From_Zero_To_One(void) {
 	return (double) rand() / ((double) RAND_MAX + 1.);
 }
 
-inline double randn(double n) {
-	return n * rand1();
+inline double random_From_Zero_To(double top) {
+	return top * random_From_Zero_To_One();
 }
 
-inline double randnk(double lower, double upper) {
-	return (upper - lower) * rand1() + lower;
+inline double random_Between(double bottom, double top) {
+	return (top - bottom) * random_From_Zero_To_One() + bottom;
 }
 
-long ceil_po2(double num) {
-	assert(num>0.);
-	register double temp = log(num) / M_LN2;
-#ifdef __USE_ISOC99
-	return (long) exp2(ceil(temp));
-#endif
-	//return (long) pow(2., ceil(temp));
-	return (long) exp(ceil(temp) * M_LN2);
+inline long greatest_Number_That_Less_Than(double number) {
+	assert(number>0.);
+	return (long) exp2(ceil(log(number) / M_LN2));
 }
 
 inline double time_To_Radian(double hour, double minute, double second) {
