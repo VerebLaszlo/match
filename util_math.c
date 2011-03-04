@@ -20,16 +20,16 @@ const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0,//
 		15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0),//
 		15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
 
-inline double random_From_Zero_To_One(void) {
-	return (double) rand() / ((double) RAND_MAX + 1.);
-}
-
 inline double random_From_Zero_To(double top) {
 	return top * random_From_Zero_To_One();
 }
 
 inline double random_Between(double bottom, double top) {
 	return (top - bottom) * random_From_Zero_To_One() + bottom;
+}
+
+inline double random_From_Zero_To_One(void) {
+	return (double) rand() / ((double) RAND_MAX + 1.);
 }
 
 inline long greatest_Number_That_Less_Than(double number) {
@@ -42,53 +42,12 @@ inline long least_Number_That_Greater_Than(double number) {
 	return (long) exp2(floor(log(number) / M_LN2));
 }
 
+inline double convert_Time_To_Degree(double hour, double minute, double second) {
+	return convert_Time_To_Radian(hour, minute, second) * CONVERSION_CONSTANT.RADIAN_TO_DEGREE;
+}
+
 inline double convert_Time_To_Radian(double hour, double minute, double second) {
 	return (hour * TIME_CONVERSION_CONSTANT.HOUR_TO_SECOND + minute
 			* TIME_CONVERSION_CONSTANT.MINUTE_TO_SECOND + second)
 			* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 }
-
-inline double convert_Time_To_Degree(double hour, double minute, double second) {
-	return convert_Time_To_Radian(hour, minute, second) * CONVERSION_CONSTANT.RADIAN_TO_DEGREE;
-}
-
-//	vector functions
-
-double scalar_Product(double vec1[], double vec2[]) {
-	return vec1[0] * vec2[0] + vec1[1] * vec2[1] + vec1[2] * vec2[2];
-}
-
-void vector_Product(double vec[], double vec1[], double vec2[]) {
-	vec[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
-	vec[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
-	vec[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
-}
-
-double unity_Vector(double uni[], double vec[]) {
-	double length = length_Vector(vec);
-	uni[0] = vec[0] / length;
-	uni[1] = vec[1] / length;
-	uni[2] = vec[2] / length;
-	return length;
-}
-
-void add_Vector(double sum[], double vec1[], double vec2[]) {
-	sum[0] = vec1[0] + vec2[0];
-	sum[1] = vec1[1] + vec2[1];
-	sum[2] = vec1[2] + vec2[2];
-}
-
-double length_Vector(double vec[]) {
-	return sqrt(scalar_Product(vec, vec));
-}
-
-double angle_Vector(double vec1[], double vec2[]) {
-	return acos(scalar_Product(vec1, vec2) / (length_Vector(vec1), length_Vector(vec2)));
-}
-
-double triple_Product(double vec1[], double vec2[], double vec3[]) {
-	return vec1[0] * vec2[1] * vec3[2] + vec1[1] * vec2[2] * vec3[0] + vec1[2] * vec2[0] * vec3[1]
-			- vec1[0] * vec2[2] * vec3[1] - vec1[1] * vec2[0] * vec3[2] - vec1[2] * vec2[1]
-			* vec3[0];
-}
-

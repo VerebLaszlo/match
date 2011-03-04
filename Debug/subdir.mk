@@ -1,6 +1,6 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
-O_SRCS += \
+#O_SRCS += \
 ../complex.o \
 ../complex_Test.o \
 ../windows.o 
@@ -13,7 +13,8 @@ C_SRCS += \
 ../match.c \
 ../match_qmss.c \
 ../util.c \
-../util_math.c 
+../util_math.c \
+../util_math_tensor.c 
 
 OBJS += \
 ./io_handler.o \
@@ -23,7 +24,8 @@ OBJS += \
 ./match.o \
 ./match_qmss.o \
 ./util.o \
-./util_math.o 
+./util_math.o \
+./util_math_tensor.o 
 
 C_DEPS += \
 ./io_handler.d \
@@ -33,7 +35,8 @@ C_DEPS += \
 ./match.d \
 ./match_qmss.d \
 ./util.d \
-./util_math.d 
+./util_math.d \
+./util_math_tensor.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
