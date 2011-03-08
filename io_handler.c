@@ -61,13 +61,13 @@ void read_Parameters(binary_System *parameters, char *file_Name) {
 	parameters[1].bh[1].psi *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
 	fscanf(file, "%lg %lg\n", &parameters[0].incl, &parameters[1].incl);
 	fscanf(file, "%lg %lg\n", &parameters[0].dist, &parameters[1].dist);
-	fscanf(file, "%lg %lg\n", &parameters[0].F.pol, &parameters[1].F.pol);
-	parameters[0].F.pol *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-	parameters[1].F.pol *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-	fscanf(file, "%lg %lg\n", &parameters[0].F.alpha, &parameters[1].F.alpha);
-	fscanf(file, "%lg %lg\n", &parameters[0].F.dec, &parameters[1].F.dec);
-	parameters[0].F.dec *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-	parameters[1].F.dec *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &parameters[0].F.polarization, &parameters[1].F.polarization);
+	parameters[0].F.polarization *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	parameters[1].F.polarization *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &parameters[0].F.right_Ascention, &parameters[1].F.right_Ascention);
+	fscanf(file, "%lg %lg\n", &parameters[0].F.declination, &parameters[1].F.declination);
+	parameters[0].F.declination *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	parameters[1].F.declination *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
 	fscanf(file, "%lg %lg\n", &parameters[0].F.gmst, &parameters[1].F.gmst);
 	fclose(file);
 }
@@ -118,8 +118,8 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 		fprintf(file, text, parameters->system[0].mu, parameters->system[0].bh[0].m,
 				parameters->system[0].bh[1].m);
 		fprintf(file, text, parameters->system[0].incl, parameters->system[0].dist,
-				parameters->system[0].F.pol);
-		fprintf(file, text, parameters->system[0].F.alpha, parameters->system[0].F.dec,
+				parameters->system[0].F.polarization);
+		fprintf(file, text, parameters->system[0].F.right_Ascention, parameters->system[0].F.declination,
 				parameters->system[0].F.gmst);
 		fprintf(file, text, parameters->system[0].bh[0].chi_Amp, parameters->system[0].bh[0].kappa,
 				parameters->system[0].bh[0].psi);
@@ -139,8 +139,8 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 		fprintf(file, text, parameters->system[1].mu, parameters->system[1].bh[0].m,
 				parameters->system[1].bh[1].m);
 		fprintf(file, text, parameters->system[1].incl, parameters->system[1].dist,
-				parameters->system[1].F.pol);
-		fprintf(file, text, parameters->system[1].F.alpha, parameters->system[1].F.dec,
+				parameters->system[1].F.polarization);
+		fprintf(file, text, parameters->system[1].F.right_Ascention, parameters->system[1].F.declination,
 				parameters->system[1].F.gmst);
 		fprintf(file, text, parameters->system[1].bh[0].chi_Amp, parameters->system[1].bh[0].kappa,
 				parameters->system[1].bh[0].psi);
@@ -195,9 +195,9 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 		fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
 				(double) i * parameters->time_Sampling);
 		fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
-				* parameters->system[0].F.F[0] + sig->signal[H1C][i] * parameters->system[0].F.F[1]);
+				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i] * parameters->system[0].F.antenna_Beam_Pattern[1]);
 		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
-				* parameters->system[0].F.F[0] + sig->signal[H2C][i] * parameters->system[0].F.F[1]);
+				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H2C][i] * parameters->system[0].F.antenna_Beam_Pattern[1]);
 		fprintf(file, "\n");
 	}
 	if (parameters->shorter) {
@@ -205,8 +205,8 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 			fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
 					(double) i * parameters->time_Sampling);
 			fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
-					* parameters->system[0].F.F[0] + sig->signal[H1C][i]
-					* parameters->system[0].F.F[1]);
+					* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i]
+					* parameters->system[0].F.antenna_Beam_Pattern[1]);
 			fprintf(file, "\n");
 		}
 	} else {
@@ -215,7 +215,7 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 		fprintf(file, "%*s\t%*s\t%*s\t", prog->width_Of_Number_To_Plot, "",
 				prog->width_Of_Number_To_Plot, "", prog->width_Of_Number_To_Plot, "");
 		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
-				* parameters->system[0].F.F[0] + sig->signal[H2C][i] * parameters->system[0].F.F[1]);
+				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H2C][i] * parameters->system[0].F.antenna_Beam_Pattern[1]);
 		fprintf(file, "\n");
 	}
 	fclose(file);
@@ -241,8 +241,8 @@ void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameter
 		fprintf(file, text, parameters->system[0].mu, parameters->system[0].bh[0].m,
 				parameters->system[0].bh[1].m);
 		fprintf(file, text, parameters->system[0].incl, parameters->system[0].dist,
-				parameters->system[0].F.pol);
-		fprintf(file, text, parameters->system[0].F.alpha, parameters->system[0].F.dec,
+				parameters->system[0].F.polarization);
+		fprintf(file, text, parameters->system[0].F.right_Ascention, parameters->system[0].F.declination,
 				parameters->system[0].F.gmst);
 		fprintf(file, text, parameters->system[0].bh[0].chi_Amp, parameters->system[0].bh[0].kappa,
 				parameters->system[0].bh[0].psi);
@@ -262,8 +262,8 @@ void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameter
 		fprintf(file, text, parameters->system[1].mu, parameters->system[1].bh[0].m,
 				parameters->system[1].bh[1].m);
 		fprintf(file, text, parameters->system[1].incl, parameters->system[1].dist,
-				parameters->system[1].F.pol);
-		fprintf(file, text, parameters->system[1].F.alpha, parameters->system[1].F.dec,
+				parameters->system[1].F.polarization);
+		fprintf(file, text, parameters->system[1].F.right_Ascention, parameters->system[1].F.declination,
 				parameters->system[1].F.gmst);
 		fprintf(file, text, parameters->system[1].bh[0].chi_Amp, parameters->system[1].bh[0].kappa,
 				parameters->system[1].bh[0].psi);
@@ -318,9 +318,9 @@ void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signal
 		fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
 				(double) i * parameters->time_Sampling);
 		fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
-				* parameters->system[0].F.F[0] + sig->signal[H1C][i] * parameters->system[0].F.F[1]);
+				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i] * parameters->system[0].F.antenna_Beam_Pattern[1]);
 		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
-				* parameters->system[0].F.F[0] + sig->signal[H2C][i] * parameters->system[0].F.F[1]);
+				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H2C][i] * parameters->system[0].F.antenna_Beam_Pattern[1]);
 		fprintf(file, "\n");
 	}
 	if (parameters->shorter) {
@@ -328,8 +328,8 @@ void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signal
 			fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
 					(double) i * parameters->time_Sampling);
 			fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
-					* parameters->system[0].F.F[0] + sig->signal[H1C][i]
-					* parameters->system[0].F.F[1]);
+					* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i]
+					* parameters->system[0].F.antenna_Beam_Pattern[1]);
 			fprintf(file, "\n");
 		}
 	} else {
@@ -338,7 +338,7 @@ void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signal
 		fprintf(file, "%*s\t%*s\t%*s\t", prog->width_Of_Number_To_Plot, "",
 				prog->width_Of_Number_To_Plot, "", prog->width_Of_Number_To_Plot, "");
 		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
-				* parameters->system[0].F.F[0] + sig->signal[H2C][i] * parameters->system[0].F.F[1]);
+				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H2C][i] * parameters->system[0].F.antenna_Beam_Pattern[1]);
 		fprintf(file, "\n");
 	}
 	fclose(file);

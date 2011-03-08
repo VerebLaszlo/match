@@ -2,6 +2,8 @@
  * @file detector.h
  * @author László Veréb
  * @date 2010.03.26.
+ * @brief Variables and functions for detectors.
+ * @see gr-qc/0008066 [1]
  */
 
 #ifndef DETECTOR_H_
@@ -9,71 +11,75 @@
 
 #include "util.h"
 
+typedef struct DETECTOR_CONSTANTS {
+	const double GPS_JAN1ST2000_MIDNIGHT;
+	const double LEAP_SECONDS_AT_JAN1ST2000;
+	const double SECONDS_FROM_GPS_JAN1ST2000_MIDNIGHT_TO_GPS_MAY1ST2005;
+	const double SECONDS_FROM_GPS_JAN1ST2000_MIDNIGHT_TO_GPS_SEP1ST2008;
+	const double CENTURIES_TO_DAYS;
+	const double DAYS_TO_CENTURIES;
+	const double COEFFICIENT_FOR_DEGREE0;
+	const double COEFFICIENT_FOR_DEGREE1;
+	const double COEFFICIENT_FOR_DEGREE2;
+	const double COEFFICIENT_FOR_DEGREE3;
+} DETECTOR_CONSTANTS;
+
+/**	Contains various constants used for detectors.
+ */
+extern const DETECTOR_CONSTANTS DETECTOR_CONSTANT;
+
 typedef enum detector_Enum {
-	LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT
-} detector;
+	LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT, NUMBER_OF_DETECTORS,
+} detector_Enum;
 
 typedef struct detector_table {
-	enum detector_Enum id;///<a
-	char* name;///<a
-	double nx[3];///<a
-	double ny[3];///<a
-	double x[3];///<a
-} detector_table;
+	detector_Enum id;
+	char* name;
+	double direction_Vector_X[3];
+	double direction_Vector_Y[3];
+	double location[3];
+} Detector_Table;
 
-/**
- * cos(theta) = det_z / r
- * cos(phi) = x / (r * sin(theta))
- * psi) =
- */
 typedef struct {
-	double dec; ///< declination
-	double pol; ///< polarisation
-	double alpha; ///< right ascension
-	double gmst;///<a
-	double F[2]; ///< antenna functions: \f$F_+, F_\times\f$
+	double declination; ///< in radians
+	double polarization; ///< in radians
+	double right_Ascention; ///< in radians
+	double gmst; ///< in radians
+	double greenwich_Hour_Angle; ///< in radians
+	double antenna_Beam_Pattern[2]; ///< \f$F_+, F_\times\f$
 } antenna_Func;
 
-/**
- *		The function converts the detector-string to detector-enum value.
- * @param[in]	: detector string
- * @return	the detectors enum-value
+/**	Returns the id of the named detector.
+ * @param[in] name	: the name of the detector
+ * @return the id of the detector
  */
-detector con_Det_Str_Enum(char *str);
+detector_Enum id_Of_Detector(char *name);
 
-/**
- * @param[in]   : detector id
- * @return  the detector-table
+/**	Calculates the antenna pattern for the given detector.
+ * @todo finish for all detectors
+ * @param[in] id	: the detector
+ * @param[out] F	: antenna function struct containing the antenna pattern
  */
-detector_table GetDetectorTable(enum detector_Enum id);
+void calc_Antenna_Pattern_For(detector_Enum det, antenna_Func *F);
 
-/**
- *		The function calculates the response-matrix of the detector given by teh nx, ny vectors.
- * @param[in]	nx : unity-vector of the detectors x-arm
- * @param[in]	ny : unity-vector of the detectors y-arm
- * @param[out]	rm : the detectors response-matri
+/**	Gets the detector specific parameters.
+ * @param[in] id	: the detector
+ * @return	the parameters of the detector
  */
-void calc_Response_Matrix(const double nx[3], const double ny[3], double rm[3][3]);
+Detector_Table get_Detector_Table(detector_Enum id);
 
-/**
- *		The function calulates the respons-function of the detector given by the response-matrix.
- * @param[in]	D	: the detectors response-matrix
- * @param[in]	dec	: the declination of the source
- * @param[in]	phi	: \todo ez mi
- * @param[in]	pol	: the sources polarization angle
- * @param[out]	fp	: F+
- * @param[out]	fc	: Fx
+/**	Calculates the response matrix for a given detector parameters. Equation [1] (B6).
+ * @param[in] detector	:  the detectors parameters
+ * @param[out] response_Matrix
  */
-void calc_Response(double D[3][3], double dec, double phi, double pol, double *fp, double *fc);
+void calc_Response_Matrix(Detector_Table detector, double rm[3][3]);
 
-double GMST(double GPSsec);
-
-/**
- *		The function calulates the given detectors response-function. Currentli supports only three.
- *	\bug	Még be kell fejezni a többi detektorra
- * @param[in]	det	: the detectors ID from the enumeration, (LL : Livingston, LH : Hanford, VIRGO: Virgo)
- * @param[out]	sys
+/**	Calculates the antenna pattern for a response matrix. Equations [1] (B1-5) (B7-8)
+ * @param[in] response_Matrix	:
+ * @param[out] antenna	:
  */
-void calc_Response_For_Detector(detector det, antenna_Func *F);
+void calc_Antenna_Pattern_From_Response_Matrix(double D[3][3], antenna_Func *antenna);
+
+double convert_GMST_From_Seconds_To_Radians(double GPSsec);
 
 #endif /* DETECTOR_H_ */

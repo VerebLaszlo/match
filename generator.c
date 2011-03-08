@@ -32,7 +32,7 @@ void init_Binary_System(binary_System *min, binary_System *max) {
 	max->chirpM = DBL_MAX;
 	max->eta = 0.25;
 	max->coaPhase = 2. * M_PI;
-	max->F.alpha = max->F.dec = max->F.pol = 2. * M_PI;
+	max->F.right_Ascention = max->F.declination = max->F.polarization = 2. * M_PI;
 	min->F.gmst = DBL_MIN;
 	max->F.gmst = DBL_MAX;
 }
@@ -312,11 +312,11 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 	sys->dist = random_Between(min->dist, max->dist);
 	sys->coaPhase = random_Between(min->coaPhase, max->coaPhase);
 	sys->incl = random_Between(min->incl, max->incl);
-	sys->F.dec = random_Between(min->F.dec, max->F.dec);
-	sys->F.pol = random_Between(min->F.pol, max->F.pol);
-	sys->F.alpha = random_Between(min->F.alpha, max->F.alpha);
+	sys->F.declination = random_Between(min->F.declination, max->F.declination);
+	sys->F.polarization = random_Between(min->F.polarization, max->F.polarization);
+	sys->F.right_Ascention = random_Between(min->F.right_Ascention, max->F.right_Ascention);
 	sys->F.gmst = random_Between(min->F.gmst, max->F.gmst);
-	calc_Response_For_Detector(LH, &(sys->F));
+	calc_Antenna_Pattern_For(LH, &(sys->F));
 }
 
 /**
