@@ -49,6 +49,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 	is_First = 1;
 	short is_Good;
 	parameters->critical_Match = 0.0;
+	double min_Spin = parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp;
 	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < parameters->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp
 			+= parameters->spin_Step) {
 		for (; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp < parameters->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp
@@ -63,6 +64,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 			}
 			sprintf(prog->folder, "%s", temp);
 		}
+		parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp = min_Spin;
 	}
 	return 1;
 }
@@ -84,7 +86,6 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	assert(prog);
 	assert(parameters);
 	static LALParameters lalparams;
-	//	double f0, f1;
 	signalStruct sig;
 	initLALParameters(&lalparams, parameters);
 	for (short i = 0; i < 2; i++) {
