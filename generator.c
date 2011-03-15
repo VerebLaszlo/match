@@ -130,12 +130,28 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 		}
 		break;
 	case FROM_KAPPA_PSI:
-		for (i = 0; i < 2; i++) {
+		if (theta1 != 0.0) {
 			theta1 *= -1.0;
+		}
+		if (theta2 != 0.0) {
 			theta2 *= -1.0;
-			xyz[0] = sin(sys->bh[i].kappa) * cos(sys->bh[i].psi);
+		}
+		for (i = 0; i < 2; i++) {
+			double cos_psi;
+			if (sys->bh[i].psi == M_PI_2) {
+				cos_psi = 0.0;
+			} else {
+				cos_psi = cos(sys->bh[i].psi);
+			}
+			double cos_kappa;
+			if (sys->bh[i].kappa == M_PI_2) {
+				cos_kappa = 0.0;
+			} else {
+				cos_kappa = cos(sys->bh[i].kappa);
+			}
+			xyz[0] = sin(sys->bh[i].kappa) * cos_psi;
 			xyz[1] = sin(sys->bh[i].kappa) * sin(sys->bh[i].psi);
-			xyz[2] = cos(sys->bh[i].kappa);
+			xyz[2] = cos_kappa;
 			sys->bh[i].chi[0] = sys->bh[i].chi_Amp * (xyz[0] * cos(theta1) * cos(theta2) + xyz[1]
 					* sin(theta1) - xyz[2] * cos(theta1) * sin(theta2));
 			sys->bh[i].chi[1] = sys->bh[i].chi_Amp * (-xyz[0] * sin(theta1) * sin(theta2) + xyz[1]
