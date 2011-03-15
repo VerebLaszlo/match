@@ -8,17 +8,17 @@
 #include "util_math.h"
 
 const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT = { 60.0, 1.0 / 60.0, //
-		60.0, 1.0 / 60.0,//
-		60.0 * 60.0, 1.0 / (60.0 * 60.0),//
-		24.0, 1.0 / 24.0,//
-		24.0 * 60.0, 1.0 / (24.0 * 60.0),//
-		24.0 * 60.0 * 60.0, 1.0 / (24.0 * 60.0 * 60.0), };
+	60.0, 1.0 / 60.0,//
+	60.0 * 60.0, 1.0 / (60.0 * 60.0),//
+	24.0, 1.0 / 24.0,//
+	24.0 * 60.0, 1.0 / (24.0 * 60.0),//
+	24.0 * 60.0 * 60.0, 1.0 / (24.0 * 60.0 * 60.0), };
 
 const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0,//
-		15.0 * M_PI / 180.0, 1.0 / (15.0 * M_PI / 180.0),//
-		15.0, 1.0 / 15.0,//
-		15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0),//
-		15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
+	15.0 * M_PI / 180.0, 1.0 / (15.0 * M_PI / 180.0),//
+	15.0, 1.0 / 15.0,//
+	15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0),//
+	15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
 
 inline double random_From_Zero_To(double top) {
 	return top * random_From_Zero_To_One();
@@ -50,4 +50,64 @@ inline double convert_Time_To_Radian(double hour, double minute, double second) 
 	return (hour * TIME_CONVERSION_CONSTANT.HOUR_TO_SECOND + minute
 			* TIME_CONVERSION_CONSTANT.MINUTE_TO_SECOND + second)
 			* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+}
+
+// trigonometric functions
+
+const double epsilon = 1.0e-14;
+
+inline double cos_good(double number) {
+	number = normalise_Radians(number);
+	if (is_Near(number, M_PI_2, epsilon) || is_Near(number, 3.0 * M_PI_2, epsilon)) {
+		return 0.0;
+	}
+	return cos(number);
+}
+
+inline double sin_good(double number) {
+	number = normalise_Radians(number);
+	if (is_Near(number, M_PI, epsilon) || is_Near(number, 2.0 * M_PI, epsilon)) {
+		return 0.0;
+	}
+	return sin(number);
+}
+
+inline double tan_good(double number) {
+	number = normalise_Radians(number);
+	if (is_Near(number, 0.0, epsilon) || is_Near(number, M_PI, epsilon)) {
+		return 0.0;
+	}
+	if (is_Near(number, M_PI_4, epsilon) || is_Near(number, M_PI + M_PI_4, epsilon)) {
+		return 1.0;
+	}
+	if (is_Near(number, M_PI_2 + M_PI_4, epsilon) || is_Near(number, M_PI + M_PI_2 + M_PI_4,
+			epsilon)) {
+		return -1.0;
+	}
+	if (is_Near(number, M_PI_2, epsilon) || is_Near(number, M_PI + M_PI_2, epsilon)) {
+		return NAN;
+	}
+	return tan(number);
+}
+
+inline double normalise_Radians(double number) {
+	while (number < 0.0) {
+		number += 2.0 * M_PI;
+	}
+	while (number >= 2.0 * M_PI) {
+		number -= 2.0 * M_PI;
+	}
+	return number;
+}
+
+inline double is_Near(const double first, const double second, const double epsilon) {
+	return fabs(first - second) < epsilon;
+}
+
+inline double is_Equal(const double first, const double second) {
+	return !islessgreater(first, second);
+}
+
+inline double is_Not_Equal(const double first, const double second) {
+	return islessgreater(first, second);
 }

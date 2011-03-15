@@ -104,4 +104,53 @@ double convert_Time_To_Radian(double hour, double minute, double second);
  */
 double convert_Time_To_Degree(double hour, double minute, double second);
 
+// trigonometric functions
+
+/**	Returns the cosine of the number more accurately at \f$\pi/2\f$ and \f$3\pi/2\f$ radians, too.
+ * @param[in] number
+ * @return
+ */
+double cos_good(double number);
+
+/**	Returns the sine of the number more accurately at \f$\pi\f$ and \f$2\pi\f$ radians, too.
+ * @param[in] number
+ * @return
+ */
+double sin_good(double number);
+
+/**	Returns the tangent of the number more accurately at \f$0\f$, \f$\pi/4\f$, \f$\pi/2\f$,
+ * \f$3\pi/4\f$, \f$\pi\f$, \f$5\pi/4\f$, \f$3\pi/2\f$ and \f$7\pi/4\f$ radians, too.
+ * @param[in] number
+ * @return
+ */
+double tan_good(double number);
+
+/**	Returns normalised radians between \f$[0,2\pi)\f$.
+ * @param[in] number
+ * @return
+ */
+double normalise_Radians(double number);
+
+/**	Returns nonzero value, if the difference is less then epsilon.
+ * @param[in] first
+ * @param[in] second
+ * @param[in] epsilon
+ * @return
+ */
+double is_Near(const double first, const double second, const double epsilon);
+
+/**	Returns nonzero value if the numbers are equal.
+ * @param[in] first
+ * @param[in] second
+ * @return
+ */
+double is_Equal(const double first, const double second);
+
+/**	Returns nonzero value if the numbers are not equal.
+ * @param[in] first
+ * @param[in] second
+ * @return
+ */
+double is_Not_Equal(const double first, const double second);
+
 #endif	// UTIL_MATH_H
