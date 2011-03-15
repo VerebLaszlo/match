@@ -19,13 +19,20 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: test
+all: test temp
 
 # Tool invocations
-test: $(OBJS) $(USER_OBJS)
+test: main_New.o $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"test" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"test" main_New.o $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Finished building target: $@'
+	@echo ' '
+
+temp: main_Test.o $(OBJS) $(USER_OBJS)
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C Linker'
+	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"temp" main_Test.o $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -9,6 +9,7 @@ C_SRCS += \
 ../detector.c \
 ../io_handler.c \
 ../generator.c \
+../main_Test.c \
 ../main_New.c \
 ../match.c \
 ../match_qmss.c \
@@ -20,7 +21,6 @@ OBJS += \
 ./io_handler.o \
 ./detector.o \
 ./generator.o \
-./main_New.o \
 ./match.o \
 ./match_qmss.o \
 ./util.o \
@@ -31,13 +31,13 @@ C_DEPS += \
 ./io_handler.d \
 ./detector.d \
 ./generator.d \
+./main_Test.d \
 ./main_New.d \
 ./match.d \
 ./match_qmss.d \
 ./util.d \
 ./util_math.d \
 ./util_math_tensor.d 
-
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ../%.c
