@@ -108,7 +108,6 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 			= lalparams.waveform[lalparams.shorter].f->data->length;
 	parameters->max_Length = lalparams.max_Length
 			= lalparams.waveform[!lalparams.shorter].f->data->length;
-	parameters->freq_Max = (lalparams.injParams[0].f_final + lalparams.injParams[1].f_final) / 2.;
 	parameters->freq_Step = 1. / (lalparams.ppnParams.deltaT * lalparams.max_Length);
 	create_Signal_Struct(&sig, lalparams.waveform[!lalparams.shorter].f->data->length);
 	createPSD(&lalparams, &sig);
@@ -175,7 +174,7 @@ void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) 
 		lalparams->injParams[i].coa_phase = parameters->system[i].coaPhase = 0.;
 		lalparams->injParams[i].f_lower = parameters->freq_Initial;
 		lalparams->ppnParams.deltaT = 1. / parameters->freq_Sampling;
-		lalparams->injParams[i].amp_order = parameters->amp_Code;
+		lalparams->injParams[i].amp_order = parameters->amp_Code[i];
 		snprintf(lalparams->injParams[i].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "%s%s%s",
 				parameters->approx[i], parameters->phase[i], parameters->spin[i]);
 	}

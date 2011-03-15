@@ -7,6 +7,7 @@ proba
 0.01
 10240.
 40.0
+600.0
 0.01
 SpinQuadTaylor
 twoPointFivePN

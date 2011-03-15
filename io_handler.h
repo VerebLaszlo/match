@@ -56,7 +56,7 @@ typedef struct System_Parameters {
 	double min_Match;///<a
 	double critical_Match;///<a
 	double delta_Length;///<a
-	short amp_Code;
+	short amp_Code[2];
 	char approx[2][FILE_NAME_LENGTH];///<a
 	char phase[2][FILE_NAME_LENGTH];///<a
 	char spin[2][FILE_NAME_LENGTH];///<a

@@ -25,14 +25,15 @@ void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *
 	fscanf(file, "%lg\n", &params->freq_Sampling);
 	params->time_Sampling = 1. / params->freq_Sampling;
 	fscanf(file, "%lg\n", &params->freq_Initial);
+	fscanf(file, "%lg\n", &params->freq_Max);
 	fscanf(file, "%lg\n", &params->delta_Length);
 	fscanf(file, "%s\n", params->approx[0]);
 	fscanf(file, "%s\n", params->phase[0]);
-	fscanf(file, "%hd\n", &params->amp_Code);
+	fscanf(file, "%hd\n", &params->amp_Code[0]);
 	fscanf(file, "%s\n", params->spin[0]);
 	fscanf(file, "%s\n", params->approx[1]);
 	fscanf(file, "%s\n", params->phase[1]);
-	fscanf(file, "%hd\n", &params->amp_Code);
+	fscanf(file, "%hd\n", &params->amp_Code[1]);
 	fscanf(file, "%s\n", params->spin[1]);
 	fclose(file);
 }
@@ -139,7 +140,8 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 				parameters->system[0].bh[1].theta);
 		fprintf(file, text, parameters->system[0].bh[1].varphi, parameters->system[0].coaPhase,
 				parameters->system[0].coaTime);
-		fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code, parameters->spin[0]);
+		fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code[0],
+				parameters->spin[0]);
 		fprintf(file, text, parameters->system[1].M, parameters->system[1].eta,
 				parameters->system[1].chirpM);
 		fprintf(file, text, parameters->system[1].mu, parameters->system[1].bh[0].m,
@@ -160,7 +162,8 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 				parameters->system[1].bh[1].theta);
 		fprintf(file, text, parameters->system[1].bh[1].varphi, parameters->system[1].coaPhase,
 				parameters->system[1].coaTime);
-		fprintf(file, "%s %d %s ", parameters->phase[1], parameters->amp_Code, parameters->spin[1]);
+		fprintf(file, "%s %d %s ", parameters->phase[1], parameters->amp_Code[1],
+				parameters->spin[1]);
 		fprintf(file, text, parameters->match_Typ, parameters->match_Best,
 				parameters->match_Minimax);
 		fprintf(file, "%d\n", index);
@@ -185,7 +188,7 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 			parameters->system[0].bh[0].psi);
 	fprintf(file, text, parameters->system[0].bh[1].chi_Amp, parameters->system[0].bh[1].kappa,
 			parameters->system[0].bh[1].psi);
-	fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code, parameters->spin[0]);
+	fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code[0], parameters->spin[0]);
 	fprintf(file, "#");
 	fprintf(file, text, parameters->system[1].M, parameters->system[1].bh[0].m
 			/ parameters->system[1].bh[1].m, parameters->system[1].eta);
@@ -193,7 +196,7 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 			parameters->system[1].bh[0].psi);
 	fprintf(file, text, parameters->system[1].bh[1].chi_Amp, parameters->system[1].bh[1].kappa,
 			parameters->system[1].bh[1].psi);
-	fprintf(file, "%s %d %s", parameters->phase[1], parameters->amp_Code, parameters->spin[1]);
+	fprintf(file, "%s %d %s", parameters->phase[1], parameters->amp_Code[1], parameters->spin[1]);
 	fprintf(file, text, parameters->match_Typ, parameters->match_Best, parameters->match_Minimax);
 	fprintf(file, "\n");
 	long i;
@@ -265,7 +268,8 @@ void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameter
 				parameters->system[0].bh[1].theta);
 		fprintf(file, text, parameters->system[0].bh[1].varphi, parameters->system[0].coaPhase,
 				parameters->system[0].coaTime);
-		fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code, parameters->spin[0]);
+		fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code[0],
+				parameters->spin[0]);
 		fprintf(file, text, parameters->system[1].M, parameters->system[1].eta,
 				parameters->system[1].chirpM);
 		fprintf(file, text, parameters->system[1].mu, parameters->system[1].bh[0].m,
@@ -286,7 +290,8 @@ void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameter
 				parameters->system[1].bh[1].theta);
 		fprintf(file, text, parameters->system[1].bh[1].varphi, parameters->system[1].coaPhase,
 				parameters->system[1].coaTime);
-		fprintf(file, "%s %hd %s ", parameters->phase[1], parameters->amp_Code, parameters->spin[1]);
+		fprintf(file, "%s %hd %s ", parameters->phase[1], parameters->amp_Code[1],
+				parameters->spin[1]);
 		fprintf(file, text, parameters->match_Typ, parameters->match_Best,
 				parameters->match_Minimax);
 		fclose(file);
@@ -311,7 +316,7 @@ void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signal
 			parameters->system[0].bh[0].psi);
 	fprintf(file, text, parameters->system[0].bh[1].chi_Amp, parameters->system[0].bh[1].kappa,
 			parameters->system[0].bh[1].psi);
-	fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code, parameters->spin[0]);
+	fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code[0], parameters->spin[0]);
 	fprintf(file, "#");
 	fprintf(file, text, parameters->system[1].M, parameters->system[1].bh[0].m
 			/ parameters->system[1].bh[1].m, parameters->system[1].eta);
@@ -319,7 +324,7 @@ void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signal
 			parameters->system[1].bh[0].psi);
 	fprintf(file, text, parameters->system[1].bh[1].chi_Amp, parameters->system[1].bh[1].kappa,
 			parameters->system[1].bh[1].psi);
-	fprintf(file, "%s %d %s", parameters->phase[1], parameters->amp_Code, parameters->spin[1]);
+	fprintf(file, "%s %d %s", parameters->phase[1], parameters->amp_Code[1], parameters->spin[1]);
 	fprintf(file, text, parameters->match_Typ, parameters->match_Best, parameters->match_Minimax);
 	fprintf(file, "\n");
 	long i;
