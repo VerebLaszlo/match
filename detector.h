@@ -82,4 +82,20 @@ void calc_Antenna_Pattern_From_Response_Matrix(double D[3][3], antenna_Func *ant
 
 double convert_GMST_From_Seconds_To_Radians(double GPSsec);
 
+/**	Prints the antenna parameters.
+ * @param[in] file
+ * @param[in] antenna
+ * @param[in] format
+ */
+void print_Antenna_Function_Parameters(FILE*file, antenna_Func *antenna,
+		OUTPUT_FORMAT_CONSTANTS *format);
+
+/**	Prints the antenna parameters to plot.
+ * @param[in] file
+ * @param[in] antenna
+ * @param[in] format
+ */
+void print_Antenna_Function_Parameters_To_Plot(FILE *file, antenna_Func *antenna,
+		OUTPUT_FORMAT_CONSTANTS *format);
+
 #endif /* DETECTOR_H_ */
