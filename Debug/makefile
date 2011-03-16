@@ -43,7 +43,7 @@ doxy: ../*.h
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match
+	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match main_Test.o main_New.o
 	-@echo ' '
 
 .PHONY: all clean dependents

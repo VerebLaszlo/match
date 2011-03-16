@@ -14,7 +14,6 @@
 /**	Return the angle between the two vectors assuming their sizes are 3.
  * @param[in] left	: the first vector
  * @param[in] right	: the second vector
- * @param[in] size	: the size of the vectors
  * @return	the angle between the two vectors in radian
  */
 #define	ANGLE_BETWEEN_VECTORS3(left,right) ({ \
@@ -24,7 +23,6 @@
 /**	Return the angle between the two vectors assuming their sizes are 3.
  * @param[in] left	: the first vector
  * @param[in] right	: the second vector
- * @param[in] size	: the size of the vectors
  * @return	the angle between the two vectors in radian
  */
 double angle_Between_Vectors3(double left[], double right[]);
@@ -74,8 +72,8 @@ normalize_Vector(double vector[], short size, double normalizing_Constant, doubl
  * @param[in] vector	: the vector in question
  * @return	the length of the vector
  */
-#define LENGTH_OF_VECTOR3(vec) \
-	sqrt(DOT_PRODUCT3(vec, vec));
+#define LENGTH_OF_VECTOR3(vector) \
+	sqrt(DOT_PRODUCT3(vector, vector));
 
 /**	Returns the length of the vector assuming that its size is 3. @callgraph @callergraph
  * @param[in] vector	: the vector in question
@@ -140,7 +138,6 @@ void cross_Product3(double left[], double right[], double result[]);
 /**	Adds two vectors assuming their sizes are 3.
  * @param[in]	left	: the first vector
  * @param[in]	right	: the second vector
- * @param[in]	size	: the size of the vectors
  * @param[out]	result	: the result
  */
 #define ADD_VECTORS3(left,right, result) \
@@ -151,7 +148,6 @@ for (short i = 0; i < size; i++) { \
 /**	Adds two vectors assuming their sizes are 3.
  * @param[in]	left	: the first vector
  * @param[in]	right	: the second vector
- * @param[in]	size	: the size of the vectors
  * @param[out]	result	: the result
  */
 void add_Vectors3(double left[], double right[], double result[]);
@@ -165,7 +161,7 @@ void add_Vectors3(double left[], double right[], double result[]);
 void add_Vectors(double left[], double right[], short size, double result[]);
 
 /** Returns the triple product of the vectors
- * @param[in] right : first vector
+ * @param[in] vec1 : first vector
  * @param[in] vec2 : second vector
  * @param[in] vec3 : third vector
  * @return	the triple product
@@ -176,7 +172,7 @@ void add_Vectors(double left[], double right[], short size, double result[]);
 	vec1[1]*vec2[0]*vec3[2] - vec1[2]*vec2[1]*vec3[0];
 
 /** Returns the triple product of the vectors
- * @param[in] right : first vector
+ * @param[in] vec1 : first vector
  * @param[in] vec2 : second vector
  * @param[in] vec3 : third vector
  * @return	the triple product
