@@ -4,6 +4,7 @@
 match
 test
 temp
+time
 
 # generated
 
@@ -15,6 +16,7 @@ temp
 # folders
 doc
 proba
+out
 
 # Ignore the folders
 

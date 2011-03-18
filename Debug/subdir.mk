@@ -11,6 +11,7 @@ C_SRCS += \
 ../generator.c \
 ../main_Test.c \
 ../main_New.c \
+../main_Time.c \
 ../match.c \
 ../match_qmss.c \
 ../util.c \
@@ -33,6 +34,7 @@ C_DEPS += \
 ./generator.d \
 ./main_Test.d \
 ./main_New.d \
+./main_Time.d \
 ./match.d \
 ./match_qmss.d \
 ./util.d \
