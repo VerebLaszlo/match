@@ -12,6 +12,7 @@ C_SRCS += \
 ../main_Test.c \
 ../main_New.c \
 ../main_Time.c \
+../main_SQT-ST.c \
 ../match.c \
 ../match_qmss.c \
 ../util.c \
@@ -35,6 +36,7 @@ C_DEPS += \
 ./main_Test.d \
 ./main_New.d \
 ./main_Time.d \
+./main_SQT-ST.d \
 ./match.d \
 ./match_qmss.d \
 ./util.d \

@@ -1,28 +1,20 @@
 /**
- * @file main_Time.c
+ * @file main_SQT-ST.c
  *
- * @date Mar 17, 2011
+ * @date Mar 18, 2011
  * @author vereb
  */
 
 #include <stdlib.h>
 #include <time.h>
-
 #include "io_handler.h"
-
-int lalDebugLevel = 0;
 
 #include <lal/LALSQTPNWaveformInterface.h>
 #include <lal/LALNoiseModelsInspiral.h>
-//#include <lal/GeneratePPNInspiral.h>
-#include <lal/SimulateCoherentGW.h>	// CoherentGW
-//#include <lal/LIGOMetadataTables.h>		// SimInspiralTable
 #include <lal/GenerateInspiral.h>
-#include <lal/LALInspiralBank.h>
-#include <lal/LALDatatypes.h>		// LALStatus)
 #include <lal/LALInspiral.h>
-#include <lal/LALStdlib.h>
-#include <lal/RealFFT.h>
+
+int lalDebugLevel = 0;
 
 typedef struct LALParameters {
 	LALStatus status;///<a
@@ -35,14 +27,9 @@ typedef struct LALParameters {
 	long max_Length;///<a
 } LALParameters;
 
-time_t start, end;
-
-void proba1(Program_Parameters *program_Parameters, System_Parameters *parameters,
-		binary_System *limits);
-
 void generate_Parameters1(System_Parameters *parameters, binary_System *limits);
 
-short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long index);
+short run_For_Time(Program_Parameters *prog, System_Parameters *parameters);
 
 void initLALParameters1(LALParameters *lalparams, System_Parameters *parameters);
 
@@ -51,12 +38,12 @@ void create_Signal_Struct1(signalStruct *signal, long size);
 void set_hphc(short index, long elem, signalStruct *sig, LALParameters *lal,
 		System_Parameters *params);
 
-void write_Wave_To_File1(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig, short index);
+void destroy_Signal_Struct1(signalStruct *signal);
 
 void XLALSQTPNDestroyCoherentGW1(CoherentGW *wave);
 
-void destroy_Signal_Struct1(signalStruct *signal);
+void write_Wave_To_File1(Program_Parameters *prog, System_Parameters *parameters,
+		signalStruct *sig, short index);
 
 int main(int argc, char *argv[]) {
 	char program_Parameters_File_Name[FILE_NAME_LENGTH];
@@ -73,33 +60,12 @@ int main(int argc, char *argv[]) {
 	puts("Start!!");
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
 	read_Parameters(limits_Of_Parameters, parameters_File_Name);
-	proba1(&program_Parameters, &parameters, limits_Of_Parameters);
-	//LALCheckMemoryLeaks();
+	srand(time(NULL));
+	srand(86);
+	generate_Parameters1(&parameters, limits_Of_Parameters);
+	run_For_Time(&program_Parameters, &parameters);
 	puts("Done!!!");
 	return EXIT_SUCCESS;
-}
-
-void proba1(Program_Parameters *program_Parameters, System_Parameters *parameters,
-		binary_System *limits) {
-	assert(program_Parameters);
-	assert(parameters);
-	assert(limits);
-	assert(program_Parameters->number_Of_Runs >= 0);
-	char temp[2*FILE_NAME_LENGTH];
-	srand(86);
-	sprintf(temp, "%s/%s%s%d.time", program_Parameters->folder, parameters->approx[0], parameters->spin[0], parameters->amp_Code[0]);
-	FILE *file = safely_Open_File_For_Writing(temp);
-	time(&start);
-	for (long i = 0; i < program_Parameters->number_Of_Runs; i++) {
-		generate_Parameters1(parameters, limits);
-		run_For_Time(program_Parameters, parameters, i);
-		if ((i + 1) % 100 == 0) {
-			time(&end);
-			fprintf(file, "%ld %lg\n", i + 1, difftime(end, start));
-			printf("%ld %lg\n", i + 1, difftime(end, start));
-		}
-	}
-	fclose(file);
 }
 
 void generate_Parameters1(System_Parameters *parameters, binary_System *limits) {
@@ -109,7 +75,7 @@ void generate_Parameters1(System_Parameters *parameters, binary_System *limits) 
 	memcpy(&parameters->system[1], &parameters->system[0], sizeof(binary_System));
 }
 
-short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long index) {
+short run_For_Time(Program_Parameters *prog, System_Parameters *parameters) {
 	assert(prog);
 	assert(parameters);
 	static LALParameters lalparams;
@@ -121,13 +87,17 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long
 				&lalparams.ppnParams);
 		if (lalparams.status.statusCode) {
 			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform\n", i);
-			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
-			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
-			return 1;
+			XLALSQTPNDestroyCoherentGW1(&lalparams.waveform[0]);
+			XLALSQTPNDestroyCoherentGW1(&lalparams.waveform[1]);
+			exit(EXIT_FAILURE);
 		}
+		puts("X");
 	}
-	parameters->max_Length = parameters->min_Length = lalparams.waveform[0].f->data->length
+	parameters->max_Length = lalparams.waveform[0].f->data->length
 			> lalparams.waveform[1].f->data->length ? lalparams.waveform[0].f->data->length
+			: lalparams.waveform[1].f->data->length;
+	parameters->min_Length = lalparams.waveform[0].f->data->length
+			< lalparams.waveform[1].f->data->length ? lalparams.waveform[0].f->data->length
 			: lalparams.waveform[1].f->data->length;
 	create_Signal_Struct1(&sig, parameters->max_Length);
 	for (short i = 0; i < 2; i++) {
@@ -135,7 +105,13 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long
 			set_hphc(i, j, &sig, &lalparams, parameters);
 		}
 	}
-	write_Wave_To_File1(prog, parameters, &sig, index);
+	for (long i = 0; i < parameters->max_Length; i++) {
+		double x = fabs(sig.signal[0][i] - sig.signal[2][i] + sig.signal[1][i] - sig.signal[3][i]);
+		if (x > 5.0 * 1e-26) {
+			//printf("%ld: % 20.15lg\n", i, x);
+		}
+	}
+	write_Wave_To_File1(prog, parameters, &sig, 0);
 	XLALSQTPNDestroyCoherentGW1(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW1(&lalparams.waveform[1]);
 	destroy_Signal_Struct1(&sig);
@@ -189,71 +165,35 @@ void create_Signal_Struct1(signalStruct *signal, long size) {
 void set_hphc(short index, long elem, signalStruct *sig, LALParameters *lal,
 		System_Parameters *params) {
 	double a1, a2, phi, shift;
-	for (short i = 0; i < 2; i++) {
-		if (!strcmp(params->approx[i], "SpinQuadTaylor")) {
-			sig->signal[2 * index][elem] = lal->waveform[index].h->data->data[2 * elem];
-			sig->signal[2 * index + 1][elem] = lal->waveform[index].h->data->data[2 * elem + 1];
-		} else if (!strcmp(params->approx[i], "SpinTaylor")) {
-			a1 = lal->waveform[index].a->data->data[2 * elem];
-			a2 = lal->waveform[index].a->data->data[2 * elem + 1];
-			phi = lal->waveform[index].phi->data->data[elem] - lal->waveform[index].phi->data->data[0];
-			shift = lal->waveform[index].shift->data->data[elem];
-			sig->signal[2 * index][elem] = a1 * cos(shift) * cos(phi) - a2 * sin(shift) * sin(phi);
-			sig->signal[2 * index + 1][elem] = a1 * sin(shift) * cos(phi) + a2 * cos(shift) * sin(phi);
-		}
+	if (!strcmp(params->approx[index], "SpinQuadTaylor")) {
+		sig->signal[2 * index][elem] = lal->waveform[index].h->data->data[2 * elem];
+		sig->signal[2 * index + 1][elem] = lal->waveform[index].h->data->data[2 * elem + 1];
+	} else if (!strcmp(params->approx[index], "SpinTaylor")) {
+		a1 = lal->waveform[index].a->data->data[2 * elem];
+		a2 = lal->waveform[index].a->data->data[2 * elem + 1];
+		phi = lal->waveform[index].phi->data->data[elem] - lal->waveform[index].phi->data->data[0];
+		shift = lal->waveform[index].shift->data->data[elem];
+		sig->signal[2 * index][elem] = a1 * cos(shift) * cos(phi) - a2 * sin(shift) * sin(phi);
+		sig->signal[2 * index + 1][elem] = a1 * sin(shift) * cos(phi) + a2 * cos(shift) * sin(phi);
 	}
 }
 
-void write_Wave_To_File1(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig, short index) {
-	assert(prog);
-	assert(parameters);
-	assert(sig);
-	char file_Name[FILE_NAME_LENGTH];
-	static char temp[FILE_NAME_LENGTH];
-	static char text[FILE_NAME_LENGTH];
-	sprintf(file_Name, "out/wave%d.txt", index);
-	FILE *file = fopen(file_Name, "w");
-	if (file) {
-		sprintf(temp, "%%%d.%dlg ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
-		sprintf(text, "%s%s%s", temp, temp, temp);
-		fprintf(file, "#");
-		fprintf(file, text, parameters->system[0].M, parameters->system[0].bh[0].m
-				/ parameters->system[0].bh[1].m, parameters->system[0].eta);
-		fprintf(file, text, parameters->system[0].bh[0].chi_Amp, parameters->system[0].bh[0].kappa,
-				parameters->system[0].bh[0].psi);
-		fprintf(file, text, parameters->system[0].bh[1].chi_Amp, parameters->system[0].bh[1].kappa,
-				parameters->system[0].bh[1].psi);
-		fprintf(file, "%s %d %s\n", parameters->phase[0], parameters->amp_Code[0],
-				parameters->spin[0]);
-		fprintf(file, "#");
-		fprintf(file, text, parameters->system[1].M, parameters->system[1].bh[0].m
-				/ parameters->system[1].bh[1].m, parameters->system[1].eta);
-		fprintf(file, text, parameters->system[1].bh[0].chi_Amp, parameters->system[1].bh[0].kappa,
-				parameters->system[1].bh[0].psi);
-		fprintf(file, text, parameters->system[1].bh[1].chi_Amp, parameters->system[1].bh[1].kappa,
-				parameters->system[1].bh[1].psi);
-		fprintf(file, "%s %d %s", parameters->phase[1], parameters->amp_Code[1],
-				parameters->spin[1]);
-		fprintf(file, "\n");
-		sprintf(text, "%s %%%% %s %%%% %s %%%% ", temp, temp, temp);
-		long i;
-		for (i = 0; i < parameters->min_Length; i++) {
-			fprintf(file, "%*.*lg %% ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-					(double)i * parameters->time_Sampling);
-			fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
-					* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i]
-					* parameters->system[0].F.antenna_Beam_Pattern[1]);
-			fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
-					* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H2C][i]
-					* parameters->system[0].F.antenna_Beam_Pattern[1]);
-			fprintf(file, "\n");
+void destroy_Signal_Struct1(signalStruct *signal) {
+	assert(signal);
+	short i;
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		if (signal->signal[i]) {
+			free(signal->signal[i]);
 		}
-		fclose(file);
-	} else {
-		printf("Can not open file: %s, terminating!!!\n", file_Name);
-		fflush(stdout);
-		abort();
+		if (signal->product_Signal[i]) {
+			free(signal->product_Signal[i]);
+		}
+		if (signal->csignal[i]) {
+			free(signal->csignal[i]);
+		}
+	}
+	if (signal->psd) {
+		free(signal->psd);
 	}
 }
 
@@ -295,24 +235,44 @@ void XLALSQTPNDestroyCoherentGW1(CoherentGW *wave) {
 	}
 }
 
-void destroy_Signal_Struct1(signalStruct *signal) {
-	assert(signal);
-	short i;
-	for (i = 0; i < NUM_OF_SIGNALS; i++) {
-		if (signal->signal[i]) {
-			free(signal->signal[i]);
+void write_Wave_To_File1(Program_Parameters *prog, System_Parameters *parameters,
+		signalStruct *sig, short index) {
+	assert(prog);
+	assert(parameters);
+	assert(sig);
+	char file_Name[FILE_NAME_LENGTH];
+	static char temp[FILE_NAME_LENGTH];
+	static char text[FILE_NAME_LENGTH];
+	FILE *file;
+	for (short i = 0; i < 2; i++) {
+		sprintf(file_Name, "out/wave%d.txt", i);
+		file = fopen(file_Name, "w");
+		sprintf(temp, "%%- %d.%dlg ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
+		sprintf(text, "%s%s%s", temp, temp, temp);
+		fprintf(file, "#");
+		fprintf(file, text, parameters->system[i].M, parameters->system[i].bh[0].m
+				/ parameters->system[i].bh[1].m, parameters->system[i].eta);
+		fprintf(file, text, parameters->system[i].bh[0].chi_Amp, parameters->system[i].bh[0].kappa,
+				parameters->system[i].bh[0].psi);
+		fprintf(file, text, parameters->system[i].bh[1].chi_Amp, parameters->system[i].bh[1].kappa,
+				parameters->system[i].bh[1].psi);
+		fprintf(file, "%s %d %s\n", parameters->phase[i], parameters->amp_Code[i],
+				parameters->spin[i]);
+		fprintf(file, "# ");
+		fprintf(file, text, parameters->system[i].F.antenna_Beam_Pattern[0],
+				parameters->system[i].F.antenna_Beam_Pattern[1], NAN);
+		fprintf(file, "\n");
+		sprintf(temp, "%%- %d.%dlg ", prog->width_Of_Number, prog->precision);
+		sprintf(text, "%s %%%% %s %%%% %s %%%% ", temp, temp, temp);
+		for (long j = 0; j < parameters->min_Length; j++) {
+			fprintf(file, "%*.*lg %% ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
+					(double)j * parameters->time_Sampling);
+			fprintf(file, text, sig->signal[2 * i][j], sig->signal[2 * i + 1][j],
+					sig->signal[2 * i][j] * parameters->system[i].F.antenna_Beam_Pattern[0]
+							+ sig->signal[2 * i + 1][j]
+									* parameters->system[i].F.antenna_Beam_Pattern[1]);
+			fprintf(file, "\n");
 		}
-		if (signal->product_Signal[i]) {
-			free(signal->product_Signal[i]);
-		}
-		if (signal->csignal[i]) {
-			free(signal->csignal[i]);
-		}
-		//		if (signal->plan[i]) {
-		//			fftw_destroy_plan(signal->plan[i]);
-		//		}
-	}
-	if (signal->psd) {
-		free(signal->psd);
+		fclose(file);
 	}
 }

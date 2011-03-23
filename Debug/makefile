@@ -19,7 +19,7 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: test temp time
+all: test temp time sqt_st
 
 # Tool invocations
 test: main_New.o $(OBJS) $(USER_OBJS)
@@ -43,6 +43,13 @@ time: main_Time.o $(OBJS) $(USER_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
+sqt_st: main_SQT-ST.o $(OBJS) $(USER_OBJS)
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C Linker'
+	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"sqt_st" main_SQT-ST.o $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Finished building target: $@'
+	@echo ' '
+
 doxy: ../*.h
 	@echo 'Generating documentation'
 	doxygen ../Doxyfile
@@ -50,7 +57,7 @@ doxy: ../*.h
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match main_Test.o main_New.o
+	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match main_Test.o main_New.o main_SQT-ST.o
 	-@echo ' '
 
 .PHONY: all clean dependents
