@@ -142,6 +142,20 @@ void create_Signal_Struct(signalStruct *signal, long size) {
 	memset(signal->psd, 0, signal->size * sizeof(double));
 }
 
+void create_Signal_Struct1(signalStruct *signal, long size) {
+	assert(size>0);
+	signal->size = size;
+	short i;
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		signal->signal[i] = malloc(signal->size * sizeof(double));
+		memset(signal->signal[i], 0, signal->size * sizeof(double));
+		signal->product_Signal[i] = NULL;
+		signal->csignal[i] = NULL;
+		signal->plan[i] = NULL;
+	}
+	signal->psd = NULL;
+}
+
 void destroy_Signal_Struct(signalStruct *signal) {
 	assert(signal);
 	short i;
@@ -161,5 +175,24 @@ void destroy_Signal_Struct(signalStruct *signal) {
 	}
 	if (signal->psd) {
 		fftw_free(signal->psd);
+	}
+}
+
+void destroy_Signal_Struct1(signalStruct *signal) {
+	assert(signal);
+	short i;
+	for (i = 0; i < NUM_OF_SIGNALS; i++) {
+		if (signal->signal[i]) {
+			free(signal->signal[i]);
+		}
+		if (signal->product_Signal[i]) {
+			free(signal->product_Signal[i]);
+		}
+		if (signal->csignal[i]) {
+			free(signal->csignal[i]);
+		}
+	}
+	if (signal->psd) {
+		free(signal->psd);
 	}
 }

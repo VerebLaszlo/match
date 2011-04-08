@@ -78,6 +78,8 @@ void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *
  */
 void read_Parameters(binary_System *parameters, char *file_Name);
 
+void readExactParameters(FILE *file, System_Parameters *params);
+
 /**
  * Done
  * @param prog

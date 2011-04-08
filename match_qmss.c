@@ -27,11 +27,18 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
 	}
 }
 
-void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
+void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits) {
 	assert(parameters);
 	assert(limits);
 	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 	memcpy(&parameters->system[1], &parameters->system[0], sizeof(binary_System));
+}
+
+void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
+	assert(parameters);
+	assert(limits);
+	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
+	gen_Parameters(&parameters->system[1], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 }
 
 short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index) {
@@ -189,5 +196,24 @@ void createPSD(LALParameters *lalparams, signalStruct *sig) {
 	LALNoiseSpectralDensity(&lalparams->status, &lalparams->randIn.psd, &LALLIGOIPsd, df);
 	for (long j = 0; j < lalparams->randIn.psd.length; j++) {
 		sig->psd[j] = lalparams->randIn.psd.data[j];
+	}
+}
+
+void set_Signal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal) {
+	double a1, a2, phi, shift;
+	for (short i = 0; i < 2; i++) {
+		a1 = lal->waveform[index].a->data->data[2 * elem];
+		a2 = lal->waveform[index].a->data->data[2 * elem + 1];
+		phi = lal->waveform[index].phi->data->data[elem] - lal->waveform[index].phi->data->data[0];
+		shift = 0.0;
+		sig->signal[2 * index][elem] = a1 * M_SQRT2 / 2.0;
+		sig->signal[2 * index + 1][elem] = a2 * M_SQRT2 / 2.0;
+	}
+}
+
+void set_Signal_FromHPHC(short index, long elem, signalStruct *sig, LALParameters *lal) {
+	for (short i = 0; i < 2; i++) {
+		sig->signal[2 * index][elem] = lal->waveform[index].h->data->data[2 * elem];
+		sig->signal[2 * index + 1][elem] = lal->waveform[index].h->data->data[2 * elem + 1];
 	}
 }

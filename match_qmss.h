@@ -64,6 +64,7 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
  * @param parameters
  * @param limits
  */
+void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits);
 void generate_Parameters(System_Parameters *parameters, binary_System *limits);
 
 /**
@@ -106,5 +107,8 @@ void initLALParameters(LALParameters *lalparams, System_Parameters *parameters);
  * @param sig
  */
 void createPSD(LALParameters *lalparams, signalStruct *sig);
+
+void set_Signal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal);
+void set_Signal_From_HPHC(short index, long elem, signalStruct *sig, LALParameters *lal);
 
 #endif /* MATCH_QMSS_H_ */

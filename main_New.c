@@ -13,44 +13,6 @@ short is_First;///<a
 void proba(Program_Parameters *program_Parameters, System_Parameters *parameters,
 		binary_System *limits);
 
-void generate_Parameters2(System_Parameters *parameters, binary_System *limits);
-
-void readExactParameters(FILE *file, System_Parameters *params) {
-	char name[100];
-	for (short i = 0; i < 2; i++) {
-		fscanf(file, "%s ", name);
-		fscanf(file, "%lg ", &params->system[i].bh[0].m);
-		fscanf(file, "%lg ", &params->system[i].bh[1].m);
-		fscanf(file, "%lg ", &params->system[i].bh[0].chi_Amp);
-		fscanf(file, "%lg ", &params->system[i].bh[0].kappa);
-		params->system[i].bh[0].kappa *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-		fscanf(file, "%lg ", &params->system[i].bh[0].psi);
-		params->system[i].bh[0].psi *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-		fscanf(file, "%lg ", &params->system[i].bh[1].chi_Amp);
-		fscanf(file, "%lg ", &params->system[i].bh[1].kappa);
-		params->system[i].bh[1].kappa *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-		fscanf(file, "%lg ", &params->system[i].bh[1].psi);
-		params->system[i].bh[1].psi *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-		fscanf(file, "%lg ", &params->system[i].dist);
-		fscanf(file, "%lg ", &params->system[i].incl);
-		params->system[i].incl *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
-		fscanf(file, "%lg ", &params->freq_Sampling);
-		params->time_Sampling = 1.0 / params->freq_Sampling;
-		fscanf(file, "%lg ", &params->freq_Initial);
-		fscanf(file, "%lg ", &params->freq_Max);
-		fscanf(file, "%s ", params->phase[i]);
-		fscanf(file, "%s ", params->spin[i]);
-		fscanf(file, "%hd ", &params->amp_Code[i]);
-		fscanf(file, "%s\n", params->approx[i]);
-		params->system[i].F.declination = params->system[i].F.gmst
-				= params->system[i].F.greenwich_Hour_Angle = params->system[i].F.polarization
-						= params->system[i].F.right_Ascention = 0.;
-		convert_Masses(&params->system[i], FROM_M1M2);
-		convert_Spins(&params->system[i], FROM_KAPPA_PSI);
-		calc_Antenna_Pattern_For(LH, &params->system[i].F);
-	}
-}
-
 void multirun(Program_Parameters *program_Parameters, char *file_Name);
 
 /**
@@ -110,11 +72,4 @@ void proba(Program_Parameters *program_Parameters, System_Parameters *parameters
 		//		}
 		sprintf(program_Parameters->folder, "%s", temp);
 	}
-}
-
-void generate_Parameters2(System_Parameters *parameters, binary_System *limits) {
-	assert(parameters);
-	assert(limits);
-	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
-	gen_Parameters(&parameters->system[1], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 }

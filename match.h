@@ -134,10 +134,12 @@ void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index
  * @return : the succes of the memory allocation
  */
 void create_Signal_Struct(signalStruct *s, long size);
+void create_Signal_Struct1(signalStruct *s, long size);
 
 /**	Deallocates the memory of the signals.
  * @param[in] s	: pointer to the structure containing the signals
  */
 void destroy_Signal_Struct(signalStruct *s);
+void destroy_Signal_Struct1(signalStruct *s);
 
 #endif
