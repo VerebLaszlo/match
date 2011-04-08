@@ -8,7 +8,7 @@
 #define MATCH_H
 
 #include <fftw3.h>
-#include "io_handler.h"
+#include "generator.h"
 
 /**	An enum to contains the integer type constatns.
  */
@@ -146,6 +146,43 @@ void create_Signal_Struct1(signalStruct *s, long size);
 void destroy_Signal_Struct(signalStruct *s);
 void destroy_Signal_Struct1(signalStruct *s);
 
+typedef struct System_Parameters {
+	binary_System system[2];///<a
+	double max_Spin;///<a
+	double spin_Step;///<a
+	double freq_Sampling;///<a
+	double freq_Initial;///<a
+	double time_Sampling;///<a
+	double match_Typ;///<aa
+	double match_Best;///<a
+	double match_Minimax;///<a
+	short shorter;///<a
+	long min_Length;///<a
+	long max_Length;///<a
+	double freq_Min;///<a
+	double freq_Max;///<a
+	double freq_Step;///<a
+	double min_Match;///<a
+	double critical_Match;///<a
+	double delta_Length;///<a
+	short amp_Code[2];
+	char approx[2][FILENAME_MAX];///<a
+	char phase[2][FILENAME_MAX];///<a
+	char spin[2][FILENAME_MAX];///<a
+} System_Parameters;
+typedef struct Program_Parameters {
+	char (*output_Directories)[FILENAME_MAX];///<a
+	long number_Of_Runs;///<a
+	short precision;///<a
+	short precision_To_Plot;///<a
+	short width_Of_Number;///<a
+	short width_Of_Number_To_Plot;///<a
+	char folder[FILENAME_MAX];///<a
+} Program_Parameters;
+
+void readExactParameters(FILE *file, System_Parameters *params);
+void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *params,
+		char *file_Name);
 void print_Two_Signals(FILE*file, signalStruct *sig, double dt, Program_Parameters *prog);
 
 void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt,

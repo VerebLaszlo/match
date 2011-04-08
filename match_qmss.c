@@ -45,7 +45,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 	assert(prog);
 	assert(parameters);
 	FILE*file;
-	char file_Name[FILE_NAME_LENGTH];
+	char file_Name[FILENAME_MAX];
 	short is_Good;
 	parameters->critical_Match = 0.0;
 	signalStruct first, second;
@@ -87,7 +87,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 
 inline void increment_Spin_Of_Binary_System(binary_System *system, double step) {
 	assert(system);
-	assert(step>0.);
+	assert(step > 0.);
 	system->bh[0].chi_Amp += step;
 	system->bh[1].chi_Amp += step;
 }

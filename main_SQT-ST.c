@@ -12,8 +12,8 @@ int lalDebugLevel = 0;
 short run_For_Time(Program_Parameters *prog, System_Parameters *parameters);
 
 int main(int argc, char *argv[]) {
-	char program_Parameters_File_Name[FILE_NAME_LENGTH];
-	char parameters_File_Name[FILE_NAME_LENGTH];
+	char program_Parameters_File_Name[FILENAME_MAX];
+	char parameters_File_Name[FILENAME_MAX];
 	if (argc != 3) {
 		puts("\"file for program parameters\" \"file for the parameter limits\"!!!");
 		exit(-1);
@@ -23,9 +23,12 @@ int main(int argc, char *argv[]) {
 	Program_Parameters program_Parameters;
 	binary_System limits_Of_Parameters[2];
 	System_Parameters parameters;
+	FILE *file;
 	puts("Start!!");
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
-	read_Parameters(limits_Of_Parameters, parameters_File_Name);
+	file =safely_Open_File_For_Reading(parameters_File_Name);
+	read_Binary_Parameter_Limits(file, limits_Of_Parameters);
+	fclose(file);
 	srand(time(NULL));
 	srand(86);
 	generate_Same_Parameters(&parameters, limits_Of_Parameters);

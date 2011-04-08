@@ -54,8 +54,8 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long
 }
 
 int main(int argc, char *argv[]) {
-	char program_Parameters_File_Name[FILE_NAME_LENGTH];
-	char parameters_File_Name[FILE_NAME_LENGTH];
+	char program_Parameters_File_Name[FILENAME_MAX];
+	char parameters_File_Name[FILENAME_MAX];
 	if (argc != 3) {
 		puts("\"file for program parameters\" \"file for the parameter limits\"!!!");
 		exit(-1);
@@ -65,9 +65,12 @@ int main(int argc, char *argv[]) {
 	Program_Parameters program_Parameters;
 	binary_System limits_Of_Parameters[2];
 	System_Parameters parameters;
+	FILE*file;
 	puts("Start!!");
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
-	read_Parameters(limits_Of_Parameters, parameters_File_Name);
+	file =safely_Open_File_For_Reading(parameters_File_Name);
+	read_Binary_Parameter_Limits(file, limits_Of_Parameters);
+	fclose(file);
 	proba1(&program_Parameters, &parameters, limits_Of_Parameters);
 	LALCheckMemoryLeaks();
 	puts("Done!!!");
@@ -80,7 +83,7 @@ void proba1(Program_Parameters *program_Parameters, System_Parameters *parameter
 	assert(parameters);
 	assert(limits);
 	assert(program_Parameters->number_Of_Runs >= 0);
-	char temp[2 * FILE_NAME_LENGTH];
+	char temp[FILENAME_MAX];
 	srand(86);
 	sprintf(temp, "%s/%s%s%d.time", program_Parameters->folder, parameters->approx[0],
 			parameters->spin[0], parameters->amp_Code[0]);

@@ -83,4 +83,6 @@ void gen_Sys(binary_System *sys, binary_System *min, binary_System *max);
 void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
 		gen_Mode_Masses mass, gen_Mode_Spin spin);
 
+void read_Binary_Parameter_Limits(FILE*file, binary_System *sys);
+
 #endif /* GENERATOR_H */

@@ -352,3 +352,40 @@ void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
 	gen_Mass(sys, min, max, mass);
 	gen_Chi(sys, min, max, spin);
 }
+
+void read_Binary_Parameter_Limits(FILE*file, binary_System *sys) {
+	fscanf(file, "%lg %lg\n", &sys->M, &sys->M);
+	fscanf(file, "%lg %lg\n", &sys->eta, &sys->eta);
+	fscanf(file, "%lg %lg\n", &sys->bh[0].m, &sys->bh[0].m);
+	fscanf(file, "%lg %lg\n", &sys->bh[1].m, &sys->bh[1].m);
+	fscanf(file, "%lg %lg\n", &sys->bh[0].chi_Amp, &sys->bh[0].chi_Amp);
+	fscanf(file, "%lg %lg\n", &sys->bh[1].chi_Amp, &sys->bh[1].chi_Amp);
+	fscanf(file, "%lg %lg\n", &sys->bh[0].kappa, &sys->bh[0].kappa);
+	sys->bh[0].kappa *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	sys->bh[0].kappa *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->bh[1].kappa, &sys->bh[1].kappa);
+	sys->bh[1].kappa *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	sys->bh[1].kappa *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->bh[0].psi, &sys->bh[0].psi);
+	sys->bh[0].psi *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	sys->bh[0].psi *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->bh[1].psi, &sys->bh[1].psi);
+	sys->bh[1].psi *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	sys->bh[1].psi *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->incl, &sys->incl);
+	sys->incl *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	sys->incl *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->dist, &sys->dist);
+	fscanf(file, "%lg %lg\n", &sys->F.polarization, &sys->F.polarization);
+	sys->F.polarization *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	sys->F.polarization *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->F.right_Ascention, &sys->F.right_Ascention);
+	sys->F.right_Ascention *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+	sys->F.right_Ascention *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->F.declination, &sys->F.declination);
+	sys->F.declination *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	sys->F.declination *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
+	fscanf(file, "%lg %lg\n", &sys->F.gmst, &sys->F.gmst);
+	sys->F.declination *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+	sys->F.declination *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+}
