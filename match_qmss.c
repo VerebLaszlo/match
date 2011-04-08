@@ -44,6 +44,7 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
 short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index) {
 	assert(prog);
 	assert(parameters);
+	FILE*file;
 	char file_Name[FILE_NAME_LENGTH];
 	short is_Good;
 	parameters->critical_Match = 0.0;
@@ -65,9 +66,13 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 			is_Good = calc_Matches_For_ParameterPair(prog, parameters, &second);
 			if (is_Good && parameters->match_Minimax > parameters->critical_Match) {
 				sprintf(file_Name, "%s/first%hd.txt", prog->folder, index);
-				write_Waves(prog, parameters, &first, file_Name);
+				file = safely_Open_File_For_Writing(file_Name);
+				print_Two_Signals(file, &first, parameters->time_Sampling, prog);
+				fclose(file);
 				sprintf(file_Name, "%s/found%hd.txt", prog->folder, index);
-				write_Waves(prog, parameters, &second, file_Name);
+				file = safely_Open_File_For_Writing(file_Name);
+				print_Two_Signals(file, &first, parameters->time_Sampling, prog);
+				fclose(file);
 				destroy_Signal_Struct(&first);
 				destroy_Signal_Struct(&second);
 				return FOUND;
@@ -124,8 +129,8 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	createPSD(&lalparams, sig);
 	for (short i = 0; i < 2; i++) {
 		for (long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			sig->signal[2 * i][j] = lalparams.waveform[i].h->data->data[2 * j];
-			sig->signal[2 * i + 1][j] = lalparams.waveform[i].h->data->data[2 * j + 1];
+			set_Signal_From_A1A2(i, j, sig, &lalparams,
+					parameters->system[i].F.antenna_Beam_Pattern);
 		}
 	}
 	double fr = 0.;
@@ -199,21 +204,21 @@ void createPSD(LALParameters *lalparams, signalStruct *sig) {
 	}
 }
 
-void set_Signal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal) {
+void set_Signal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]) {
 	double a1, a2, phi, shift;
-	for (short i = 0; i < 2; i++) {
-		a1 = lal->waveform[index].a->data->data[2 * elem];
-		a2 = lal->waveform[index].a->data->data[2 * elem + 1];
-		phi = lal->waveform[index].phi->data->data[elem] - lal->waveform[index].phi->data->data[0];
-		shift = 0.0;
-		sig->signal[2 * index][elem] = a1 * M_SQRT2 / 2.0;
-		sig->signal[2 * index + 1][elem] = a2 * M_SQRT2 / 2.0;
-	}
+	a1 = lal->waveform[index].a->data->data[2 * elem];
+	a2 = lal->waveform[index].a->data->data[2 * elem + 1];
+	phi = lal->waveform[index].phi->data->data[elem] - lal->waveform[index].phi->data->data[0];
+	shift = 0.0;
+	sig->signal[2 * index][elem] = a1 * M_SQRT2 / 2.0;
+	sig->signal[2 * index + 1][elem] = a2 * M_SQRT2 / 2.0;
+	sig->signal[RESPONSE1 + index][elem] = sig->signal[2 * index][elem] * F[0] + sig->signal[2
+			* index + 1][elem] * F[1];
 }
 
-void set_Signal_FromHPHC(short index, long elem, signalStruct *sig, LALParameters *lal) {
-	for (short i = 0; i < 2; i++) {
-		sig->signal[2 * index][elem] = lal->waveform[index].h->data->data[2 * elem];
-		sig->signal[2 * index + 1][elem] = lal->waveform[index].h->data->data[2 * elem + 1];
-	}
+void set_Signal_FromHPHC(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]) {
+	sig->signal[2 * index][elem] = lal->waveform[index].h->data->data[2 * elem];
+	sig->signal[2 * index + 1][elem] = lal->waveform[index].h->data->data[2 * elem + 1];
+	sig->signal[RESPONSE1 + index][elem] = sig->signal[2 * index][elem] * F[0] + sig->signal[2
+			* index + 1][elem] * F[1];
 }

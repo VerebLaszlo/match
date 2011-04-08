@@ -8,7 +8,7 @@
 #define MATCH_H
 
 #include <fftw3.h>
-#include "util_math.h"
+#include "io_handler.h"
 
 /**	An enum to contains the integer type constatns.
  */
@@ -24,16 +24,20 @@ typedef enum {
 	HCP = 2,
 	HCC = 3,
 	NUM_OF_SIGNALS = 4,
+	RESPONSE1 = 4,
+	RESPONSE2 = 5,
+	NOS_WITH_DETECTOR_RESPONSE = 6,
 } constantValues;
 
 /**	Structure containing the signals.
  */
 typedef struct {
-	double *signal[NUM_OF_SIGNALS]; ///< the signals in time domain with the following order: \f$h_{1+}\f$, \f$h_{1\times}\f$, \f$h_{2+}\f$, \f$h_{2\times}\f$.
+	double *signal[NOS_WITH_DETECTOR_RESPONSE]; ///< the signals in time domain with the following order: \f$h_{1+}\f$, \f$h_{1\times}\f$, \f$h_{2+}\f$, \f$h_{2\times}\f$.
 	double *product_Signal[NUM_OF_SIGNALS];///<a
 	fftw_complex *csignal[NUM_OF_SIGNALS]; ///< the signals in frequency domain with the following order: \f$\tilde h_{1+}\f$, \f$\tilde h_{1\times}\f$, \f$\tilde h_{2+}\f$, \f$\tilde h_{2\times}\f$.
 	fftw_plan plan[NUM_OF_SIGNALS]; ///< FFT plans to calculate \f$\tilde h_{ij}=F\left(h_{ij}\right)\f$
 	double *psd;///<d
+	long length[2];
 	long size; ///< the allocated memory for the signals
 } signalStruct;
 
@@ -141,5 +145,12 @@ void create_Signal_Struct1(signalStruct *s, long size);
  */
 void destroy_Signal_Struct(signalStruct *s);
 void destroy_Signal_Struct1(signalStruct *s);
+
+void print_Two_Signals(FILE*file, signalStruct *sig, double dt, Program_Parameters *prog);
+
+void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt,
+		Program_Parameters *prog);
+
+void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, Program_Parameters *prog);
 
 #endif

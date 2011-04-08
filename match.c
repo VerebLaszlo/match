@@ -6,9 +6,8 @@
 
 #include "match.h"
 
-
-void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
-		double *best, double *minimax) {
+void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
+		double *minimax) {
 	assert(in);
 	assert(in->size);
 	assert(0<min_Index && min_Index< max_Index);
@@ -30,8 +29,7 @@ void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
 	calc_Timemaximised_Matches(in, min_Index, max_Index, typ, best, minimax);
 }
 
-void orthonormalise(signalStruct *in, long min_Index, long max_Index,
-		signalStruct *out) {
+void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
 	assert(in);
 	assert(out);
 	assert(in->size >0 && out->size == in->size);
@@ -194,5 +192,103 @@ void destroy_Signal_Struct1(signalStruct *signal) {
 	}
 	if (signal->psd) {
 		free(signal->psd);
+	}
+}
+
+void print_Two_Signals(FILE*file, signalStruct *sig, double dt, Program_Parameters *prog) {
+	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
+	static char temp[FILENAME_MAX];
+	static char format[FILENAME_MAX];
+	static char text[FILENAME_MAX];
+	sprintf(temp, "%%%d.%dlg %%", prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
+	sprintf(text, "%%%ds %%", prog->width_Of_Number_To_Plot);
+	sprintf(format, "%s %s", temp, temp);
+	long i;
+	for (i = 0; i < sig->length[shorter]; i++) {
+		fprintf(file, temp, (double)i * dt);
+		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2]);
+		fprintf(file, "\n");
+	}
+	if (shorter) {
+		for (; i < sig->size; i++) {
+			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, sig->signal[RESPONSE1][i]);
+			fprintf(file, "\n");
+		}
+	} else {
+		for (; i < sig->size; i++) {
+			fprintf(file, temp, (double)i * dt);
+			fprintf(file, text, "");
+			fprintf(file, temp, sig->signal[RESPONSE2][i]);
+			fprintf(file, "\n");
+		}
+	}
+}
+
+void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt,
+		Program_Parameters *prog) {
+	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
+	static char temp[FILENAME_MAX];
+	static char format[FILENAME_MAX];
+	static char text[FILENAME_MAX];
+	sprintf(temp, "%%%d.%dlg %%", prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
+	sprintf(text, "%%%ds %%", prog->width_Of_Number_To_Plot);
+	sprintf(format, "%s %s %s", temp, temp, temp);
+	long i;
+	for (i = 0; i < sig->length[shorter]; i++) {
+		fprintf(file, temp, (double)i * dt);
+		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2],
+				sig->signal[RESPONSE1][i] - sig->signal[RESPONSE2][i]);
+		fprintf(file, "\n");
+	}
+	if (shorter) {
+		for (; i < sig->size; i++) {
+			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, sig->signal[RESPONSE1][i]);
+			fprintf(file, text, "");
+			fprintf(file, temp, sig->signal[RESPONSE1][i]);
+			fprintf(file, "\n");
+		}
+	} else {
+		for (; i < sig->size; i++) {
+			fprintf(file, temp, (double)i * dt);
+			fprintf(file, text, prog->width_Of_Number_To_Plot, "");
+			fprintf(file, temp, sig->signal[RESPONSE2][i]);
+			fprintf(file, temp, -sig->signal[RESPONSE2][i]);
+			fprintf(file, "\n");
+		}
+	}
+}
+
+void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, Program_Parameters *prog) {
+	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
+	static char temp[FILENAME_MAX];
+	static char format[FILENAME_MAX];
+	static char text[FILENAME_MAX];
+	static char textformat[FILENAME_MAX];
+	sprintf(temp, "%%%d.%dlg %%", prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
+	sprintf(text, "%%%ds %%", prog->width_Of_Number_To_Plot);
+	sprintf(format, "%s %s %s", temp, temp, temp);
+	sprintf(textformat, "%s %s %s", text, text, text);
+	long i;
+	for (i = 0; i < sig->length[shorter]; i++) {
+		fprintf(file, temp, (double)i * dt);
+		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P], sig->signal[H1C]);
+		fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P], sig->signal[H2C]);
+		fprintf(file, "\n");
+	}
+	if (shorter) {
+		for (; i < sig->size; i++) {
+			fprintf(file, temp, (double)i * dt);
+			fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P], sig->signal[H1C]);
+			fprintf(file, "\n");
+		}
+	} else {
+		for (; i < sig->size; i++) {
+			fprintf(file, temp, (double)i * dt);
+			fprintf(file, textformat, "", "", "");
+			fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P], sig->signal[H2C]);
+			fprintf(file, "\n");
+		}
 	}
 }

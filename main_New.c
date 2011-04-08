@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 	System_Parameters parameters;
 	puts("Start!!");
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
-	multirun(&program_Parameters, parameters_File_Name);
+	//multirun(&program_Parameters, parameters_File_Name);
 	read_Parameters(limits_Of_Parameters, parameters_File_Name);
 	//proba(&program_Parameters, &parameters, limits_Of_Parameters);
 	run_Algorithm(&program_Parameters, &parameters, limits_Of_Parameters);

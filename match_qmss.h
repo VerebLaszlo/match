@@ -8,7 +8,7 @@
 #ifndef MATCH_QMSS_H_
 #define MATCH_QMSS_H_
 
-#include "io_handler.h"
+#include "match.h"
 
 #include <limits.h>
 #include <time.h>
@@ -108,7 +108,7 @@ void initLALParameters(LALParameters *lalparams, System_Parameters *parameters);
  */
 void createPSD(LALParameters *lalparams, signalStruct *sig);
 
-void set_Signal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal);
-void set_Signal_From_HPHC(short index, long elem, signalStruct *sig, LALParameters *lal);
+void set_Signal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]);
+void set_Signal_From_HPHC(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]);
 
 #endif /* MATCH_QMSS_H_ */

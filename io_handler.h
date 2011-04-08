@@ -8,7 +8,6 @@
 #ifndef IO_HANDLER_H_
 #define IO_HANDLER_H_
 
-#include "match.h"
 #include "generator.h"
 
 extern short is_First;///<a
@@ -79,36 +78,5 @@ void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *
 void read_Parameters(binary_System *parameters, char *file_Name);
 
 void readExactParameters(FILE *file, System_Parameters *params);
-
-/**
- * Done
- * @param prog
- * @param parameters
- * @param sig
- */
-void write_Waves_To_Files(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig);
-
-void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signalStruct *sig,
-		char *file_Name);
-
-/**
- * Done.
- * @todo előbb megnyitni valahol, hogy megkezdjük írással a fájlt, és ne csak hozzáfüzzünk!!!
- * @param prog
- * @param parameters
- * @param sig
- * @param index
- */
-void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters, signalStruct *sig,
-		short index);
-
-/**
- *
- * @param prog
- * @param parameters
- * @param file_Name
- */
-void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameters, char *file_Name);
 
 #endif /* IO_HANDLER_H_ */

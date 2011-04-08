@@ -11,9 +11,6 @@ int lalDebugLevel = 0;
 
 short run_For_Time(Program_Parameters *prog, System_Parameters *parameters);
 
-void write_Wave_To_File1(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig, short index);
-
 int main(int argc, char *argv[]) {
 	char program_Parameters_File_Name[FILE_NAME_LENGTH];
 	char parameters_File_Name[FILE_NAME_LENGTH];
@@ -64,54 +61,14 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters) {
 	create_Signal_Struct1(&sig, parameters->max_Length);
 	for (short i = 0; i < 2; i++) {
 		for (long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			set_Signal_From_A1A2(i, j, &sig, &lalparams);
+			set_Signal_From_A1A2(i, j, &sig, &lalparams,
+					parameters->system[i].F.antenna_Beam_Pattern);
 		}
 	}
-	write_Wave_To_File1(prog, parameters, &sig, 0);
+	FILE*file = safely_Open_File_For_Writing("out/temp.txt");
+	print_Two_Signals(file, &sig, parameters->time_Sampling, prog);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
 	destroy_Signal_Struct1(&sig);
 	return 0;
-}
-
-void write_Wave_To_File1(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig, short index) {
-	assert(prog);
-	assert(parameters);
-	assert(sig);
-	char file_Name[FILE_NAME_LENGTH];
-	static char temp[FILE_NAME_LENGTH];
-	static char text[FILE_NAME_LENGTH];
-	FILE *file;
-	for (short i = 0; i < 2; i++) {
-		sprintf(file_Name, "out/wave%d.txt", i);
-		file = fopen(file_Name, "w");
-		sprintf(temp, "%%- %d.%dlg ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
-		sprintf(text, "%s%s%s", temp, temp, temp);
-		fprintf(file, "#");
-		fprintf(file, text, parameters->system[i].M, parameters->system[i].bh[0].m
-				/ parameters->system[i].bh[1].m, parameters->system[i].eta);
-		fprintf(file, text, parameters->system[i].bh[0].chi_Amp, parameters->system[i].bh[0].kappa,
-				parameters->system[i].bh[0].psi);
-		fprintf(file, text, parameters->system[i].bh[1].chi_Amp, parameters->system[i].bh[1].kappa,
-				parameters->system[i].bh[1].psi);
-		fprintf(file, "%s %d %s\n", parameters->phase[i], parameters->amp_Code[i],
-				parameters->spin[i]);
-		fprintf(file, "# ");
-		fprintf(file, text, parameters->system[i].F.antenna_Beam_Pattern[0],
-				parameters->system[i].F.antenna_Beam_Pattern[1], NAN);
-		fprintf(file, "\n");
-		sprintf(temp, "%%- %d.%dlg ", prog->width_Of_Number, prog->precision);
-		sprintf(text, "%s %%%% %s %%%% %s %%%% ", temp, temp, temp);
-		for (long j = 0; j < parameters->min_Length; j++) {
-			fprintf(file, "%*.*lg %% ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-					(double)j * parameters->time_Sampling);
-			fprintf(file, text, sig->signal[2 * i][j], sig->signal[2 * i + 1][j],
-					sig->signal[2 * i][j] * parameters->system[i].F.antenna_Beam_Pattern[0]
-							+ sig->signal[2 * i + 1][j]
-									* parameters->system[i].F.antenna_Beam_Pattern[1]);
-			fprintf(file, "\n");
-		}
-		fclose(file);
-	}
 }
