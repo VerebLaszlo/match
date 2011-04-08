@@ -19,6 +19,8 @@
 #define SQR(number) \
 	({ typeof(number) _number = (number); _number*_number; })
 
+/** Time conversion constants
+ */
 typedef struct {
 	const double MINUTE_TO_SECOND;
 	const double SECOND_TO_MINUTE;
@@ -34,6 +36,8 @@ typedef struct {
 	const double SECOND_TO_DAY;
 } TIME_CONVERSION_CONSTANTS;
 
+/** Degree conversion constants
+ */
 typedef struct {
 	const double RADIAN_TO_DEGREE;
 	const double DEGREE_TO_RADIAN;

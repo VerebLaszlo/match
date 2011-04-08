@@ -11,35 +11,43 @@
 
 #include "util.h"
 
+/** Egyéb
+ */
 typedef struct DETECTOR_CONSTANTS {
-	const double GPS_JAN1ST2000_MIDNIGHT;
-	const double LEAP_SECONDS_AT_JAN1ST2000;
-	const double SECONDS_FROM_GPS_JAN1ST2000_MIDNIGHT_TO_GPS_MAY1ST2005;
-	const double SECONDS_FROM_GPS_JAN1ST2000_MIDNIGHT_TO_GPS_SEP1ST2008;
-	const double CENTURIES_TO_DAYS;
-	const double DAYS_TO_CENTURIES;
-	const double COEFFICIENT_FOR_DEGREE0;
-	const double COEFFICIENT_FOR_DEGREE1;
-	const double COEFFICIENT_FOR_DEGREE2;
-	const double COEFFICIENT_FOR_DEGREE3;
+	const double GPS_JAN1ST2000_MIDNIGHT; ///<x
+	const double LEAP_SECONDS_AT_JAN1ST2000; ///<x
+	const double SECONDS_FROM_GPS_JAN1ST2000_MIDNIGHT_TO_GPS_MAY1ST2005; ///<x
+	const double SECONDS_FROM_GPS_JAN1ST2000_MIDNIGHT_TO_GPS_SEP1ST2008; ///<x
+	const double CENTURIES_TO_DAYS; ///<x
+	const double DAYS_TO_CENTURIES; ///<x
+	const double COEFFICIENT_FOR_DEGREE0; ///<x
+	const double COEFFICIENT_FOR_DEGREE1; ///<x
+	const double COEFFICIENT_FOR_DEGREE2; ///<x
+	const double COEFFICIENT_FOR_DEGREE3; ///<x
 } DETECTOR_CONSTANTS;
 
 /**	Contains various constants used for detectors.
  */
 extern const DETECTOR_CONSTANTS DETECTOR_CONSTANT;
 
+/** The detectors
+ */
 typedef enum detector_Enum {
 	LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT, NUMBER_OF_DETECTORS,
 } detector_Enum;
 
+/** Defines a detector
+ */
 typedef struct detector_table {
-	detector_Enum id;
-	char* name;
-	double direction_Vector_X[3];
-	double direction_Vector_Y[3];
-	double location[3];
+	detector_Enum id; ///< id of the detector
+	char* name; ///< name of the detector
+	double direction_Vector_X[3]; ///< x arm of the detector
+	double direction_Vector_Y[3]; ///< y arm of the detector
+	double location[3]; ///< location of the detector
 } Detector_Table;
 
+/**	Contains variables for the antenna beam pattern
+ */
 typedef struct {
 	double declination; ///< in radians
 	double polarization; ///< in radians
@@ -60,7 +68,7 @@ detector_Enum id_Of_Detector(char *name);
  * @param[in] id	: the detector
  * @param[out] F	: antenna function struct containing the antenna pattern
  */
-void calc_Antenna_Pattern_For(detector_Enum det, antenna_Func *F);
+void calc_Antenna_Pattern_For(detector_Enum id, antenna_Func *F);
 
 /**	Gets the detector specific parameters.
  * @param[in] id	: the detector
@@ -72,14 +80,18 @@ Detector_Table get_Detector_Table(detector_Enum id);
  * @param[in] detector	:  the detectors parameters
  * @param[out] response_Matrix
  */
-void calc_Response_Matrix(Detector_Table detector, double rm[3][3]);
+void calc_Response_Matrix(Detector_Table detector, double response_Matrix[3][3]);
 
 /**	Calculates the antenna pattern for a response matrix. Equations [1] (B1-5) (B7-8)
  * @param[in] response_Matrix	:
  * @param[out] antenna	:
  */
-void calc_Antenna_Pattern_From_Response_Matrix(double D[3][3], antenna_Func *antenna);
+void calc_Antenna_Pattern_From_Response_Matrix(double response_Matrix[3][3], antenna_Func *antenna);
 
+/** X
+ * @param GPSsec
+ * @return
+ */
 double convert_GMST_From_Seconds_To_Radians(double GPSsec);
 
 /**	Prints the antenna parameters.

@@ -1,4 +1,4 @@
-/**
+/*
  * @file test.h
  *
  * @date Apr 1, 2011

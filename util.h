@@ -16,24 +16,28 @@
 #include <string.h>
 #endif
 
+/** Constants for output
+ */
 typedef enum OUTPUT_CONSTANTS {
 	SPECIAL_CHARACTER_LENGTH = 6, SEPARATOR_LENGTH = 3, FORMAT_LENGTH = 10,
 } OUTPUT_CONSTANTS;
 
+/** Specifies the formatting of the output
+ */
 typedef struct OUTPUT_FORMAT_CONSTANTS {
-	short precision;
-	short width_Of_Number;
-	short width_Of_Number_Width_Separator;
-	char separate_Character;
-	short left_Justify;
-	char format_For_One_Number[FORMAT_LENGTH];
-	short precision_To_Plot;
-	short width_Of_Number_To_Plot;
-	short width_Of_Number_To_Plot_Width_Separator;
-	char separate_Character_To_Plot;
-	short left_Justify_To_Plot;
-	char format_For_One_Number_To_Plot[FORMAT_LENGTH];
-	char output_Folder[FILENAME_MAX];
+	short precision; ///< precision of the number
+	short width_Of_Number; ///< length of the string containing the number without separator character
+	short width_Of_Number_Width_Separator; ///< the length of the string containing the number with separator character
+	char separate_Character; ///< the separator character
+	short left_Justify; ///< true if the numbers are left justified
+	char format_For_One_Number[FORMAT_LENGTH]; ///< contains the format-string for one number
+	short precision_To_Plot; ///< precision of the number for plotting
+	short width_Of_Number_To_Plot; ///< length of the string containing the number without separator character for plotting
+	short width_Of_Number_To_Plot_Width_Separator; ///< the length of the string containing the number with separator character for plotting
+	char separate_Character_To_Plot; ///< the separator character for plotting
+	short left_Justify_To_Plot; ///< true if the numbers are left justified for plotting
+	char format_For_One_Number_To_Plot[FORMAT_LENGTH]; ///< contains the format-string for one number for plotting
+	char output_Folder[FILENAME_MAX]; ///< where to write files
 } OUTPUT_FORMAT_CONSTANTS;
 
 /**		Opens the file with the given access mode. On error it terminates the program and prints an

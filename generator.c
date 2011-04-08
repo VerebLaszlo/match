@@ -9,36 +9,6 @@
 
 /**
  * XX
- * @param min
- * @param max
- */
-void init_Binary_System(binary_System *min, binary_System *max) {
-	memset(min, 0, sizeof(binary_System));
-	memset(max, 0, sizeof(binary_System));
-	max->incl = M_PI; ///< \bug nem biztos
-	short i;
-	for (i = 0; i < 2; i++) {
-		max->bh[i].m = DBL_MAX;
-		max->bh[i].chi_Amp = 1.;
-		max->bh[i].chi[0] = 1.;
-		max->bh[i].chi[1] = 1.;
-		max->bh[i].chi[2] = 1.;
-		max->bh[i].theta = max->bh[i].kappa = M_PI;
-		max->bh[i].varphi = max->bh[i].phi = max->bh[i].psi = 2. * M_PI;
-		min->bh[i].ctheta = -1.;
-		max->bh[i].ctheta = 1.;
-	}
-	max->M = DBL_MAX;
-	max->chirpM = DBL_MAX;
-	max->eta = 0.25;
-	max->coaPhase = 2. * M_PI;
-	max->F.right_Ascention = max->F.declination = max->F.polarization = 2. * M_PI;
-	min->F.gmst = DBL_MIN;
-	max->F.gmst = DBL_MAX;
-}
-
-/**
- * XX
  * @param sys
  * @param mode
  */
@@ -46,13 +16,12 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 	assert(sys);
 	double temp;
 	double PHI = M_PI / 2.0;
-	short i;
 	double theta1 = 0.0;
 	double theta2 = sys->incl;
 	double xyz[3];
 	switch (mode) {
 	case FROM_XYZ:
-		for (i = 0; i < 2; i++) {
+		for (short i = 0; i < 2; i++) {
 			sys->bh[i].chi_Amp = sqrt(SQR(sys->bh[i].chi[0]) + SQR(sys->bh[i].chi[1])
 					+ SQR(sys->bh[i].chi[2]));
 			sys->bh[i].ctheta = sys->bh[i].chi[2] / sys->bh[i].chi_Amp;
@@ -84,7 +53,7 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 		}
 		break;
 	case FROM_THETA_VPHI:
-		for (i = 0; i < 2; i++) {
+		for (short i = 0; i < 2; i++) {
 			sys->bh[i].ctheta = cos(sys->bh[i].theta);
 			sys->bh[i].chi[0] = sys->bh[i].chi_Amp * sin(sys->bh[i].theta) * cos(sys->bh[i].varphi);
 			sys->bh[i].chi[1] = sys->bh[i].chi_Amp * sin(sys->bh[i].theta) * sin(sys->bh[i].varphi);
@@ -106,7 +75,7 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 		}
 		break;
 	case FROM_THETA_PHI:
-		for (i = 0; i < 2; i++) {
+		for (short i = 0; i < 2; i++) {
 			sys->bh[i].varphi = sys->bh[i].phi - PHI;
 			sys->bh[i].ctheta = cos(sys->bh[i].theta);
 			temp = cos(sys->bh[i].theta) * cos(sys->incl) - //
@@ -136,7 +105,7 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 		if (theta2 != 0.0) {
 			theta2 *= -1.0;
 		}
-		for (i = 0; i < 2; i++) {
+		for (short i = 0; i < 2; i++) {
 			double cos_psi;
 			if (sys->bh[i].psi == M_PI_2) {
 				cos_psi = 0.0;
@@ -276,7 +245,6 @@ void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mod
 	assert(sys);
 	assert(min);
 	assert(max);
-	short i;
 	switch (mode) {
 	case XYZ:
 		fprintf(stderr, "Not implemented yet.");
@@ -284,7 +252,7 @@ void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mod
 		exit(-1);
 		break;
 	case THETA_VPHI:
-		for (i = 0; i < 3; i++) {
+		for (short i = 0; i < 3; i++) {
 			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
 			sys->bh[i].theta = acos(random_Between(cos(min->bh[i].theta), cos(max->bh[i].theta)));
 			sys->bh[i].varphi = random_Between(min->bh[i].varphi, max->bh[i].varphi);
@@ -292,7 +260,7 @@ void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mod
 		convert_Spins(sys, FROM_THETA_VPHI);
 		break;
 	case THETA_PHI:
-		for (i = 0; i < 3; i++) {
+		for (short i = 0; i < 3; i++) {
 			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
 			sys->bh[i].theta = acos(random_Between(cos(min->bh[i].theta), cos(max->bh[i].theta)));
 			sys->bh[i].phi = random_Between(min->bh[i].phi, max->bh[i].phi);
@@ -300,7 +268,7 @@ void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mod
 		convert_Spins(sys, FROM_THETA_PHI);
 		break;
 	case KAPPA_PSI:
-		for (i = 0; i < 3; i++) {
+		for (short i = 0; i < 3; i++) {
 			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
 			sys->bh[i].kappa = acos(random_Between(cos(min->bh[i].kappa), cos(max->bh[i].kappa)));
 			sys->bh[i].psi = random_Between(min->bh[i].psi, max->bh[i].psi);
