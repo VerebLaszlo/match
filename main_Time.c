@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
 	read_Parameters(limits_Of_Parameters, parameters_File_Name);
 	proba1(&program_Parameters, &parameters, limits_Of_Parameters);
-	//LALCheckMemoryLeaks();
+	LALCheckMemoryLeaks();
 	puts("Done!!!");
 	return EXIT_SUCCESS;
 }
@@ -85,9 +85,10 @@ void proba1(Program_Parameters *program_Parameters, System_Parameters *parameter
 	assert(parameters);
 	assert(limits);
 	assert(program_Parameters->number_Of_Runs >= 0);
-	char temp[2*FILE_NAME_LENGTH];
+	char temp[2 * FILE_NAME_LENGTH];
 	srand(86);
-	sprintf(temp, "%s/%s%s%d.time", program_Parameters->folder, parameters->approx[0], parameters->spin[0], parameters->amp_Code[0]);
+	sprintf(temp, "%s/%s%s%d.time", program_Parameters->folder, parameters->approx[0],
+			parameters->spin[0], parameters->amp_Code[0]);
 	FILE *file = safely_Open_File_For_Writing(temp);
 	time(&start);
 	for (long i = 0; i < program_Parameters->number_Of_Runs; i++) {
@@ -120,7 +121,8 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long
 		LALGenerateInspiral(&lalparams.status, &lalparams.waveform[i], &lalparams.injParams[i],
 				&lalparams.ppnParams);
 		if (lalparams.status.statusCode) {
-			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform\n", i);
+			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform %d\n", i,
+					lalparams.status.statusCode);
 			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
 			return 1;
@@ -135,7 +137,9 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long
 			set_hphc(i, j, &sig, &lalparams, parameters);
 		}
 	}
-	write_Wave_To_File1(prog, parameters, &sig, index);
+	if (!index) {
+		write_Wave_To_File1(prog, parameters, &sig, index);
+	}
 	XLALSQTPNDestroyCoherentGW1(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW1(&lalparams.waveform[1]);
 	destroy_Signal_Struct1(&sig);
@@ -196,10 +200,12 @@ void set_hphc(short index, long elem, signalStruct *sig, LALParameters *lal,
 		} else if (!strcmp(params->approx[i], "SpinTaylor")) {
 			a1 = lal->waveform[index].a->data->data[2 * elem];
 			a2 = lal->waveform[index].a->data->data[2 * elem + 1];
-			phi = lal->waveform[index].phi->data->data[elem] - lal->waveform[index].phi->data->data[0];
-			shift = lal->waveform[index].shift->data->data[elem];
+			phi = lal->waveform[index].phi->data->data[elem]
+					- lal->waveform[index].phi->data->data[0];
+			shift = 0.0;//lal->waveform[index].shift->data->data[elem];
 			sig->signal[2 * index][elem] = a1 * cos(shift) * cos(phi) - a2 * sin(shift) * sin(phi);
-			sig->signal[2 * index + 1][elem] = a1 * sin(shift) * cos(phi) + a2 * cos(shift) * sin(phi);
+			sig->signal[2 * index + 1][elem] = a1 * sin(shift) * cos(phi) + a2 * cos(shift) * sin(
+					phi);
 		}
 	}
 }

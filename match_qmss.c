@@ -7,9 +7,6 @@
 
 #include "match_qmss.h"
 
-short is_First;///<a
-long db;
-
 void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *parameters,
 		binary_System *limits) {
 	assert(program_Parameters);
@@ -18,19 +15,15 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
 	assert(program_Parameters->number_Of_Runs > 0);
 	srand(86);
 	short is_Good;
-	char temp[FILE_NAME_LENGTH];
-	sprintf(temp, "%s", program_Parameters->folder);
-	for (long i = 0; i < program_Parameters->number_Of_Runs;) {
+	for (short i = 0; i < program_Parameters->number_Of_Runs;) {
 		generate_Parameters(parameters, limits);
-		is_Good = incrementing_Spins(program_Parameters, parameters);
+		is_Good = incrementing_Spins(program_Parameters, parameters, i);
 		if (is_Good) {
 			i++;
-			db = i;
 		}
 		if ((i + 1) % 10 == 0) {
 			printf("%ld%%\n", 100 * i / program_Parameters->number_Of_Runs);
 		}
-		sprintf(program_Parameters->folder, "%s", temp);
 	}
 }
 
@@ -41,32 +34,43 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
 	memcpy(&parameters->system[1], &parameters->system[0], sizeof(binary_System));
 }
 
-short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters) {
+short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index) {
 	assert(prog);
 	assert(parameters);
-	char temp[FILE_NAME_LENGTH];
-	sprintf(temp, "%s", prog->folder);
-	is_First = 1;
+	char file_Name[FILE_NAME_LENGTH];
 	short is_Good;
 	parameters->critical_Match = 0.0;
+	signalStruct first, second;
+	is_Good = calc_Matches_For_ParameterPair(prog, parameters, &first);
+	if (!is_Good) {
+		return NOT_FOUND;
+	}
+	parameters->critical_Match = parameters->match_Minimax;
 	double min_Spin = parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp;
 	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < parameters->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp
 			+= parameters->spin_Step) {
 		for (; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp < parameters->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp
 				+= parameters->spin_Step) {
-			is_Good = calc_Matches_For_ParameterPair(prog, parameters);
-			if (is_First) {
-				if (!is_Good) {
-					return is_Good;
-				}
-				parameters->critical_Match = parameters->match_Minimax;
-				is_First = 0;
+			if (parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp == min_Spin
+					&& parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp == min_Spin) {
+				continue;
 			}
-			sprintf(prog->folder, "%s", temp);
+			is_Good = calc_Matches_For_ParameterPair(prog, parameters, &second);
+			if (is_Good && parameters->match_Minimax > parameters->critical_Match) {
+				sprintf(file_Name, "%s/first%hd.txt", prog->folder, index);
+				write_Waves(prog, parameters, &first, file_Name);
+				sprintf(file_Name, "%s/found%hd.txt", prog->folder, index);
+				write_Waves(prog, parameters, &second, file_Name);
+				destroy_Signal_Struct(&first);
+				destroy_Signal_Struct(&second);
+				return FOUND;
+			}
+			destroy_Signal_Struct(&second);
 		}
 		parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp = min_Spin;
 	}
-	return 1;
+	destroy_Signal_Struct(&first);
+	return NOT_FOUND;
 }
 
 inline void increment_Spin_Of_Binary_System(binary_System *system, double step) {
@@ -82,11 +86,11 @@ inline void increment_Spins(System_Parameters* parameters) {
 	increment_Spin_Of_Binary_System(&parameters->system[1], parameters->spin_Step);
 }
 
-short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters) {
+short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
+		signalStruct *sig) {
 	assert(prog);
 	assert(parameters);
 	static LALParameters lalparams;
-	signalStruct sig;
 	initLALParameters(&lalparams, parameters);
 	for (short i = 0; i < 2; i++) {
 		memset(&lalparams.status, 0, sizeof(LALStatus));
@@ -95,7 +99,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 		if (lalparams.status.statusCode) {
 			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform\n", i);
 			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
-			return 1;
+			return NOT_FOUND;
 		}
 		parameters->system[i].coaPhase
 				= lalparams.waveform[i].phi->data->data[lalparams.waveform[i].phi->data->length - 1];
@@ -109,12 +113,12 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	parameters->max_Length = lalparams.max_Length
 			= lalparams.waveform[!lalparams.shorter].f->data->length;
 	parameters->freq_Step = 1. / (lalparams.ppnParams.deltaT * lalparams.max_Length);
-	create_Signal_Struct(&sig, lalparams.waveform[!lalparams.shorter].f->data->length);
-	createPSD(&lalparams, &sig);
+	create_Signal_Struct(sig, lalparams.waveform[!lalparams.shorter].f->data->length);
+	createPSD(&lalparams, sig);
 	for (short i = 0; i < 2; i++) {
 		for (long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			sig.signal[2 * i][j] = lalparams.waveform[i].h->data->data[2 * j];
-			sig.signal[2 * i + 1][j] = lalparams.waveform[i].h->data->data[2 * j + 1];
+			sig->signal[2 * i][j] = lalparams.waveform[i].h->data->data[2 * j];
+			sig->signal[2 * i + 1][j] = lalparams.waveform[i].h->data->data[2 * j + 1];
 		}
 	}
 	double fr = 0.;
@@ -132,22 +136,18 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 				parameters->freq_Min, parameters->freq_Max, minfr, maxfr);
 		XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 		XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
-		return 1;
+		return NOT_FOUND;
 	}
 	parameters->match_Typ = parameters->match_Best = parameters->match_Minimax = 0.0;
-	calc_Matches(&sig, minfr, maxfr, &parameters->match_Typ, &parameters->match_Best,
+	calc_Matches(sig, minfr, maxfr, &parameters->match_Typ, &parameters->match_Best,
 			&parameters->match_Minimax);
-	if (parameters->match_Minimax > parameters->min_Match) {
-		write_Waves_To_Files(prog, parameters, &sig);
-	}
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
-	destroy_Signal_Struct(&sig);
 	XLALFree(lalparams.randIn.psd.data);
-	if (parameters->match_Minimax > parameters->min_Match) {
-		return 1;
+	if (parameters->match_Minimax < parameters->min_Match) {
+		return NOT_FOUND;
 	}
-	return 0;
+	return FOUND;
 }
 
 void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) {
@@ -185,7 +185,7 @@ void createPSD(LALParameters *lalparams, signalStruct *sig) {
 	assert(sig);
 	lalparams->randIn.psd.length = lalparams->max_Length;
 	double df = 1. / lalparams->ppnParams.deltaT / lalparams->randIn.psd.length;
-	lalparams->randIn.psd.data = (REAL8*) LALMalloc(sizeof(REAL8) * lalparams->randIn.psd.length);
+	lalparams->randIn.psd.data = (REAL8*)LALMalloc(sizeof(REAL8) * lalparams->randIn.psd.length);
 	LALNoiseSpectralDensity(&lalparams->status, &lalparams->randIn.psd, &LALLIGOIPsd, df);
 	for (long j = 0; j < lalparams->randIn.psd.length; j++) {
 		sig->psd[j] = lalparams->randIn.psd.data[j];

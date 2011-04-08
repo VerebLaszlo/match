@@ -92,18 +92,14 @@ void write_Waves_To_Files(Program_Parameters *prog, System_Parameters *parameter
 		sprintf(prog->folder, "%s/best", temp);
 		write_Wave_To_File(prog, parameters, sig, index[0]);
 		index[0]++;
-		if (db > 148) {
-			printf("% 11.6lg% 11.6lg% 11.6lg% 11.6lg\n", parameters->system[0].bh[0].chi_Amp,
-					parameters->match_Typ, parameters->match_Best, parameters->match_Minimax);
-		}
+		printf("% 11.6lg% 11.6lg% 11.6lg% 11.6lg\n", parameters->system[0].bh[0].chi_Amp,
+				parameters->match_Typ, parameters->match_Best, parameters->match_Minimax);
 	} else if (parameters->match_Minimax > parameters->critical_Match) {
 		sprintf(prog->folder, "%s/match", temp);
 		write_Wave_To_File(prog, parameters, sig, index[1]);
 		index[1]++;
-		if (db > 148) {
-			printf("% 11.6lg% 11.6lg% 11.6lg% 11.6lg\n", parameters->system[0].bh[0].chi_Amp,
-					parameters->match_Typ, parameters->match_Best, parameters->match_Minimax);
-		}
+		printf("% 11.6lg% 11.6lg% 11.6lg% 11.6lg\n", parameters->system[0].bh[0].chi_Amp,
+				parameters->match_Typ, parameters->match_Best, parameters->match_Minimax);
 	}
 }
 
@@ -203,7 +199,7 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 	long i;
 	for (i = 0; i < parameters->min_Length; i++) {
 		fprintf(file, "%*.*lg %% ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-				(double) i * parameters->time_Sampling);
+				(double)i * parameters->time_Sampling);
 		fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
 				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i]
 				* parameters->system[0].F.antenna_Beam_Pattern[1]);
@@ -221,7 +217,7 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 	if (parameters->shorter) {
 		for (; i < parameters->max_Length; i++) {
 			fprintf(file, "%*.*lg %% ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-					(double) i * parameters->time_Sampling);
+					(double)i * parameters->time_Sampling);
 			fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
 					* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i]
 					* parameters->system[0].F.antenna_Beam_Pattern[1]);
@@ -242,7 +238,7 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 		}
 	} else {
 		fprintf(file, "%*.*lg %% ", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-				(double) i * parameters->time_Sampling);
+				(double)i * parameters->time_Sampling);
 		fprintf(file, "%*s %*s %*s %%%% ", prog->width_Of_Number_To_Plot, "",
 				prog->width_Of_Number_To_Plot, "", prog->width_Of_Number_To_Plot, "");
 		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]
@@ -258,12 +254,6 @@ void write_Wave_To_File(Program_Parameters *prog, System_Parameters *parameters,
 	fclose(file);
 }
 
-/**
- *
- * @param prog
- * @param parameters
- * @param file_Name
- */
 void write_Params_To_File(Program_Parameters *prog, System_Parameters *parameters, char *file_Name) {
 	assert(prog);
 	assert(parameters);
@@ -354,8 +344,8 @@ void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signal
 	fprintf(file, "\n");
 	long i;
 	for (i = 0; i < parameters->min_Length; i++) {
-		fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-				(double) i * parameters->time_Sampling);
+		fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot, (double)i
+				* parameters->time_Sampling);
 		fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
 				* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i]
 				* parameters->system[0].F.antenna_Beam_Pattern[1]);
@@ -367,15 +357,15 @@ void write_Waves(Program_Parameters *prog, System_Parameters *parameters, signal
 	if (parameters->shorter) {
 		for (; i < parameters->max_Length; i++) {
 			fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-					(double) i * parameters->time_Sampling);
+					(double)i * parameters->time_Sampling);
 			fprintf(file, text, sig->signal[H1P][i], sig->signal[H1C][i], sig->signal[H1P][i]
 					* parameters->system[0].F.antenna_Beam_Pattern[0] + sig->signal[H1C][i]
 					* parameters->system[0].F.antenna_Beam_Pattern[1]);
 			fprintf(file, "\n");
 		}
 	} else {
-		fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot,
-				(double) i * parameters->time_Sampling);
+		fprintf(file, "%*.*lg\t", prog->width_Of_Number_To_Plot, prog->precision_To_Plot, (double)i
+				* parameters->time_Sampling);
 		fprintf(file, "%*s\t%*s\t%*s\t", prog->width_Of_Number_To_Plot, "",
 				prog->width_Of_Number_To_Plot, "", prog->width_Of_Number_To_Plot, "");
 		fprintf(file, text, sig->signal[H2P][i], sig->signal[H2C][i], sig->signal[H2P][i]

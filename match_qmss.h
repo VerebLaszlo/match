@@ -10,6 +10,9 @@
 
 #include "io_handler.h"
 
+#include <limits.h>
+#include <time.h>
+
 #define MOD_SPIN_INDEX 0///<C
 #include <lal/LALSQTPNWaveformInterface.h>
 #include <lal/LALNoiseModelsInspiral.h>
@@ -24,6 +27,10 @@
 #include <lal/RealFFT.h>
 
 short is_First;///<a
+
+typedef enum CONSTANTS{
+	NOT_FOUND = 0, FOUND = 1,
+} CONSTANTS;
 
 typedef enum {
 	AMP00 = 1, AMP05=2, AMP10 = 4,
@@ -65,7 +72,7 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits);
  * @param parameters
  * @return
  */
-short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters);
+short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index);
 
 /** Done
  * @param system
@@ -84,7 +91,7 @@ void increment_Spins(System_Parameters* parameters);
  * @param parameters
  * @return
  */
-short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters);
+short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters, signalStruct *sig);
 
 /**
  * Done
