@@ -65,6 +65,11 @@ typedef struct Program_Parameters {
 	short width_Of_Number;///<a
 	short width_Of_Number_To_Plot;///<a
 	char folder[FILENAME_MAX];///<a
+	double max_Spin;///<a
+	double spin_Step;///<a
+	double freq_Max;///<a
+	double delta_Length;///<a
+	double min_Match;///<a
 } Program_Parameters;
 
 /** Reads the exact system parameters.
@@ -78,8 +83,9 @@ void readExactParameters(FILE *file, System_Parameters *params);
  * @param params
  * @param file_Name
  */
-void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *params,
-		char *file_Name);
+void read_Program_Parameters(FILE*file, Program_Parameters *params);
+
+void print_Program_Parameters(FILE*file, Program_Parameters *params);
 
 /** Reads system parameters.
  * @param file

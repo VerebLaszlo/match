@@ -1,20 +1,9 @@
-1000
-17
-5
-proba
-0.7
-1.5
-0.01
-10240.
-40.0
-600.0
-0.01
-SpinQuadTaylor
-twoPointFivePN
-1
-SOSSQM
-SpinQuadTaylor
-twoPointFivePN
-1
-SOSS
-
+1000    # nuber of runs
+17      # precision
+5       # presision to plot
+proba   # output folder
+0.7     # minimal match
+1.5     # max spin
+0.01    # step spin
+600.0   # freq max
+0.01    # delta length

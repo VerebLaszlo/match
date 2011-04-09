@@ -25,7 +25,9 @@ int main(int argc, char *argv[]) {
 	System_Parameters parameters;
 	FILE *file;
 	puts("Start!!");
-	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
+	file = safely_Open_File_For_Reading(program_Parameters_File_Name);
+	read_Program_Parameters(file, &program_Parameters);
+	fclose(file);
 	file = safely_Open_File_For_Reading(parameters_File_Name);
 	read_Binary_Parameter_Limits(file, limits_Of_Parameters);
 	fclose(file);

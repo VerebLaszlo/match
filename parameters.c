@@ -70,7 +70,6 @@ void read_Program_Parameters(FILE*file, Program_Parameters *params) {
 }
 
 void print_Program_Parameters(FILE*file, Program_Parameters *params) {
-	puts("T");
 	fprintf(file, "%10s %10ld\n", "numOfRuns", params->number_Of_Runs);
 	fprintf(file, "%10s %10hd\n", "prec", params->precision);
 	fprintf(file, "%10s %10d\n", "width", params->width_Of_Number);

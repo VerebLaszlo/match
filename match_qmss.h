@@ -70,7 +70,7 @@ void increment_Spin_Of_Binary_System(binary_System *system, double step);
 /** Done
  * @param parameters
  */
-void increment_Spins(System_Parameters* parameters);
+void increment_Spins(System_Parameters* parameters, double step);
 
 /**
  * Done.

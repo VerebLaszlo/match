@@ -55,10 +55,10 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 	}
 	parameters->critical_Match = parameters->match_Minimax;
 	double min_Spin = parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp;
-	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < parameters->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp
-			+= parameters->spin_Step) {
-		for (; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp < parameters->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp
-				+= parameters->spin_Step) {
+	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < prog->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp
+			+= prog->spin_Step) {
+		for (; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp < prog->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp
+				+= prog->spin_Step) {
 			if (parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp == min_Spin
 					&& parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp == min_Spin) {
 				continue;
@@ -94,10 +94,10 @@ inline void increment_Spin_Of_Binary_System(binary_System *system, double step) 
 	system->bh[1].chi_Amp += step;
 }
 
-inline void increment_Spins(System_Parameters* parameters) {
+inline void increment_Spins(System_Parameters* parameters, double step) {
 	assert(parameters);
-	increment_Spin_Of_Binary_System(&parameters->system[0], parameters->spin_Step);
-	increment_Spin_Of_Binary_System(&parameters->system[1], parameters->spin_Step);
+	increment_Spin_Of_Binary_System(&parameters->system[0], step);
+	increment_Spin_Of_Binary_System(&parameters->system[1], step);
 }
 
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
@@ -131,8 +131,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	createPSD(&lalparams, sig);
 	for (short i = 0; i < 2; i++) {
 		for (unsigned long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			setSignal_From_A1A2(i, j, sig, &lalparams,
-					parameters->system[i].F.antenna_Beam_Pattern);
+			setSignal_From_A1A2(i, j, sig, &lalparams, parameters->system[i].F.antenna_Beam_Pattern);
 		}
 	}
 	double fr = 0.;
@@ -141,13 +140,13 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 		fr += parameters->freq_Step;
 		maxfr = ++minfr;
 	}
-	while (fr < parameters->freq_Max) {
+	while (fr < prog->freq_Max) {
 		fr += parameters->freq_Step;
 		maxfr++;
 	}
 	if (minfr == maxfr) {
 		fprintf(stderr, "The two frequencies are too close!!! %lg~%lg: %ld %ld\n",
-				parameters->freq_Min, parameters->freq_Max, minfr, maxfr);
+				parameters->freq_Min, prog->freq_Max, minfr, maxfr);
 		XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 		XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
 		return NOT_FOUND;
@@ -158,7 +157,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
 	XLALFree(lalparams.randIn.psd.data);
-	if (parameters->match_Minimax < parameters->min_Match) {
+	if (parameters->match_Minimax < prog->min_Match) {
 		return NOT_FOUND;
 	}
 	return FOUND;
