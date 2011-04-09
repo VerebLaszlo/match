@@ -29,7 +29,6 @@ void readExactParameters(FILE *file, System_Parameters *params) {
 		fscanf(file, "%lg ", &params->freq_Sampling);
 		params->time_Sampling = 1.0 / params->freq_Sampling;
 		fscanf(file, "%lg ", &params->freq_Initial);
-		fscanf(file, "%lg ", &params->freq_Max);
 		fscanf(file, "%s ", params->phase[i]);
 		fscanf(file, "%s ", params->spin[i]);
 		fscanf(file, "%hd ", &params->amp_Code[i]);
@@ -43,35 +42,78 @@ void readExactParameters(FILE *file, System_Parameters *params) {
 	}
 }
 
-void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *params,
-		char *file_Name) {
-	assert(parameters);
+void read_Program_Parameters(FILE*file, Program_Parameters *params) {
+	assert(file);
 	assert(params);
-	assert(file_Name);
-	FILE *file = fopen(file_Name, "r");
-	fscanf(file, "%ld\n", &parameters->number_Of_Runs);
-	fscanf(file, "%hd\n", &parameters->precision);
-	parameters->width_Of_Number = parameters->precision + SPECIAL_CHARACTER_LENGTH;
-	fscanf(file, "%hd\n", &parameters->precision_To_Plot);
-	parameters->width_Of_Number_To_Plot = parameters->precision_To_Plot + SPECIAL_CHARACTER_LENGTH;
-	fscanf(file, "%s\n", parameters->folder);
-	fscanf(file, "%lg\n", &params->min_Match);
-	fscanf(file, "%lg\n", &params->max_Spin);
-	fscanf(file, "%lg\n", &params->spin_Step);
-	fscanf(file, "%lg\n", &params->freq_Sampling);
+	short length = 100;
+	char line[length];
+	fgets(line, length, file);
+	sscanf(line, "%ld\n", &params->number_Of_Runs);
+	fgets(line, length, file);
+	sscanf(line, "%hd\n", &params->precision);
+	params->width_Of_Number = params->precision + SPECIAL_CHARACTER_LENGTH;
+	fgets(line, length, file);
+	sscanf(line, "%hd\n", &params->precision_To_Plot);
+	params->width_Of_Number_To_Plot = params->precision_To_Plot + SPECIAL_CHARACTER_LENGTH;
+	fgets(line, length, file);
+	sscanf(line, "%s\n", params->folder);
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->min_Match);
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->max_Spin);
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->spin_Step);
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->freq_Max);
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->delta_Length);
+}
+
+void print_Program_Parameters(FILE*file, Program_Parameters *params) {
+	puts("T");
+	fprintf(file, "%10s %10ld\n", "numOfRuns", params->number_Of_Runs);
+	fprintf(file, "%10s %10hd\n", "prec", params->precision);
+	fprintf(file, "%10s %10d\n", "width", params->width_Of_Number);
+	fprintf(file, "%10s %10hd\n", "precPlot", params->precision_To_Plot);
+	fprintf(file, "%10s %10d\n", "widthPlot", params->width_Of_Number_To_Plot);
+	fprintf(file, "%10s %10s\n", "folder", params->folder);
+	fprintf(file, "%10s %10.4lg\n", "min match", params->min_Match);
+	fprintf(file, "%10s %10.4lg\n", "max spin", params->max_Spin);
+	fprintf(file, "%10s %10.4lg\n", "spin step", params->spin_Step);
+	fprintf(file, "%10s %10.4lg\n", "freq max", params->freq_Max);
+	fprintf(file, "%10s %10.4lg\n", "delta L", params->delta_Length);
+}
+
+void read_System_Parameters(FILE *file, System_Parameters *params) {
+	short length = 100;
+	char line[length];
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->freq_Initial);
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->freq_Sampling);
 	params->time_Sampling = 1. / params->freq_Sampling;
-	fscanf(file, "%lg\n", &params->freq_Initial);
-	fscanf(file, "%lg\n", &params->freq_Max);
-	fscanf(file, "%lg\n", &params->delta_Length);
-	fscanf(file, "%s\n", params->approx[0]);
-	fscanf(file, "%s\n", params->phase[0]);
-	fscanf(file, "%hd\n", &params->amp_Code[0]);
-	fscanf(file, "%s\n", params->spin[0]);
-	fscanf(file, "%s\n", params->approx[1]);
-	fscanf(file, "%s\n", params->phase[1]);
-	fscanf(file, "%hd\n", &params->amp_Code[1]);
-	fscanf(file, "%s\n", params->spin[1]);
-	fclose(file);
+	fgets(line, length, file);
+	fgets(line, length, file);
+	fgets(line, length, file);
+	sscanf(line, "%s %s %*s\n", params->approx[0], params->approx[1]);
+	fgets(line, length, file);
+	sscanf(line, "%s %s %*s\n", params->phase[0], params->phase[1]);
+	fgets(line, length, file);
+	sscanf(line, "%s %s %*s\n", params->spin[0], params->spin[1]);
+	fgets(line, length, file);
+	sscanf(line, "%hd %hd %*s\n", &params->amp_Code[0], &params->amp_Code[1]);
+	fgets(line, length, file);
+	read_Binary_Parameter_Limits(file, params->system);
+}
+
+void print_System_Parameters(FILE *file, System_Parameters *params) {
+	fprintf(file, "%10s %10.4lg\n", "freq_I", params->freq_Initial);
+	fprintf(file, "%10s %10.4lg\n", "freq_S", params->freq_Sampling);
+	fprintf(file, "%10s %10s %10s\n", "approx", params->approx[0], params->approx[1]);
+	fprintf(file, "%10s %10s %10s\n", "phase", params->phase[0], params->phase[1]);
+	fprintf(file, "%10s %10s %10s\n", "spin", params->spin[0], params->spin[1]);
+	fprintf(file, "%10s %10d %10d\n", "amp", params->amp_Code[0], params->amp_Code[1]);
+	print_Binary_Parameter_Limits(file, params->system);
 }
 
 void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) {

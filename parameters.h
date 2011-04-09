@@ -37,8 +37,6 @@ typedef struct LALParameters {
  */
 typedef struct System_Parameters {
 	binary_System system[2];///<a
-	double max_Spin;///<a
-	double spin_Step;///<a
 	double freq_Sampling;///<a
 	double freq_Initial;///<a
 	double time_Sampling;///<a
@@ -49,11 +47,8 @@ typedef struct System_Parameters {
 	long min_Length;///<a
 	long max_Length;///<a
 	double freq_Min;///<a
-	double freq_Max;///<a
 	double freq_Step;///<a
-	double min_Match;///<a
 	double critical_Match;///<a
-	double delta_Length;///<a
 	short amp_Code[2];///< amplitude code
 	char approx[2][FILENAME_MAX];///<a
 	char phase[2][FILENAME_MAX];///<a
@@ -85,6 +80,18 @@ void readExactParameters(FILE *file, System_Parameters *params);
  */
 void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *params,
 		char *file_Name);
+
+/** Reads system parameters.
+ * @param file
+ * @param params
+ */
+void read_System_Parameters(FILE *file, System_Parameters *params);
+
+/** Prints system parameters.
+ * @param file
+ * @param params
+ */
+void print_System_Parameters(FILE *file, System_Parameters *params);
 
 /**
  * Done

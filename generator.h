@@ -71,7 +71,8 @@ typedef enum {
 typedef enum {
 	ETAM = 0,///< in \f$\eta,M\f$
 	ETACHRIP,///< in \f$\eta,M_{chirp}\f$
-	M1M2,///< in \f$m_1,m_2\f$
+	M1M2,
+///< in \f$m_1,m_2\f$
 } gen_Mode_Masses;///<a
 
 /** Generation mode for spin
@@ -140,5 +141,11 @@ void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
 /** Reads the parameter limits of the binary from the file.
  */
 void read_Binary_Parameter_Limits(FILE*file, binary_System *sys);
+
+/** Prints the parameter limits of the binary.
+ * @param file
+ * @param sys
+ */
+void print_Binary_Parameter_Limits(FILE* file, binary_System*sys);
 
 #endif /* GENERATOR_H */

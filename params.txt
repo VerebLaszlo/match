@@ -1,17 +1,27 @@
-6.00	80.00
-0.00	0.15
-3.00	80.00
-3.00	80.00
-0.80	0.99
-0.80	0.99
-0.00	180.00
-0.00	180.00
-0.00	360.00
-0.00	360.00
-0.00	180.00
-1.0		1.00
-0.00	0.00
-0.00	0.00
-0.00	0.00
-0.00	0.00
+40.0     #initial frequency
+10240.0  #sampling frequency
+
+#first waveform - second waveform
+SpinQuadTaylor    SpinQuadTaylor  # approximant
+twoPointFivePN    twoPointFivePN  # pn-order
+SOSSQM            SOSSQM          # spin contribution
+1                 1               # amplitude order
+
+# parameter limits
+6.00	80.00   # total mass (0,80)
+0.00	0.15    # symmetric mass ratio (eta) (0,0.25]
+3.00	80.00   # first mass
+3.00	80.00   # second mass
+0.80	0.99    # first mass-normalized spin magnitude [0,1]
+0.80	0.99    # second mass-normalized spin magnitude [0,1]
+0.00	180.00  # first spin's inclination [0,180]
+0.00	180.00  # second spin's inclination [0,180]
+0.00	360.00  # first spin's azimuth [0,360)
+0.00	360.00  # second spin's azimuth [0,360)
+0.00	180.00  # inclination of the angular-momentum
+1.0		1.00    # distance
+0.00	0.00    # polarization
+0.00	0.00    # right ascension
+0.00	0.00    # declination
+0.00	0.00    # gmst
 
