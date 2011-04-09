@@ -19,17 +19,17 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: test temp time sqt_st
+all: test time diff
 
 # Tool invocations
-test: main_New.o $(OBJS) $(USER_OBJS)
-	@echo 'Building target: $@'
-	@echo 'Invoking: GCC C Linker'
-	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"test" main_New.o $(OBJS) $(USER_OBJS) $(LIBS)
-	@echo 'Finished building target: $@'
-	@echo ' '
+#test: main_New.o $(OBJS) $(USER_OBJS)
+#	@echo 'Building target: $@'
+#	@echo 'Invoking: GCC C Linker'
+#	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"test" main_New.o $(OBJS) $(USER_OBJS) $(LIBS)
+#	@echo 'Finished building target: $@'
+#	@echo ' '
 
-temp: main_Test.o $(OBJS) $(USER_OBJS)
+test: main_Test.o $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
 	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"temp" main_Test.o $(OBJS) $(USER_OBJS) $(LIBS)
@@ -43,21 +43,16 @@ time: main_Time.o $(OBJS) $(USER_OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-sqt_st: main_SQT-ST.o $(OBJS) $(USER_OBJS)
+diff: main_SQT-ST.o $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
 	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"sqt_st" main_SQT-ST.o $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
-doxy: ../*.h
-	@echo 'Generating documentation'
-	doxygen ../Doxyfile
-	@echo 'Finished generating documentation'
-
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match main_Test.o main_New.o main_SQT-ST.o
+	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match sqt_st temp test time main_Test.o main_Time.o main_New.o main_SQT-ST.o
 	-@echo ' '
 
 .PHONY: all clean dependents

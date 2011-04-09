@@ -7,6 +7,7 @@
 
 C_SRCS += \
 ../detector.c \
+../parameters.c \
 ../io_handler.c \
 ../generator.c \
 ../main_Test.c \
@@ -17,9 +18,11 @@ C_SRCS += \
 ../match_qmss.c \
 ../util.c \
 ../util_math.c \
-../util_math_tensor.c 
+../util_math_tensor.c \
+../test.c 
 
 OBJS += \
+./parameters.o \
 ./io_handler.o \
 ./detector.o \
 ./generator.o \
@@ -27,9 +30,11 @@ OBJS += \
 ./match_qmss.o \
 ./util.o \
 ./util_math.o \
-./util_math_tensor.o 
+./util_math_tensor.o \
+./test.o
 
 C_DEPS += \
+./parameters.d \
 ./io_handler.d \
 ./detector.d \
 ./generator.d \
@@ -41,13 +46,14 @@ C_DEPS += \
 ./match_qmss.d \
 ./util.d \
 ./util_math.d \
-./util_math_tensor.d 
+./util_math_tensor.d \
+./test.d
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ../%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -std=gnu99 -I/usr/include/ $(INCLUDES) -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	gcc -std=gnu99 -I/usr/include/ $(INCLUDES) -O0 -g3 -Wall -Wextra -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

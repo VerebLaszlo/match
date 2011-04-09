@@ -37,7 +37,7 @@ typedef struct {
 	fftw_complex *csignal[NUM_OF_SIGNALS]; ///< the signals in frequency domain with the following order: \f$\tilde h_{1+}\f$, \f$\tilde h_{1\times}\f$, \f$\tilde h_{2+}\f$, \f$\tilde h_{2\times}\f$.
 	fftw_plan plan[NUM_OF_SIGNALS]; ///< FFT plans to calculate \f$\tilde h_{ij}=F\left(h_{ij}\right)\f$
 	double *psd;///<d
-	long length[2];
+	long length[2];///< lnegth of the signals
 	long size; ///< the allocated memory for the signals
 } signalStruct;
 

@@ -37,14 +37,15 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters, long
 			: lalparams.waveform[1].f->data->length;
 	create_Signal_Struct1(&sig, parameters->max_Length);
 	for (short i = 0; i < 2; i++) {
-		for (long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			set_Signal_From_A1A2(i, j, &sig, &lalparams,
+		for (unsigned long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
+			setSignal_From_A1A2(i, j, &sig, &lalparams,
 					parameters->system[i].F.antenna_Beam_Pattern);
 		}
 	}
 	if (!index) {
 		FILE *file = safely_Open_File_For_Writing("out/fortime.txt");
-		print_Two_Signals(file, &sig, parameters->time_Sampling, prog);
+		print_Two_Signals(file, &sig, parameters->time_Sampling, prog->width_Of_Number_To_Plot,
+				prog->precision_To_Plot);
 		fclose(file);
 	}
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
@@ -68,7 +69,7 @@ int main(int argc, char *argv[]) {
 	FILE*file;
 	puts("Start!!");
 	read_Program_Parameters(&program_Parameters, &parameters, program_Parameters_File_Name);
-	file =safely_Open_File_For_Reading(parameters_File_Name);
+	file = safely_Open_File_For_Reading(parameters_File_Name);
 	read_Binary_Parameter_Limits(file, limits_Of_Parameters);
 	fclose(file);
 	proba1(&program_Parameters, &parameters, limits_Of_Parameters);
