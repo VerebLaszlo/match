@@ -9,6 +9,7 @@
 
 #include <fftw3.h>
 #include "generator.h"
+#include "lal_wrapper.h"
 
 /**	An enum to contains the integer type constatns.
  */
@@ -184,5 +185,21 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
  */
 void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short width,
 		short precision);
+
+/** Sets the signal from CoherentGW's A1A2
+ * @param i
+ * @param sig
+ * @param lal
+ * @param F
+ */
+void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]);
+
+/** Sets the signal from CoherentGW's HPHC
+ * @param i
+ * @param sig
+ * @param lal
+ * @param F
+ */
+void setSignal_From_HPHC(short i, signalStruct *sig, LALParameters *lal, double F[]);
 
 #endif

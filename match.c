@@ -293,3 +293,21 @@ void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short 
 		}
 	}
 }
+
+void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]) {
+	for (unsigned long j = 0; j < lal->waveform[i].f->data->length; j++) {
+		sig->signal[2 * i][j] = lal->waveform[i].a->data->data[2 * j] * M_SQRT2 / 2.0;
+		sig->signal[2 * i + 1][j] = lal->waveform[i].a->data->data[2 * j + 1] * M_SQRT2 / 2.0;
+		sig->signal[RESPONSE1 + i][j] = sig->signal[2 * i][j] * F[0] + sig->signal[2 * i + 1][j]
+				* F[1];
+	}
+}
+
+void setSignal_From_HPHC(short i, signalStruct *sig, LALParameters *lal, double F[]) {
+	for (unsigned long j = 0; j < lal->waveform[i].f->data->length; j++) {
+		sig->signal[2 * i][j] = lal->waveform[i].h->data->data[2 * j];
+		sig->signal[2 * i + 1][j] = lal->waveform[i].h->data->data[2 * j + 1];
+		sig->signal[RESPONSE1 + i][j] = sig->signal[2 * i][j] * F[0] + sig->signal[2 * i + 1][j]
+				* F[1];
+	}
+}

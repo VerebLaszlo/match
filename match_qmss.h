@@ -83,20 +83,4 @@ void increment_Spins(System_Parameters* parameters, double step);
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
 		signalStruct *sig);
 
-/** Sets the signal from CoherentGW's A1A2
- * @param i
- * @param sig
- * @param lal
- * @param F
- */
-void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]);
-
-/** Sets the signal from CoherentGW's HPHC
- * @param i
- * @param sig
- * @param lal
- * @param F
- */
-void setSignal_From_HPHC(short i, signalStruct *sig, LALParameters *lal, double F[]);
-
 #endif /* MATCH_QMSS_H_ */
