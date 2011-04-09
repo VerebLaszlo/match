@@ -128,7 +128,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 			= lalparams.waveform[!lalparams.shorter].f->data->length;
 	parameters->freq_Step = 1. / (lalparams.ppnParams.deltaT * lalparams.max_Length);
 	create_Signal_Struct(sig, lalparams.waveform[!lalparams.shorter].f->data->length);
-	createPSD(&lalparams, sig);
+	createPSD(&lalparams, sig->psd);
 	for (short i = 0; i < 2; i++) {
 		setSignal_From_A1A2(i, sig, &lalparams, parameters->system[i].F.antenna_Beam_Pattern);
 	}
@@ -159,18 +159,6 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 		return NOT_FOUND;
 	}
 	return FOUND;
-}
-
-void createPSD(LALParameters *lalparams, signalStruct *sig) {
-	assert(lalparams);
-	assert(sig);
-	lalparams->randIn.psd.length = lalparams->max_Length;
-	double df = 1. / lalparams->ppnParams.deltaT / lalparams->randIn.psd.length;
-	lalparams->randIn.psd.data = (REAL8*)LALMalloc(sizeof(REAL8) * lalparams->randIn.psd.length);
-	LALNoiseSpectralDensity(&lalparams->status, &lalparams->randIn.psd, &LALLIGOIPsd, df);
-	for (unsigned long j = 0; j < lalparams->randIn.psd.length; j++) {
-		sig->psd[j] = lalparams->randIn.psd.data[j];
-	}
 }
 
 void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]) {

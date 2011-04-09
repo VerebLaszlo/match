@@ -9,29 +9,7 @@
 #define PARAMETERS_H_
 
 #include "generator.h"
-
-#include <lal/LALSQTPNWaveformInterface.h>
-#include <lal/LALNoiseModelsInspiral.h>
-#include <lal/SimulateCoherentGW.h>
-#include <lal/GenerateInspiral.h>
-#include <lal/LALInspiralBank.h>
-#include <lal/LALDatatypes.h>
-#include <lal/LALInspiral.h>
-#include <lal/LALStdlib.h>
-#include <lal/RealFFT.h>
-
-/** LAL parameters.
- */
-typedef struct LALParameters {
-	LALStatus status;///<a
-	CoherentGW waveform[2];///<a
-	SimInspiralTable injParams[2];///<a
-	PPNParamStruc ppnParams;///<a
-	RandomInspiralSignalIn randIn;///<a
-	short shorter;///<a
-	long min_Length;///<a
-	long max_Length;///<a
-} LALParameters;
+#include "lal_wrapper.h"
 
 /** System aprameters.
  */

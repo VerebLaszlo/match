@@ -14,6 +14,7 @@ C_SRCS += \
 ../main_Time.c \
 ../main_SQT-ST.c \
 ../match.c \
+../lal_wrapper.c \
 ../match_qmss.c \
 ../util.c \
 ../util_math.c \
@@ -24,6 +25,7 @@ OBJS += \
 ./parameters.o \
 ./detector.o \
 ./generator.o \
+./lal_wrapper.o \
 ./match.o \
 ./match_qmss.o \
 ./util.o \
@@ -35,6 +37,7 @@ C_DEPS += \
 ./parameters.d \
 ./detector.d \
 ./generator.d \
+./lal_wrapper.d \
 ./main_Test.d \
 ./main_New.d \
 ./main_Time.d \

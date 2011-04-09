@@ -83,16 +83,8 @@ void increment_Spins(System_Parameters* parameters, double step);
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
 		signalStruct *sig);
 
-/**
- * Done
- * @param lalparams
- * @param sig
- */
-void createPSD(LALParameters *lalparams, signalStruct *sig);
-
 /** Sets the signal from CoherentGW's A1A2
- * @param index
- * @param elem
+ * @param i
  * @param sig
  * @param lal
  * @param F
@@ -100,8 +92,7 @@ void createPSD(LALParameters *lalparams, signalStruct *sig);
 void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]);
 
 /** Sets the signal from CoherentGW's HPHC
- * @param index
- * @param elem
+ * @param i
  * @param sig
  * @param lal
  * @param F
