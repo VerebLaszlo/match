@@ -138,56 +138,51 @@ void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index
  * @return : the succes of the memory allocation
  */
 void create_Signal_Struct(signalStruct *s, long size);
+
+/**	Allocates memory for the signals.
+ * @param[in] s		: pointer to the structure containing the signals
+ * @param[in] size	: the size of the allocated memory
+ * @return : the succes of the memory allocation
+ */
 void create_Signal_Struct1(signalStruct *s, long size);
 
 /**	Deallocates the memory of the signals.
  * @param[in] s	: pointer to the structure containing the signals
  */
 void destroy_Signal_Struct(signalStruct *s);
+
+/**	Deallocates the memory of the signals.
+ * @param[in] s	: pointer to the structure containing the signals
+ */
 void destroy_Signal_Struct1(signalStruct *s);
 
-typedef struct System_Parameters {
-	binary_System system[2];///<a
-	double max_Spin;///<a
-	double spin_Step;///<a
-	double freq_Sampling;///<a
-	double freq_Initial;///<a
-	double time_Sampling;///<a
-	double match_Typ;///<aa
-	double match_Best;///<a
-	double match_Minimax;///<a
-	short shorter;///<a
-	long min_Length;///<a
-	long max_Length;///<a
-	double freq_Min;///<a
-	double freq_Max;///<a
-	double freq_Step;///<a
-	double min_Match;///<a
-	double critical_Match;///<a
-	double delta_Length;///<a
-	short amp_Code[2];
-	char approx[2][FILENAME_MAX];///<a
-	char phase[2][FILENAME_MAX];///<a
-	char spin[2][FILENAME_MAX];///<a
-} System_Parameters;
-typedef struct Program_Parameters {
-	char (*output_Directories)[FILENAME_MAX];///<a
-	long number_Of_Runs;///<a
-	short precision;///<a
-	short precision_To_Plot;///<a
-	short width_Of_Number;///<a
-	short width_Of_Number_To_Plot;///<a
-	char folder[FILENAME_MAX];///<a
-} Program_Parameters;
+/** Prints the two signal
+ * @param file
+ * @param sig
+ * @param dt
+ * @param width
+ * @param precision
+ */
+void print_Two_Signals(FILE*file, signalStruct *sig, double dt, short width, short precision);
 
-void readExactParameters(FILE *file, System_Parameters *params);
-void read_Program_Parameters(Program_Parameters *parameters, System_Parameters *params,
-		char *file_Name);
-void print_Two_Signals(FILE*file, signalStruct *sig, double dt, Program_Parameters *prog);
+/** Prints the two signal and there difference.
+ * @param file
+ * @param sig
+ * @param dt
+ * @param width
+ * @param precision
+ */
+void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, short width,
+		short precision);
 
-void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt,
-		Program_Parameters *prog);
-
-void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, Program_Parameters *prog);
+/** Prints the two signal with their \f$+,\times\f$ polarisations.
+ * @param file
+ * @param sig
+ * @param dt
+ * @param width
+ * @param precision
+ */
+void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short width,
+		short precision);
 
 #endif
