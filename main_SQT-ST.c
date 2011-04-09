@@ -65,10 +65,7 @@ short run_For_Time(Program_Parameters *prog, System_Parameters *parameters) {
 			: lalparams.waveform[1].f->data->length;
 	create_Signal_Struct1(&sig, parameters->max_Length);
 	for (short i = 0; i < 2; i++) {
-		for (unsigned long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			setSignal_From_A1A2(i, j, &sig, &lalparams,
-					parameters->system[i].F.antenna_Beam_Pattern);
-		}
+		setSignal_From_A1A2(i, &sig, &lalparams, parameters->system[i].F.antenna_Beam_Pattern);
 	}
 	FILE*file = safely_Open_File_For_Writing("out/temp.txt");
 	print_Two_Signals(file, &sig, parameters->time_Sampling, prog->width_Of_Number_To_Plot,

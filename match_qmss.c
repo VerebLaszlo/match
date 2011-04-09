@@ -130,9 +130,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	create_Signal_Struct(sig, lalparams.waveform[!lalparams.shorter].f->data->length);
 	createPSD(&lalparams, sig);
 	for (short i = 0; i < 2; i++) {
-		for (unsigned long j = 0; j < lalparams.waveform[i].f->data->length; j++) {
-			setSignal_From_A1A2(i, j, sig, &lalparams, parameters->system[i].F.antenna_Beam_Pattern);
-		}
+		setSignal_From_A1A2(i, sig, &lalparams, parameters->system[i].F.antenna_Beam_Pattern);
 	}
 	double fr = 0.;
 	long minfr = 0, maxfr = 0;
@@ -175,21 +173,20 @@ void createPSD(LALParameters *lalparams, signalStruct *sig) {
 	}
 }
 
-void setSignal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]) {
-	double a1, a2, phi, shift;
-	a1 = lal->waveform[index].a->data->data[2 * elem];
-	a2 = lal->waveform[index].a->data->data[2 * elem + 1];
-	phi = lal->waveform[index].phi->data->data[elem] - lal->waveform[index].phi->data->data[0];
-	shift = 0.0;
-	sig->signal[2 * index][elem] = a1 * M_SQRT2 / 2.0;
-	sig->signal[2 * index + 1][elem] = a2 * M_SQRT2 / 2.0;
-	sig->signal[RESPONSE1 + index][elem] = sig->signal[2 * index][elem] * F[0] + sig->signal[2
-			* index + 1][elem] * F[1];
+void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]) {
+	for (unsigned long j = 0; j < lal->waveform[i].f->data->length; j++) {
+		sig->signal[2 * i][j] = lal->waveform[i].a->data->data[2 * j] * M_SQRT2 / 2.0;
+		sig->signal[2 * i + 1][j] = lal->waveform[i].a->data->data[2 * j + 1] * M_SQRT2 / 2.0;
+		sig->signal[RESPONSE1 + i][j] = sig->signal[2 * i][j] * F[0] + sig->signal[2 * i + 1][j]
+				* F[1];
+	}
 }
 
-void setSignal_From_HPHC(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]) {
-	sig->signal[2 * index][elem] = lal->waveform[index].h->data->data[2 * elem];
-	sig->signal[2 * index + 1][elem] = lal->waveform[index].h->data->data[2 * elem + 1];
-	sig->signal[RESPONSE1 + index][elem] = sig->signal[2 * index][elem] * F[0] + sig->signal[2
-			* index + 1][elem] * F[1];
+void setSignal_From_HPHC(short i, signalStruct *sig, LALParameters *lal, double F[]) {
+	for (unsigned long j = 0; j < lal->waveform[i].f->data->length; j++) {
+		sig->signal[2 * i][j] = lal->waveform[i].h->data->data[2 * j];
+		sig->signal[2 * i + 1][j] = lal->waveform[i].h->data->data[2 * j + 1];
+		sig->signal[RESPONSE1 + i][j] = sig->signal[2 * i][j] * F[0] + sig->signal[2 * i + 1][j]
+				* F[1];
+	}
 }

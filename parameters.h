@@ -79,12 +79,15 @@ typedef struct Program_Parameters {
 void readExactParameters(FILE *file, System_Parameters *params);
 
 /** Reads program parameters
- * @param parameters
+ * @param file
  * @param params
- * @param file_Name
  */
 void read_Program_Parameters(FILE*file, Program_Parameters *params);
 
+/** Prints program parameters.
+ * @param file
+ * @param params
+ */
 void print_Program_Parameters(FILE*file, Program_Parameters *params);
 
 /** Reads system parameters.

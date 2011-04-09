@@ -69,6 +69,7 @@ void increment_Spin_Of_Binary_System(binary_System *system, double step);
 
 /** Done
  * @param parameters
+ * @param step
  */
 void increment_Spins(System_Parameters* parameters, double step);
 
@@ -96,7 +97,7 @@ void createPSD(LALParameters *lalparams, signalStruct *sig);
  * @param lal
  * @param F
  */
-void setSignal_From_A1A2(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]);
+void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]);
 
 /** Sets the signal from CoherentGW's HPHC
  * @param index
@@ -105,6 +106,6 @@ void setSignal_From_A1A2(short index, long elem, signalStruct *sig, LALParameter
  * @param lal
  * @param F
  */
-void setSignal_From_HPHC(short index, long elem, signalStruct *sig, LALParameters *lal, double F[]);
+void setSignal_From_HPHC(short i, signalStruct *sig, LALParameters *lal, double F[]);
 
 #endif /* MATCH_QMSS_H_ */
