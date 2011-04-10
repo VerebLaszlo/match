@@ -11,7 +11,6 @@ C_SRCS += \
 ../generator.c \
 ../main_Test.c \
 ../main_New.c \
-../main_Time.c \
 ../main_SQT-ST.c \
 ../match.c \
 ../lal_wrapper.c \
@@ -40,7 +39,6 @@ C_DEPS += \
 ./lal_wrapper.d \
 ./main_Test.d \
 ./main_New.d \
-./main_Time.d \
 ./main_SQT-ST.d \
 ./match.d \
 ./match_qmss.d \

@@ -71,4 +71,10 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
 		signalStruct *sig);
 
+/** Calculates the running time.
+ * @param program_Parameters
+ * @param parameters
+ */
+void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters, short sampling);
+
 #endif /* MATCH_QMSS_H_ */

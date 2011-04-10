@@ -19,7 +19,7 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: test time diff
+all: test diff main
 
 # Tool invocations
 #test: main_New.o $(OBJS) $(USER_OBJS)
@@ -29,17 +29,17 @@ all: test time diff
 #	@echo 'Finished building target: $@'
 #	@echo ' '
 
+main: main.o $(OBJS) $(USER_OBJS)
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C Linker'
+	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"main" main.o $(OBJS) $(USER_OBJS) $(LIBS)
+	@echo 'Finished building target: $@'
+	@echo ' '
+
 test: main_Test.o $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
 	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"test" main_Test.o $(OBJS) $(USER_OBJS) $(LIBS)
-	@echo 'Finished building target: $@'
-	@echo ' '
-
-time: main_Time.o $(OBJS) $(USER_OBJS)
-	@echo 'Building target: $@'
-	@echo 'Invoking: GCC C Linker'
-	gcc -std=gnu99 -L/usr/lib/ $(SHARED) -o"time" main_Time.o $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -52,7 +52,7 @@ diff: main_SQT-ST.o $(OBJS) $(USER_OBJS)
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match sqt_st temp test time main_Test.o main_Time.o main_New.o main_SQT-ST.o
+	-$(RM) $(OBJS)$(C_DEPS)$(EXECUTABLES) match sqt_st temp test main_Test.o main_New.o main_SQT-ST.o
 	-@echo ' '
 
 .PHONY: all clean dependents

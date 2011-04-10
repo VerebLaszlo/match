@@ -147,3 +147,48 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	}
 	return FOUND;
 }
+
+static void generate_Waveform_For_Testing_Speed(Program_Parameters *prog,
+		System_Parameters *parameters) {
+	assert(prog);
+	assert(parameters);
+	static LALParameters lalparams;
+	initLALParameters(&lalparams, parameters);
+	for (short i = 0; i < 2; i++) {
+		memset(&lalparams.status, 0, sizeof(LALStatus));
+		LALGenerateInspiral(&lalparams.status, &lalparams.waveform[i], &lalparams.injParams[i],
+				&lalparams.ppnParams);
+		if (lalparams.status.statusCode) {
+			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform\n", i);
+			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
+			return;
+		}
+	}
+	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
+	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
+}
+
+void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters, short sampling) {
+	assert(program_Parameters);
+	assert(parameters);
+	assert(program_Parameters->number_Of_Runs >= 0);
+	binary_System limits[2];
+	memmove(limits, parameters->system, 2 * sizeof(binary_System));
+	memset(parameters->system, 0, 2 * sizeof(binary_System));
+	char temp[FILENAME_MAX];
+	time_t start, end;
+	srand(86);
+	sprintf(temp, "%s/%s%s%d.time", program_Parameters->folder, parameters->approx[0],
+			parameters->spin[0], parameters->amp_Code[0]);
+	FILE *file = safely_Open_File_For_Writing(temp);
+	time(&start);
+	for (long i = 0; i < program_Parameters->number_Of_Runs; i++) {
+		generate_Parameters(parameters, limits);
+		generate_Waveform_For_Testing_Speed(program_Parameters, parameters);
+		if ((i + 1) % sampling == 0) {
+			time(&end);
+			fprintf(file, "%ld %lg\n", i + 1, difftime(end, start));
+		}
+	}
+	fclose(file);
+}
