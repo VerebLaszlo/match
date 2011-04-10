@@ -194,7 +194,8 @@ void convert_Masses(binary_System *sys, conversion_Mode_Masses mode) {
  * @param max
  * @param mode
  */
-void gen_Mass(binary_System *sys, binary_System *min, binary_System *max, gen_Mode_Masses mode) {
+static void gen_Mass(binary_System *sys, binary_System *min, binary_System *max,
+		gen_Mode_Masses mode) {
 	assert(sys);
 	assert(min);
 	assert(max);
@@ -241,7 +242,7 @@ void gen_Mass(binary_System *sys, binary_System *min, binary_System *max, gen_Mo
  * @param max
  * @param mode
  */
-void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mode_Spin mode) {
+static void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mode_Spin mode) {
 	assert(sys);
 	assert(min);
 	assert(max);
@@ -289,7 +290,7 @@ void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mod
  * @param min
  * @param max
  */
-void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
+static void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) {
 	assert(sys);
 	assert(min);
 	assert(max);

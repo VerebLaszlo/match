@@ -7,7 +7,21 @@
 
 #include "match_qmss.h"
 
-void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *parameters,
+void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits) {
+	assert(parameters);
+	assert(limits);
+	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
+	memcpy(&parameters->system[1], &parameters->system[0], sizeof(binary_System));
+}
+
+void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
+	assert(parameters);
+	assert(limits);
+	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
+	gen_Parameters(&parameters->system[1], &limits[0], &limits[1], ETAM, KAPPA_PSI);
+}
+
+void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters,
 		binary_System *limits) {
 	assert(program_Parameters);
 	assert(parameters);
@@ -25,20 +39,6 @@ void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *pa
 			printf("%ld%%\n", 100 * i / program_Parameters->number_Of_Runs);
 		}
 	}
-}
-
-void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits) {
-	assert(parameters);
-	assert(limits);
-	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
-	memcpy(&parameters->system[1], &parameters->system[0], sizeof(binary_System));
-}
-
-void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
-	assert(parameters);
-	assert(limits);
-	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], ETAM, KAPPA_PSI);
-	gen_Parameters(&parameters->system[1], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 }
 
 short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index) {
@@ -85,19 +85,6 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 	}
 	destroy_Signal_Struct(&first);
 	return NOT_FOUND;
-}
-
-inline void increment_Spin_Of_Binary_System(binary_System *system, double step) {
-	assert(system);
-	assert(step > 0.);
-	system->bh[0].chi_Amp += step;
-	system->bh[1].chi_Amp += step;
-}
-
-inline void increment_Spins(System_Parameters* parameters, double step) {
-	assert(parameters);
-	increment_Spin_Of_Binary_System(&parameters->system[0], step);
-	increment_Spin_Of_Binary_System(&parameters->system[1], step);
 }
 
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,

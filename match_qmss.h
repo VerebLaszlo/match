@@ -35,7 +35,7 @@ typedef enum {
  * @param parameters
  * @param limits
  */
-void run_Algorithm(Program_Parameters *program_Parameters, System_Parameters *parameters,
+void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters,
 		binary_System *limits);
 
 /**
@@ -60,18 +60,6 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits);
  * @return
  */
 short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index);
-
-/** Done
- * @param system
- * @param step
- */
-void increment_Spin_Of_Binary_System(binary_System *system, double step);
-
-/** Done
- * @param parameters
- * @param step
- */
-void increment_Spins(System_Parameters* parameters, double step);
 
 /**
  * Done.

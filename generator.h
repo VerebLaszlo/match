@@ -43,8 +43,6 @@
  } Binary_System;
  */
 
-#define PREC "% -14.8lg "///<a
-#define PREC_PL "% 10.4lg "///<a
 /** Conversion modes for spin
  */
 typedef enum {
@@ -119,20 +117,6 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode);
 
 ///
 void convert_Masses(binary_System *sys, conversion_Mode_Masses mode);
-
-/**
- * X
- */
-void check_Borders(binary_System *min, binary_System *max);
-
-///
-void gen_Mass(binary_System *sys, binary_System *min, binary_System *max, gen_Mode_Masses mode);
-
-///
-void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, gen_Mode_Spin);
-
-///
-void gen_Sys(binary_System *sys, binary_System *min, binary_System *max);
 
 ///
 void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,

@@ -6,39 +6,40 @@
 
 #include "match.h"
 
-void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
-		double *minimax) {
-	assert(in);
-	assert(in->size);
+/**
+ * Formulae given.
+ * \f{gather*}{
+ * 	\inProd{h_1}{h_2}=4\Re\int_{f_{min}}^{f_{max}}\frac{\tilde{h}_1(f)\tilde{h}_2^*(f)}{S_h(f)}df
+ * \f}
+ * @param left
+ * @param right
+ * @param norm
+ * @param min_Index
+ * @param max_Index
+ * @return
+ */
+static double inner_Product(fftw_complex left[], fftw_complex right[], double norm[],
+		long min_Index, long max_Index) {
 	assert(0<min_Index && min_Index< max_Index);
-	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
-		fftw_execute(in->plan[i]);
+	double scalar = 0.;
+	for (long i = min_Index; i < max_Index; i++) {
+		assert(norm[i]);
+		scalar += (left[i][0] * right[i][0] + left[i][1] * right[i][1]) / norm[i];
 	}
-	orthonormalise(in, min_Index, max_Index, in);
-	fftw_complex *product = fftw_malloc(in->size * sizeof(fftw_complex));
-	fftw_plan iplan;
-	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
-		iplan = fftw_plan_dft_c2r_1d(in->size, product, in->product_Signal[i], FFTW_ESTIMATE);
-		memset(product, 0, in->size * sizeof(fftw_complex));
-		cross_Product(in->csignal[i / 2], in->csignal[i % 2 + 2], in->psd, min_Index, max_Index,
-				product);
-		fftw_execute(iplan);
-		fftw_destroy_plan(iplan);
-	}
-	fftw_free(product);
-	calc_Timemaximised_Matches(in, min_Index, max_Index, typ, best, minimax);
+	return 4.0 * scalar;
 }
 
-void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
-	assert(in);
-	assert(out);
-	assert(in->size >0 && out->size == in->size);
-	assert(0<min_Index && min_Index < max_Index);
-	normalise(in, min_Index, max_Index, in);
-	orthogonise(in, min_Index, max_Index, out);
-}
-
-void normalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
+/**
+ * Formulae given.
+ * \f{gather*}{
+ * 	\tilde{e}=\frac{\tilde{h}}{\sqrt{\inProd{\tilde{h}}{\tilde{h}}}}
+ * \f}
+ * @param in
+ * @param out
+ * @param min_Index
+ * @param max_Index
+ */
+static void normalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
 	assert(in);
 	assert(out);
 	assert(in->size >0 && out->size == in->size);
@@ -55,18 +56,17 @@ void normalise(signalStruct *in, long min_Index, long max_Index, signalStruct *o
 	}
 }
 
-double inner_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index,
-		long max_Index) {
-	assert(0<min_Index && min_Index< max_Index);
-	double scalar = 0.;
-	for (long i = min_Index; i < max_Index; i++) {
-		assert(norm[i]);
-		scalar += (left[i][0] * right[i][0] + left[i][1] * right[i][1]) / norm[i];
-	}
-	return 4.0 * scalar;
-}
-
-void orthogonise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
+/**
+ * Needs formulae.
+ * \f{gather*}{
+ * 	\tilde{e}_\bot=\tilde{e}_\times-\tilde{e}_+\frac{\inProd{\tilde{e}_+}{\tilde{e}_\times}}{\inProd{\tilde{e}_+}{\tilde{e}_+}}
+ * \f}
+ * @param in
+ * @param out
+ * @param min_Index
+ * @param max_Index
+ */
+static void orthogonise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
 	assert(out);
 	assert(in->size >0 && out->size == in->size);
 	assert(0<min_Index && min_Index < max_Index);
@@ -87,7 +87,32 @@ void orthogonise(signalStruct *in, long min_Index, long max_Index, signalStruct 
 	}
 }
 
-void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index,
+/**
+ * Needs formulae.
+ * @param in
+ * @param out
+ * @param min_Index
+ * @param max_Index
+ */
+static void orthonormalise(signalStruct *in, long min_Index, long max_Index, signalStruct *out) {
+	assert(in);
+	assert(out);
+	assert(in->size >0 && out->size == in->size);
+	assert(0<min_Index && min_Index < max_Index);
+	normalise(in, min_Index, max_Index, in);
+	orthogonise(in, min_Index, max_Index, out);
+}
+
+/**
+ * Needs formulae.
+ * @param left
+ * @param right
+ * @param norm
+ * @param min_Index
+ * @param max_Index
+ * @param out
+ */
+static void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index,
 		long max_Index, fftw_complex out[]) {
 	assert(0<min_Index && min_Index<max_Index);
 	for (long i = min_Index; i < max_Index; i++) {
@@ -97,8 +122,14 @@ void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], lon
 	}
 }
 
-void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
-		double *best, double *minimax) {
+/**
+ * Needs formulae.
+ * @param in
+ * @param typ
+ * @param best
+ * @param minimax
+ */
+static void calc_Timemaximised_Matches(signalStruct *in, double *typ, double *best, double *minimax) {
 	assert(in);
 	assert(in->size);
 	double A, B, C;
@@ -120,6 +151,29 @@ void calc_Timemaximised_Matches(signalStruct *in, long min_Index, long max_Index
 	*typ = max_Typ / 2.;
 	*best = max_Best / 2.;
 	*minimax = max_Minimax / 2.;
+}
+
+void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
+		double *minimax) {
+	assert(in);
+	assert(in->size);
+	assert(0<min_Index && min_Index< max_Index);
+	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
+		fftw_execute(in->plan[i]);
+	}
+	orthonormalise(in, min_Index, max_Index, in);
+	fftw_complex *product = fftw_malloc(in->size * sizeof(fftw_complex));
+	fftw_plan iplan;
+	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
+		iplan = fftw_plan_dft_c2r_1d(in->size, product, in->product_Signal[i], FFTW_ESTIMATE);
+		memset(product, 0, in->size * sizeof(fftw_complex));
+		cross_Product(in->csignal[i / 2], in->csignal[i % 2 + 2], in->psd, min_Index, max_Index,
+				product);
+		fftw_execute(iplan);
+		fftw_destroy_plan(iplan);
+	}
+	fftw_free(product);
+	calc_Timemaximised_Matches(in, typ, best, minimax);
 }
 
 void create_Signal_Struct(signalStruct *signal, long size) {

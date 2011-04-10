@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 	//multirun(&program_Parameters, parameters_File_Name);
 	read_Parameters(limits_Of_Parameters, parameters_File_Name);
 	//proba(&program_Parameters, &parameters, limits_Of_Parameters);
-	run_Algorithm(&program_Parameters, &parameters, limits_Of_Parameters);
+	find_Spin_Greater_Than1(&program_Parameters, &parameters, limits_Of_Parameters);
 	puts("Done!!!");
 	return 0;
 }
