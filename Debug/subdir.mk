@@ -9,9 +9,6 @@ C_SRCS += \
 ../detector.c \
 ../parameters.c \
 ../generator.c \
-../main_Test.c \
-../main_New.c \
-../main_SQT-ST.c \
 ../match.c \
 ../lal_wrapper.c \
 ../match_qmss.c \
@@ -37,9 +34,6 @@ C_DEPS += \
 ./detector.d \
 ./generator.d \
 ./lal_wrapper.d \
-./main_Test.d \
-./main_New.d \
-./main_SQT-ST.d \
 ./match.d \
 ./match_qmss.d \
 ./util.d \

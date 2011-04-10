@@ -21,12 +21,13 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
 	gen_Parameters(&parameters->system[1], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 }
 
-void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters,
-		binary_System *limits) {
+void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters) {
 	assert(program_Parameters);
 	assert(parameters);
-	assert(limits);
 	assert(program_Parameters->number_Of_Runs > 0);
+	binary_System limits[2];
+	memmove(limits, parameters->system, 2 * sizeof(binary_System));
+	memset(parameters->system, 0, 2 * sizeof(binary_System));
 	srand(86);
 	short is_Good;
 	for (short i = 0; i < program_Parameters->number_Of_Runs;) {

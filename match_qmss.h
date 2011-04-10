@@ -35,8 +35,7 @@ typedef enum {
  * @param parameters
  * @param limits
  */
-void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters,
-		binary_System *limits);
+void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters);
 
 /**
  * Done
@@ -75,6 +74,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
  * @param program_Parameters
  * @param parameters
  */
-void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters, short sampling);
+void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters,
+		short sampling);
 
 #endif /* MATCH_QMSS_H_ */

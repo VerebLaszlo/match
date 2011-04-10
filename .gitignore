@@ -1,12 +1,8 @@
 # programming 
 *.[oa]
 *.d
-match
 test
-temp
-time
-
-# generated
+main
 
 # hidden files
 *.cx

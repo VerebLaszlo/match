@@ -10,10 +10,10 @@ int main(int argc, char *argv[]) {
 	if (argc < 4) {
 		puts("Usage:\nprogram_file parameter_file -mode [options]\n");
 		puts("modes:\n"
-				"t for time measurement, with the samling interval as option, ex: -t 100\n"
-				"d NOT IMPLEMENTED JET!!!!"
-				"m NOT IMPLEMENTED JET!!!!"
-				"g NOT IMPLEMENTED JET!!!!");
+			"t for time measurement, with the samling interval as option, ex: -t 100\n"
+			"d NOT IMPLEMENTED JET!!!!"
+			"m NOT IMPLEMENTED JET!!!!"
+			"g NOT IMPLEMENTED JET!!!!");
 		printf("The %d used parameters were: ", argc - 1);
 		fflush(stdout);
 		while (argc-- > 1) {
@@ -41,17 +41,19 @@ int main(int argc, char *argv[]) {
 		puts("Starting match ...");
 		break;
 	case 't':
-		if(argc != 5) {
+		if (argc != 5) {
 			puts("Not enough parameter!!!");
 			exit(EXIT_FAILURE);
 		}
 		puts("Starting time ...");
-		exit(-1);
 		calc_Time(&program_Parameters, &parameters, atoi(argv[arg++]));
 		break;
 	case 'g':
 		puts("Starting generating ...");
 		break;
+	case 's':
+		puts("Starting search for spin greter than 1 ...");
+		find_Spin_Greater_Than1(&program_Parameters, &parameters);
 	default:
 		break;
 	}
