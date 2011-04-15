@@ -190,6 +190,10 @@ void create_Signal_Struct(signalStruct *signal, long size) {
 		signal->plan[i] = fftw_plan_dft_r2c_1d(signal->size, signal->signal[i], signal->csignal[i],
 				FFTW_ESTIMATE);
 	}
+	for (; i < NOS_WITH_DETECTOR_RESPONSE; i++) {
+		signal->signal[i] = fftw_malloc(signal->size * sizeof(double));
+		memset(signal->signal[i], 0, signal->size * sizeof(double));
+	}
 	signal->psd = fftw_malloc(signal->size * sizeof(double));
 	memset(signal->psd, 0, signal->size * sizeof(double));
 }
@@ -285,13 +289,14 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
 	static char temp[FILENAME_MAX];
 	static char format[FILENAME_MAX];
 	static char text[FILENAME_MAX];
-	sprintf(temp, "%%%d.%dlg %%", width, precision);
+	sprintf(temp, "%%%d.%dlg %%%% ", width, precision);
 	sprintf(text, "%%%ds %%", width);
-	sprintf(format, "%s %s %s", temp, temp, temp);
+	sprintf(format, "%s%s%s", temp, temp, temp);
+	puts(format);
 	long i;
 	for (i = 0; i < sig->length[shorter]; i++) {
 		fprintf(file, temp, (double)i * dt);
-		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2],
+		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2][i],
 				sig->signal[RESPONSE1][i] - sig->signal[RESPONSE2][i]);
 		fprintf(file, "\n");
 	}
@@ -321,37 +326,60 @@ void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short 
 	static char format[FILENAME_MAX];
 	static char text[FILENAME_MAX];
 	static char textformat[FILENAME_MAX];
-	sprintf(temp, "%%%d.%dlg %%", width, precision);
-	sprintf(text, "%%%ds %%", width);
-	sprintf(format, "%s %s %s", temp, temp, temp);
-	sprintf(textformat, "%s %s %s", text, text, text);
+	sprintf(temp, "%%%d.%dlg %%%%", width, precision);
+	sprintf(text, "%%%ds %%%%", width);
+	sprintf(format, " %s %s %s", temp, temp, temp);
+	sprintf(textformat, " %s %s %s", text, text, text);
 	long i;
 	for (i = 0; i < sig->length[shorter]; i++) {
 		fprintf(file, temp, (double)i * dt);
-		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P], sig->signal[H1C]);
-		fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P], sig->signal[H2C]);
+		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P][i], sig->signal[H1C][i]);
+		fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P][i], sig->signal[H2C][i]);
 		fprintf(file, "\n");
 	}
 	if (shorter) {
 		for (; i < sig->size; i++) {
 			fprintf(file, temp, (double)i * dt);
-			fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P], sig->signal[H1C]);
+			fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P][i],
+					sig->signal[H1C][i]);
 			fprintf(file, "\n");
 		}
 	} else {
 		for (; i < sig->size; i++) {
 			fprintf(file, temp, (double)i * dt);
 			fprintf(file, textformat, "", "", "");
-			fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P], sig->signal[H2C]);
+			fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P][i],
+					sig->signal[H2C][i]);
 			fprintf(file, "\n");
 		}
 	}
 }
 
+char apr[2][FILENAME_MAX];
+
 void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]) {
+	REAL8 a1, a2, phi, shift;
+	puts(apr[i]);
 	for (unsigned long j = 0; j < lal->waveform[i].f->data->length; j++) {
-		sig->signal[2 * i][j] = lal->waveform[i].a->data->data[2 * j] * M_SQRT2 / 2.0;
-		sig->signal[2 * i + 1][j] = lal->waveform[i].a->data->data[2 * j + 1] * M_SQRT2 / 2.0;
+		a1 = lal->waveform[i].a->data->data[2 * j];
+		a2 = lal->waveform[i].a->data->data[2 * j + 1];
+		phi = lal->waveform[i].phi->data->data[j];
+		if (strstr(apr[i], "SpinQuadTaylor")) {
+			shift = 0.0;
+			//phi-=M_PI_2;
+		} else if (strstr(apr[i], "SpinTaylorFrameless")) {
+			shift = 0.0;
+		} else {
+			shift = lal->waveform[i].shift->data->data[j];
+		}
+		/*
+		 sig->signal[2 * i][j] = lal->waveform[i].a->data->data[2 * j] * M_SQRT2 / 2.0;
+		 sig->signal[2 * i + 1][j] = lal->waveform[i].a->data->data[2 * j + 1] * M_SQRT2 / 2.0;
+		 sig->signal[RESPONSE1 + i][j] = sig->signal[2 * i][j] * F[0] + sig->signal[2 * i + 1][j]
+		 * F[1];
+		 */
+		sig->signal[2 * i][j] = a1 * cos(shift) * cos(phi) - a2 * sin(shift) * sin(phi);
+		sig->signal[2 * i + 1][j] = a1 * sin(shift) * cos(phi) + a2 * cos(shift) * sin(phi);
 		sig->signal[RESPONSE1 + i][j] = sig->signal[2 * i][j] * F[0] + sig->signal[2 * i + 1][j]
 				* F[1];
 	}

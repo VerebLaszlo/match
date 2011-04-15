@@ -149,6 +149,43 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	return FOUND;
 }
 
+short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
+		signalStruct *sig) {
+	assert(prog);
+	assert(parameters);
+	static LALParameters lalparams;
+	initLALParameters(&lalparams, parameters);
+	for (short i = 0; i < 2; i++) {
+		memset(&lalparams.status, 0, sizeof(LALStatus));
+		LALGenerateInspiral(&lalparams.status, &lalparams.waveform[i], &lalparams.injParams[i],
+				&lalparams.ppnParams);
+		if (lalparams.status.statusCode) {
+			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform\n", i);
+			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
+			return NOT_FOUND;
+		}
+		parameters->system[i].coaPhase
+				= lalparams.waveform[i].phi->data->data[lalparams.waveform[i].phi->data->length - 1];
+		parameters->system[i].coaTime = (lalparams.waveform[i].f->data->length - 1)
+				* parameters->time_Sampling;
+	}
+	parameters->shorter = lalparams.shorter = lalparams.waveform[0].f->data->length
+			< lalparams.waveform[1].f->data->length ? 0 : 1;
+	parameters->min_Length = lalparams.min_Length
+			= lalparams.waveform[lalparams.shorter].f->data->length;
+	parameters->max_Length = lalparams.max_Length
+			= lalparams.waveform[!lalparams.shorter].f->data->length;
+	parameters->freq_Step = 1. / (lalparams.ppnParams.deltaT * lalparams.max_Length);
+	create_Signal_Struct(sig, lalparams.waveform[!lalparams.shorter].f->data->length);
+	for (short i = 0; i < 2; i++) {
+		sig->length[i] = lalparams.waveform[i].f->data->length;
+		setSignal_From_A1A2(i, sig, &lalparams, parameters->system[i].F.antenna_Beam_Pattern);
+	}
+	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
+	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
+	return 0;
+}
+
 static void generate_Waveform_For_Testing_Speed(Program_Parameters *prog,
 		System_Parameters *parameters) {
 	assert(prog);
@@ -169,7 +206,8 @@ static void generate_Waveform_For_Testing_Speed(Program_Parameters *prog,
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
 }
 
-void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters, short sampling) {
+void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters,
+		short sampling) {
 	assert(program_Parameters);
 	assert(parameters);
 	assert(program_Parameters->number_Of_Runs >= 0);

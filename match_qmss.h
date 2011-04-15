@@ -70,6 +70,16 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
 		signalStruct *sig);
 
+/**
+ * Done.
+ * @param prog
+ * @param parameters
+ * @param sig
+ * @return
+ */
+short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
+		signalStruct *sig);
+
 /** Calculates the running time.
  * @param program_Parameters
  * @param parameters
