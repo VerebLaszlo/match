@@ -25,7 +25,7 @@ typedef struct LALParameters {
 	LALStatus status;///<a
 	CoherentGW waveform[2];///<a
 	SimInspiralTable injParams[2];///<a
-	PPNParamStruc ppnParams;///<a
+	PPNParamStruc ppnParams[1];///<a
 	RandomInspiralSignalIn randIn;///<a
 	short shorter;///<a
 	long min_Length;///<a

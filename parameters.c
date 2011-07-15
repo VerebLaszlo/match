@@ -8,9 +8,8 @@
 #include "parameters.h"
 
 void readExactParameters(FILE *file, System_Parameters *params) {
-	char name[100];
 	for (short i = 0; i < 2; i++) {
-		fscanf(file, "%s ", name);
+		fscanf(file, "%s ", params->name[i]);
 		fscanf(file, "%lg ", &params->system[i].bh[0].m);
 		fscanf(file, "%lg ", &params->system[i].bh[1].m);
 		fscanf(file, "%lg ", &params->system[i].bh[0].chi_Amp);
@@ -84,7 +83,7 @@ void print_Program_Parameters(FILE*file, Program_Parameters *params) {
 }
 
 void read_System_Parameters(FILE *file, System_Parameters *params) {
-	short length = 100;
+	short length = 200;
 	char line[length];
 	fgets(line, length, file);
 	sscanf(line, "%lg\n", &params->freq_Initial);
@@ -115,6 +114,10 @@ void print_System_Parameters(FILE *file, System_Parameters *params) {
 	print_Binary_Parameter_Limits(file, params->system);
 }
 
+void print_System_Parameters_For_Plot(FILE *file, System_Parameters *params) {
+	print_Binary_Parameter_For_Plot(file, params->system);
+	fprintf(file, "%-13s %10.4lg %10.4lg %10.4lg\n", "#matches    ", params->match_Typ, params->match_Minimax, params->match_Best);
+}
 void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) {
 	assert(lalparams);
 	assert(parameters);
@@ -122,7 +125,7 @@ void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) 
 	memset(&lalparams->injParams, 0, 2 * sizeof(SimInspiralTable));
 	memset(&lalparams->ppnParams, 0, sizeof(PPNParamStruc));
 	memset(&lalparams->waveform, 0, 2 * sizeof(CoherentGW));
-	lalparams->ppnParams.deltaT = 1. / parameters->freq_Sampling;
+	lalparams->ppnParams->deltaT = 1. / parameters->freq_Sampling;
 	parameters->freq_Min = 40.;
 	for (short i = 0; i < 2; i++) {
 		lalparams->injParams[i].mass1 = parameters->system[i].bh[0].m;
@@ -138,7 +141,7 @@ void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) 
 		lalparams->injParams[i].distance = parameters->system[i].dist;
 		lalparams->injParams[i].coa_phase = parameters->system[i].coaPhase = 0.;
 		lalparams->injParams[i].f_lower = parameters->freq_Initial;
-		lalparams->ppnParams.deltaT = 1. / parameters->freq_Sampling;
+		lalparams->ppnParams->deltaT = 1. / parameters->freq_Sampling;
 		lalparams->injParams[i].amp_order = parameters->amp_Code[i];
 		snprintf(lalparams->injParams[i].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "%s%s%s",
 				parameters->approx[i], parameters->phase[i], parameters->spin[i]);

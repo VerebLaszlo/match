@@ -31,6 +31,7 @@ typedef struct System_Parameters {
 	char approx[2][FILENAME_MAX];///<a
 	char phase[2][FILENAME_MAX];///<a
 	char spin[2][FILENAME_MAX];///<a
+	char name[2][FILENAME_MAX];
 } System_Parameters;
 
 /** Program parameters
@@ -79,6 +80,8 @@ void read_System_Parameters(FILE *file, System_Parameters *params);
  * @param params
  */
 void print_System_Parameters(FILE *file, System_Parameters *params);
+
+void print_System_Parameters_For_Plot(FILE *file, System_Parameters *params);
 
 /**
  * Done

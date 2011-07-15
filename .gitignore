@@ -10,9 +10,10 @@ main
 *.autosave
 
 # folders
+old
 doc
-proba
-out
+out*
+own
 
 # Ignore the folders
 
