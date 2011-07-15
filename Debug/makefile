@@ -19,7 +19,7 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: test main
+all: main
 
 # Tool invocations
 

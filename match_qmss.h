@@ -42,7 +42,8 @@ void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Para
  * @param parameters
  * @param limits
  */
-void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits);
+void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits,
+		gen_Mode_Masses mass);
 
 /**
  * Done
@@ -79,6 +80,9 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
  */
 short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
 		signalStruct *sig);
+
+void find_Waveform_Errors_At_Parameter(Program_Parameters *prog, System_Parameters *parameters,
+		long index);
 
 /** Calculates the running time.
  * @param program_Parameters

@@ -7,15 +7,15 @@ CONFUSE=0
 include config.mk
 ifdef BUILD
 	ifeq (${BUILD}, prod)
-		CFLAGS+=-O3
+		CFLAGS+=-O3 -std=gnu99
 	else
-		CFLAGS+=-Wall -Wextra -g3
+		CFLAGS+=-Wall -Wextra -g3 -std=gnu99
 		ifeq (${BUILD}, dev)
 			RUN=valgrind --leak-check=full
 		endif	
 	endif
 else
-	CFLAGS+=-O3 -Wall -Wextra -g3 -ggdb3
+	CFLAGS+=-O3 -Wall -Wextra -g3 -ggdb3 -std=gnu99
 endif
 
 ifeq (${CONFUSE},1)
@@ -49,7 +49,7 @@ new: $(NEWDEPS)
 	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o new $(NEWDEPS)
 
 %.o: %.c %.h
-	${CC} -c ${CFLAGS} ${LAL_INC} $<
+	${CC} -std=gnu99 -c ${CFLAGS} ${LAL_INC} $<
 
 newRun: new
 	${RUN} ./new $(shell head -n 1 input.data)
@@ -65,8 +65,8 @@ lal: LALSTPNWaveformTestMod.c
 	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
 	@echo ''
  
-sqt: LALSQTPNWaveformTest.c
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o sqt LALSQTPNWaveformTest.c -lm
+sqt: LALSTPNWaveformTest.c
+	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -std=gnu99 -o sqt LALSTPNWaveformTest.c -lm
 	@echo ''
 
 clean:

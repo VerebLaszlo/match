@@ -209,6 +209,10 @@ void create_Signal_Struct1(signalStruct *signal, long size) {
 		signal->csignal[i] = NULL;
 		signal->plan[i] = NULL;
 	}
+	for (; i < NOS_WITH_DETECTOR_RESPONSE; i++) {
+		signal->signal[i] = malloc(signal->size * sizeof(double));
+		memset(signal->signal[i], 0, signal->size * sizeof(double));
+	}
 	signal->psd = NULL;
 }
 
@@ -229,6 +233,9 @@ void destroy_Signal_Struct(signalStruct *signal) {
 			fftw_destroy_plan(signal->plan[i]);
 		}
 	}
+	for (; i < NOS_WITH_DETECTOR_RESPONSE; i++) {
+		fftw_free(signal->signal[i]);
+	}
 	if (signal->psd) {
 		fftw_free(signal->psd);
 	}
@@ -248,6 +255,9 @@ void destroy_Signal_Struct1(signalStruct *signal) {
 			free(signal->csignal[i]);
 		}
 	}
+	for (; i < NOS_WITH_DETECTOR_RESPONSE; i++) {
+		free(signal->signal[i]);
+	}
 	if (signal->psd) {
 		free(signal->psd);
 	}
@@ -258,13 +268,19 @@ void print_Two_Signals(FILE*file, signalStruct *sig, double dt, short width, sho
 	static char temp[FILENAME_MAX];
 	static char format[FILENAME_MAX];
 	static char text[FILENAME_MAX];
-	sprintf(temp, "%%%d.%dlg %%", width, precision);
-	sprintf(text, "%%%ds %%", width);
+	static char text1[FILENAME_MAX];
+	static char textformat[FILENAME_MAX];
+	sprintf(temp, "%%%d.%dlg %%%% ", width, precision);
+	sprintf(text, "%%%ds %%%% ", width);
 	sprintf(format, "%s %s", temp, temp);
+	sprintf(text1, "%%-%ds ", width);
+	sprintf(textformat, "%s %s %s", text1, text1, text1);
+	fprintf(file, textformat, "#time", " h1", "  h2");
+	fprintf(file, "\n");
 	long i;
 	for (i = 0; i < sig->length[shorter]; i++) {
 		fprintf(file, temp, (double)i * dt);
-		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2]);
+		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2][i]);
 		fprintf(file, "\n");
 	}
 	if (shorter) {
@@ -359,12 +375,12 @@ char apr[2][FILENAME_MAX];
 
 void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]) {
 	REAL8 a1, a2, phi, shift;
-	puts(apr[i]);
-	for (unsigned long j = 0; j < lal->waveform[i].f->data->length; j++) {
+	for (long j = 0; j < sig->length[i]; j++) {
 		a1 = lal->waveform[i].a->data->data[2 * j];
 		a2 = lal->waveform[i].a->data->data[2 * j + 1];
 		phi = lal->waveform[i].phi->data->data[j];
 		if (strstr(apr[i], "SpinQuadTaylor")) {
+			//shift = lal->waveform[i].shift->data->data[j];
 			shift = 0.0;
 			//phi-=M_PI_2;
 		} else if (strstr(apr[i], "SpinTaylorFrameless")) {
@@ -372,6 +388,7 @@ void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double 
 		} else {
 			shift = lal->waveform[i].shift->data->data[j];
 		}
+		//printf("%ld, %ld: %lg %lg %lg %lg\n",sig->length[i],j, a1, a2, phi, shift);
 		/*
 		 sig->signal[2 * i][j] = lal->waveform[i].a->data->data[2 * j] * M_SQRT2 / 2.0;
 		 sig->signal[2 * i + 1][j] = lal->waveform[i].a->data->data[2 * j + 1] * M_SQRT2 / 2.0;

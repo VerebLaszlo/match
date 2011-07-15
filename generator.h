@@ -132,4 +132,6 @@ void read_Binary_Parameter_Limits(FILE*file, binary_System *sys);
  */
 void print_Binary_Parameter_Limits(FILE* file, binary_System*sys);
 
+void print_Binary_Parameter_For_Plot(FILE* file, binary_System*sys);
+
 #endif /* GENERATOR_H */

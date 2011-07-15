@@ -397,3 +397,13 @@ void print_Binary_Parameter_Limits(FILE* file, binary_System*sys) {
 	fprintf(file, "%10s %10.4lg %10.4lg\n", "dec", sys[0].F.declination, sys[1].F.declination);
 	fprintf(file, "%10s %10.4lg %10.4lg\n", "gmst", sys[0].F.gmst, sys[1].F.gmst);
 }
+
+void print_Binary_Parameter_For_Plot(FILE* file, binary_System*sys) {
+	fprintf(file, "%-13s %10.4lg %10.4lg %10.4lg\n", "#masses    ", sys[0].bh[0].m, sys[0].bh[1].m,
+			sys[0].bh[1].m / sys[0].bh[0].m);
+	fprintf(file, "%-13s %10.4lg %10.4lg %10.4lg\n", "#spin1     ", sys[0].bh[0].chi_Amp,
+			sys[0].bh[0].kappa, sys[0].bh[0].psi);
+	fprintf(file, "%-13s %10.4lg %10.4lg %10.4lg\n", "#spin2     ", sys[0].bh[1].chi_Amp,
+			sys[0].bh[1].kappa, sys[0].bh[1].psi);
+	fprintf(file, "%-13s %10.4lg %10.4lg\n", "#incl, dist", sys[0].incl, sys[0].dist);
+}
