@@ -9,19 +9,12 @@
 #define MATCH_QMSS_H_
 
 #include "match.h"
-#include "parameters.h"
 
 #include <limits.h>
 #include <time.h>
 
 #define MOD_SPIN_INDEX 0///<C
 short is_First;///<a
-
-/** Constants.
- */
-typedef enum CONSTANTS {
-	NOT_FOUND = 0, FOUND = 1,
-} CONSTANTS;
 
 /** Amplitude code
  */
@@ -81,8 +74,8 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
 		signalStruct *sig);
 
-void find_Waveform_Errors_At_Parameter(Program_Parameters *prog, System_Parameters *parameters,
-		long index);
+//void find_Waveform_Errors_At_Parameter(Program_Parameters *prog, System_Parameters *parameters,
+//		long index);
 
 /** Calculates the running time.
  * @param program_Parameters

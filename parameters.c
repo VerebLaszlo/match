@@ -116,34 +116,6 @@ void print_System_Parameters(FILE *file, System_Parameters *params) {
 
 void print_System_Parameters_For_Plot(FILE *file, System_Parameters *params) {
 	print_Binary_Parameter_For_Plot(file, params->system);
-	fprintf(file, "%-13s %10.4lg %10.4lg %10.4lg\n", "#matches    ", params->match_Typ, params->match_Minimax, params->match_Best);
-}
-void initLALParameters(LALParameters *lalparams, System_Parameters *parameters) {
-	assert(lalparams);
-	assert(parameters);
-	memset(&lalparams->waveform, 0, 2 * sizeof(CoherentGW));
-	memset(&lalparams->injParams, 0, 2 * sizeof(SimInspiralTable));
-	memset(&lalparams->ppnParams, 0, sizeof(PPNParamStruc));
-	memset(&lalparams->waveform, 0, 2 * sizeof(CoherentGW));
-	lalparams->ppnParams->deltaT = 1. / parameters->freq_Sampling;
-	parameters->freq_Min = 40.;
-	for (short i = 0; i < 2; i++) {
-		lalparams->injParams[i].mass1 = parameters->system[i].bh[0].m;
-		lalparams->injParams[i].mass2 = parameters->system[i].bh[1].m;
-		lalparams->injParams[i].spin1x = parameters->system[i].bh[0].chi[0];
-		lalparams->injParams[i].spin1y = parameters->system[i].bh[0].chi[1];
-		lalparams->injParams[i].spin1z = parameters->system[i].bh[0].chi[2];
-		lalparams->injParams[i].spin2x = parameters->system[i].bh[1].chi[0];
-		lalparams->injParams[i].spin2y = parameters->system[i].bh[1].chi[1];
-		lalparams->injParams[i].spin2z = parameters->system[i].bh[1].chi[2];
-		lalparams->injParams[i].inclination = parameters->system[i].incl;
-		lalparams->injParams[i].f_lower = parameters->freq_Min;
-		lalparams->injParams[i].distance = parameters->system[i].dist;
-		lalparams->injParams[i].coa_phase = parameters->system[i].coaPhase = 0.;
-		lalparams->injParams[i].f_lower = parameters->freq_Initial;
-		lalparams->ppnParams->deltaT = 1. / parameters->freq_Sampling;
-		lalparams->injParams[i].amp_order = parameters->amp_Code[i];
-		snprintf(lalparams->injParams[i].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "%s%s%s",
-				parameters->approx[i], parameters->phase[i], parameters->spin[i]);
-	}
+	fprintf(file, "%-13s %10.4lg %10.4lg %10.4lg\n", "#matches    ", params->match_Typ,
+			params->match_Minimax, params->match_Best);
 }

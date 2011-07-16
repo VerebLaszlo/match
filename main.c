@@ -8,8 +8,6 @@
 
 extern char apr[2][FILENAME_MAX];
 
-int switchMode = LALSQTPN_PRECESSING;
-
 static char*help = "Usage:\n"
 	"-mode [options] program_file parameter_file\n"
 	"mode option:\n"
@@ -19,6 +17,12 @@ static char*help = "Usage:\n"
 	"m NOT IMPLEMENTED JET!!!!\n"
 	"s NOT IMPLEMENTED JET!!!!";
 
+/**
+ *
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
 		puts(help);
@@ -41,6 +45,8 @@ int main(int argc, char *argv[]) {
 	char option = argv[arg++][1];
 	switch (option) {
 	case 'g':
+		fprintf(stderr, "NOT IMPLEMENTED!!!!");
+		exit(EXIT_FAILURE);
 		break;
 	case 'e':
 		break;
@@ -109,14 +115,14 @@ int main(int argc, char *argv[]) {
 		double percent;
 		for (long i = 0; i < program_Parameters.number_Of_Runs; i++) {
 			generate_Same_Parameters(&parameters, limits, ETAM);
-			find_Waveform_Errors_At_Parameter(&program_Parameters, &parameters, i);
+			//find_Waveform_Errors_At_Parameter(&program_Parameters, &parameters, i);
 			//if (i == 0) {
 			//	exit(EXIT_FAILURE);
 			//}
-			percent = 1000.0 * (double)i / (double)program_Parameters.number_Of_Runs;
+			percent = 1000.0 * (double) i / (double) program_Parameters.number_Of_Runs;
 			if (floor(percent) == ceil(percent)) {
-				if (((int)percent + 1) % 10 == 0) {
-					printf("%d%%o\n", (int)percent + 1);
+				if (((int) percent + 1) % 10 == 0) {
+					printf("%d%%o\n", (int) percent + 1);
 					fflush(stdout);
 				}
 			}
@@ -135,7 +141,7 @@ int main(int argc, char *argv[]) {
 			puts("Starting difference ...");
 			generate_Waveforms_For_Difference(&program_Parameters, &parameters, &sig);
 			char file_Name[FILENAME_MAX];
-			sprintf(file_Name, "%s/diff%d.txt", program_Parameters.folder,i);
+			sprintf(file_Name, "%s/diff%d.txt", program_Parameters.folder, i);
 			file = safely_Open_File_For_Writing(file_Name);
 			//print_Two_Signals_With_HPHC(file, &sig, parameters.time_Sampling,
 			//		program_Parameters.width_Of_Number_To_Plot, program_Parameters.precision_To_Plot);
@@ -189,18 +195,16 @@ int main(int argc, char *argv[]) {
 	case 'e': {
 		FILE*fileIn = safely_Open_File_For_Reading(argv[arg++]);
 		puts("Starting exact ...");
-		for (int i = 0; !feof(fileIn); i++) {
+		for (int i = 0; !feof(fileIn) && i < program_Parameters.number_Of_Runs; i++) {
 			readExactParameters(fileIn, &parameters);
 			convert_Masses(&parameters.system[0], FROM_M1M2);
 			convert_Masses(&parameters.system[1], FROM_M1M2);
 			convert_Spins(&parameters.system[0], FROM_KAPPA_PSI);
 			convert_Spins(&parameters.system[1], FROM_KAPPA_PSI);
-			puts("X 2");
 			signalStruct sig;
 			generate_Waveforms_For_Difference(&program_Parameters, &parameters, &sig);
-			puts("X 3");
 			char file_Name[FILENAME_MAX];
-			sprintf(file_Name, "%s/diff%d.txt", program_Parameters.folder,i);
+			sprintf(file_Name, "%s/%s.txt", program_Parameters.folder, parameters.name[0]);
 			file = safely_Open_File_For_Writing(file_Name);
 			print_Two_Signals(file, &sig, parameters.time_Sampling,
 					program_Parameters.width_Of_Number_To_Plot,
@@ -216,7 +220,6 @@ int main(int argc, char *argv[]) {
 	default:
 		break;
 	}
-	LALCheckMemoryLeaks();
 	puts("Done!");
 	exit(EXIT_SUCCESS);
 }

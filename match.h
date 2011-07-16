@@ -7,7 +7,6 @@
 #ifndef MATCH_H
 #define MATCH_H
 
-#include "generator.h"
 #include "lal_wrapper.h"
 
 /**

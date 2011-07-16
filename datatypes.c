@@ -110,19 +110,19 @@ void print_Two_Signals(FILE*file, signalStruct *sig, double dt, short width, sho
 	fprintf(file, "\n");
 	long i;
 	for (i = 0; i < sig->length[shorter]; i++) {
-		fprintf(file, temp, (double)i * dt);
+		fprintf(file, temp, (double) i * dt);
 		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2][i]);
 		fprintf(file, "\n");
 	}
 	if (shorter) {
 		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, (double) i * dt);
 			fprintf(file, temp, sig->signal[RESPONSE1][i]);
 			fprintf(file, "\n");
 		}
 	} else {
 		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, (double) i * dt);
 			fprintf(file, text, "");
 			fprintf(file, temp, sig->signal[RESPONSE2][i]);
 			fprintf(file, "\n");
@@ -142,14 +142,14 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
 	puts(format);
 	long i;
 	for (i = 0; i < sig->length[shorter]; i++) {
-		fprintf(file, temp, (double)i * dt);
+		fprintf(file, temp, (double) i * dt);
 		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2][i],
 				sig->signal[RESPONSE1][i] - sig->signal[RESPONSE2][i]);
 		fprintf(file, "\n");
 	}
 	if (shorter) {
 		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, (double) i * dt);
 			fprintf(file, temp, sig->signal[RESPONSE1][i]);
 			fprintf(file, text, "");
 			fprintf(file, temp, sig->signal[RESPONSE1][i]);
@@ -157,7 +157,7 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
 		}
 	} else {
 		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, (double) i * dt);
 			fprintf(file, text, width, "");
 			fprintf(file, temp, sig->signal[RESPONSE2][i]);
 			fprintf(file, temp, -sig->signal[RESPONSE2][i]);
@@ -179,25 +179,34 @@ void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short 
 	sprintf(textformat, " %s %s %s", text, text, text);
 	long i;
 	for (i = 0; i < sig->length[shorter]; i++) {
-		fprintf(file, temp, (double)i * dt);
+		fprintf(file, temp, (double) i * dt);
 		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P][i], sig->signal[H1C][i]);
 		fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P][i], sig->signal[H2C][i]);
 		fprintf(file, "\n");
 	}
 	if (shorter) {
 		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, (double) i * dt);
 			fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P][i],
 					sig->signal[H1C][i]);
 			fprintf(file, "\n");
 		}
 	} else {
 		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double)i * dt);
+			fprintf(file, temp, (double) i * dt);
 			fprintf(file, textformat, "", "", "");
 			fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P][i],
 					sig->signal[H2C][i]);
 			fprintf(file, "\n");
+		}
+	}
+}
+
+void calculate_H_From_HPHC(signalStruct *signal, double *antennaFunction) {
+	for (short i = 0; i < 2; i++) {
+		for (long j = 0; j < signal->length[i]; j++) {
+			signal->signal[RESPONSE1 + i][j] = signal->signal[H1P + 2 * i][j] * antennaFunction[H1P
+					+ 2 * i] + signal->signal[H1C + 2 * i][j] * antennaFunction[H1C + 2 * i];
 		}
 	}
 }

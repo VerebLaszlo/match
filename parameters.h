@@ -9,7 +9,6 @@
 #define PARAMETERS_H_
 
 #include "generator.h"
-#include "lal_wrapper.h"
 
 /** System aprameters.
  */
@@ -81,13 +80,11 @@ void read_System_Parameters(FILE *file, System_Parameters *params);
  */
 void print_System_Parameters(FILE *file, System_Parameters *params);
 
-void print_System_Parameters_For_Plot(FILE *file, System_Parameters *params);
-
 /**
- * Done
- * @param lalparams
- * @param parameters
+ *
+ * @param file
+ * @param params
  */
-void initLALParameters(LALParameters *lalparams, System_Parameters *parameters);
+void print_System_Parameters_For_Plot(FILE *file, System_Parameters *params);
 
 #endif /* PARAMETERS_H_ */

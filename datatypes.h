@@ -1,5 +1,5 @@
-/*
- * datatypes.h
+/**
+ * @file datatypes.h
  *
  *  Created on: Jul 16, 2011
  *      Author: vereb
@@ -12,6 +12,12 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+
+/** Constants.
+ */
+typedef enum CONSTANTS {
+	NOT_FOUND = 0, FOUND = 1,
+} CONSTANTS;
 
 /**	An enum to contains the integer type constatns.
  */
@@ -96,5 +102,7 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
  */
 void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short width,
 		short precision);
+
+void calculate_H_From_HPHC(signalStruct *signal, double *antennaFunction);
 
 #endif /* DATATYPES_H_ */
