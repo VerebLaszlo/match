@@ -39,4 +39,20 @@ typedef struct LALParameters {
  */
 void createPSD(LALParameters *lalparams, double *psd);
 
+/** Sets the signal from CoherentGW's A1A2
+ * @param i
+ * @param sig
+ * @param lal
+ * @param F
+ */
+void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal, double F[]);
+
+/** Sets the signal from CoherentGW's HPHC
+ * @param i
+ * @param sig
+ * @param lal
+ * @param F
+ */
+void setSignal_From_HPHC(short i, signalStruct *sig, LALParameters *lal, double F[]);
+
 #endif /* LAL_WRAPPER_H_ */
