@@ -8,6 +8,7 @@
 C_SRCS += \
 ../detector.c \
 ../parameters.c \
+../datatypes.c \
 ../generator.c \
 ../match.c \
 ../lal_wrapper.c \
@@ -20,6 +21,7 @@ C_SRCS += \
 OBJS += \
 ./parameters.o \
 ./detector.o \
+./datatypes.o \
 ./generator.o \
 ./lal_wrapper.o \
 ./match.o \
@@ -32,6 +34,7 @@ OBJS += \
 C_DEPS += \
 ./parameters.d \
 ./detector.d \
+./datatypes.d \
 ./generator.d \
 ./lal_wrapper.d \
 ./match.d \

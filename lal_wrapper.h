@@ -17,7 +17,7 @@
 #include <lal/LALInspiral.h>
 #include <lal/LALStdlib.h>
 #include <lal/RealFFT.h>
-#include <assert.h>
+#include "datatypes.h"
 
 /** LAL parameters.
  */
