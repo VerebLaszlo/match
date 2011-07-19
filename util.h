@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdbool.h>
 #ifndef NDEBUG
 #include <string.h>
 #endif
@@ -50,8 +51,27 @@ FILE *safelyOpenForAppend(const char *fileName);
 /** Constants for output
  */
 typedef enum OUTPUT_CONSTANTS {
-	SPECIAL_CHARACTER_LENGTH = 6, SEPARATOR_LENGTH = 3, FORMAT_LENGTH = 10,
+	SPECIAL_CHARACTER_LENGTH = 6, SEPARATOR_LENGTH = 3, FORMAT_LENGTH = 10, NAMES_LENGTH = 100,
 } OUTPUT_CONSTANTS;
+
+typedef char *string;
+typedef char nameString[NAMES_LENGTH];
+
+/**	Contains values to format an output.
+ */
+typedef struct tagOutputFormat {
+	ushort precision;
+	ushort width;
+	ushort widthWithSeparator;
+	char separator;
+	bool leftJustified;
+	char oneNumber[FORMAT_LENGTH];
+	nameString name;
+	ushort code;
+} OutputFormat;
+
+/// @name OLD
+///@{
 
 /** Specifies the formatting of the output
  */
@@ -105,5 +125,5 @@ void set_Format_Parameters(OUTPUT_FORMAT_CONSTANTS *format, const unsigned short
  * @param[in,out] format
  */
 void set_Format_For_One_Number(OUTPUT_FORMAT_CONSTANTS *format);
-
+///@}
 #endif // UTIL_H

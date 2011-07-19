@@ -50,6 +50,64 @@ FILE *safelyOpenForAppend(const char *fileName) {
 	return safelyOpenFile(fileName, "a");
 }
 
+/**	Sets the format string for one number.
+ * @param[in,ou]	format	: the format
+ */
+static void setFormatForOneNumber(OutputFormat *format) {
+	assert(format);
+	if (format->leftJustified) {
+		sprintf(format->oneNumber, "%%- %d.%dlg", format->width, format->precision);
+	} else {
+		sprintf(format->oneNumber, "%% %d.%dlg", format->width, format->precision);
+	}
+}
+
+/**	Sets the format variables.
+ * @param[out]	format			: format specific variables
+ * @param[in]	precision		: user supplied precision of the format
+ * @param[in]	width			: user supplied width of the format, its has a minimal value
+ * @param[in]	separator		: user defined separator character
+ * @param[in]	leftJustified	: left (true) or right (false) justified text
+ * @param[in]	name			: user defined name of the format
+ * @param[in]	code			: user defined code of the format
+ */
+static void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
+		const char separator, bool leftJustified, nameString name, const ushort code) {
+	assert(format);
+	assert(precision < 100);
+	assert(separator);
+	assert(name);
+	format->precision = precision;
+	format->width = width > format->precision + SPECIAL_CHARACTER_LENGTH ? width
+			: format->precision + SPECIAL_CHARACTER_LENGTH;
+	format->widthWithSeparator = format->width + SEPARATOR_LENGTH;
+	format->separator = separator;
+	format->leftJustified = leftJustified;
+	strcpy(format->name, name);
+	format->code = code;
+	setFormatForOneNumber(format);
+}
+
+/**	Set the format for given number of floating pint data to display.
+ * @param[out] formatString	: the generated format string
+ * @param[in] number		: number of the data
+ * @param[in] format		: contains the format variables
+ */
+static void setFormat(char formatString[], const ushort number, OutputFormat *format) {
+	assert(formatString);
+	assert(number);
+	assert(format);
+	char temp[number * format->widthWithSeparator];
+	strcpy(formatString, format->oneNumber);
+	for (ushort i = 1; i < number; i++) {
+		sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
+		strcpy(formatString, temp);
+	}
+}
+
+/// @name OLD
+///@{
+
 void set_Format_For(char format[], const unsigned short number,
 		OUTPUT_FORMAT_CONSTANTS*format_Constants) {
 	assert(number);
@@ -116,3 +174,5 @@ inline void set_Format_For_One_Number(OUTPUT_FORMAT_CONSTANTS *format) {
 				format->width_Of_Number_To_Plot, format->precision_To_Plot);
 	}
 }
+
+///@}
