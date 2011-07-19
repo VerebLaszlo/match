@@ -4,6 +4,7 @@
  * @date 2010.03.26.
  */
 
+#include <stdlib.h>
 #include "detector.h"
 #include "util_math.h"
 

@@ -4,8 +4,10 @@
  * @date 2010.03.26.
  */
 
-#include "generator.h"
 #include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+#include "generator.h"
 
 /**
  * XX
@@ -143,7 +145,7 @@ void convert_Spins(binary_System *sys, conversion_Mode_Spins mode) {
 	default:
 		fprintf(stderr, "Invalid spin conversion.");
 		fflush(stderr);
-		exit(-1);
+		exit(EXIT_FAILURE);
 		break;
 	}
 }
@@ -180,7 +182,7 @@ void convert_Masses(binary_System *sys, conversion_Mode_Masses mode) {
 	default:
 		fprintf(stderr, "Invalid mass conversion.");
 		fflush(stderr);
-		exit(-1);
+		exit(EXIT_FAILURE);
 		break;
 	}
 }

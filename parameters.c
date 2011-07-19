@@ -5,6 +5,7 @@
  * @author vereb
  */
 
+#include <assert.h>
 #include "parameters.h"
 
 void readExactParameters(FILE *file, System_Parameters *params) {

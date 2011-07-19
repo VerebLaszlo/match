@@ -8,14 +8,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <assert.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 #include <stdbool.h>
-#ifndef NDEBUG
-#include <string.h>
-#endif
 
 typedef unsigned short ushort;
 
@@ -125,5 +119,7 @@ void set_Format_Parameters(OUTPUT_FORMAT_CONSTANTS *format, const unsigned short
  * @param[in,out] format
  */
 void set_Format_For_One_Number(OUTPUT_FORMAT_CONSTANTS *format);
+
 ///@}
+
 #endif // UTIL_H

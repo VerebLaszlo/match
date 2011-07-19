@@ -5,6 +5,8 @@
  * @brief Various utilities for math.
  */
 
+#include <assert.h>
+#include <stdlib.h>
 #include "util_math.h"
 
 const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT = { 60.0, 1.0 / 60.0, //

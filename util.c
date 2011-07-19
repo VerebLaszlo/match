@@ -2,8 +2,15 @@
  * @file util.c
  * @author László Veréb
  * @date 2011.07.19.
+ * @brief Contains useful functions.
  */
 
+#include <errno.h>
+#include <assert.h>
+#include <stdlib.h>
+#ifndef NDEBUG
+#include <string.h>
+#endif
 #include "util.h"
 
 extern char * program_invocation_short_name;
