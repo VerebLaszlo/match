@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 	}
 	Program_Parameters program_Parameters;
 	System_Parameters parameters;
-	FILE *file = safely_Open_File_For_Reading(argv[arg++]);
+	FILE *file = safelyOpenForReading(argv[arg++]);
 	read_Program_Parameters(file, &program_Parameters);
 	fclose(file);
 	strcpy(apr[0], parameters.approx[0]);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 	case 'd':
 	case 't':
 	case 's':
-		file = safely_Open_File_For_Reading(argv[arg++]);
+		file = safelyOpenForReading(argv[arg++]);
 		read_System_Parameters(file, &parameters);
 		fclose(file);
 		//print_System_Parameters(stdout, &parameters);
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 			generate_Waveforms_For_Difference(&program_Parameters, &parameters, &sig);
 			char file_Name[FILENAME_MAX];
 			sprintf(file_Name, "%s/diff%d.txt", program_Parameters.folder, i);
-			file = safely_Open_File_For_Writing(file_Name);
+			file = safelyOpenForWriting(file_Name);
 			//print_Two_Signals_With_HPHC(file, &sig, parameters.time_Sampling,
 			//		program_Parameters.width_Of_Number_To_Plot, program_Parameters.precision_To_Plot);
 			print_Two_Signals(file, &sig, parameters.time_Sampling,
@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
 		calc_Time(&program_Parameters, &parameters, sampling);
 		break;
 	case 'm': {
-		FILE*fileIn = safely_Open_File_For_Reading(argv[arg++]);
+		FILE*fileIn = safelyOpenForReading(argv[arg++]);
 		//int xx = 0;
 		puts("Starting match ...");
 		do {
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
 			char file_Name[FILENAME_MAX];
 			sprintf(file_Name, "%s/%s.txt", program_Parameters.folder, parameters.name[0]);
 			puts(file_Name);
-			file = safely_Open_File_For_Writing(file_Name);
+			file = safelyOpenForWriting(file_Name);
 			print_System_Parameters_For_Plot(file, &parameters);
 			print_Two_Signals(file, &sig, parameters.time_Sampling,
 					program_Parameters.width_Of_Number_To_Plot,
@@ -193,7 +193,7 @@ int main(int argc, char *argv[]) {
 		break;
 	}
 	case 'e': {
-		FILE*fileIn = safely_Open_File_For_Reading(argv[arg++]);
+		FILE*fileIn = safelyOpenForReading(argv[arg++]);
 		puts("Starting exact ...");
 		for (int i = 0; !feof(fileIn) && i < program_Parameters.number_Of_Runs; i++) {
 			readExactParameters(fileIn, &parameters);
@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
 			generate_Waveforms_For_Difference(&program_Parameters, &parameters, &sig);
 			char file_Name[FILENAME_MAX];
 			sprintf(file_Name, "%s/%s.txt", program_Parameters.folder, parameters.name[0]);
-			file = safely_Open_File_For_Writing(file_Name);
+			file = safelyOpenForWriting(file_Name);
 			print_Two_Signals(file, &sig, parameters.time_Sampling,
 					program_Parameters.width_Of_Number_To_Plot,
 					program_Parameters.precision_To_Plot);

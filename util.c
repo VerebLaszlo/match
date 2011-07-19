@@ -1,7 +1,7 @@
-/*
+/**
  * @file util.c
  * @author László Veréb
- * @date 2010.01.11.
+ * @date 2011.07.19.
  */
 
 #include "util.h"
@@ -9,47 +9,45 @@
 extern char * program_invocation_short_name;
 extern char * program_invocation_name;
 
-FILE * safely_Open_File(char *file_Name, char *mode) {
-	assert(strcmp(file_Name, ""));
+FILE * safelyOpenFile(const char *fileName, const char *mode) {
+	assert(strcmp(fileName, ""));
 	assert(strcmp(mode, ""));
 	FILE *stream;
 	errno = 0;
-	stream = fopen(file_Name, mode);
+	stream = fopen(fileName, mode);
 	if (stream == NULL) {
-		fprintf(stderr, "%s: Couldn't open file %s; %s\n", program_invocation_short_name,
-				file_Name, strerror(errno));
+		if (strcmp(mode, "r")) {
+			fprintf(stderr, "%s: Couldn't open file %s for reading; %s\n",
+					program_invocation_short_name, fileName, strerror(errno));
+		} else if (strcmp(mode, "w")) {
+			fprintf(stderr, "%s: Couldn't open file %s for writing; %s\n",
+					program_invocation_short_name, fileName, strerror(errno));
+		} else if (strcmp(mode, "a")) {
+			fprintf(stderr, "%s: Couldn't open file %s for append; %s\n",
+					program_invocation_short_name, fileName, strerror(errno));
+		} else {
+			fprintf(stderr, "%s: Couldn't open file %s; %s\n", program_invocation_short_name,
+					fileName, strerror(errno));
+		}
 		exit(EXIT_FAILURE);
 	} else {
 		return stream;
 	}
 }
 
-FILE * safely_Open_File_For_Reading(char *file_Name) {
-	assert(strcmp(file_Name, ""));
-	FILE *stream;
-	errno = 0;
-	stream = fopen(file_Name, "r");
-	if (stream == NULL) {
-		fprintf(stderr, "%s: Couldn't open file for reading %s; %s\n",
-				program_invocation_short_name, file_Name, strerror(errno));
-		exit(EXIT_FAILURE);
-	} else {
-		return stream;
-	}
+FILE *safelyOpenForReading(const char *fileName) {
+	assert(strcmp(fileName, ""));
+	return safelyOpenFile(fileName, "r");
 }
 
-FILE * safely_Open_File_For_Writing(char *file_Name) {
-	assert(strcmp(file_Name, ""));
-	FILE *stream;
-	errno = 0;
-	stream = fopen(file_Name, "w");
-	if (stream == NULL) {
-		fprintf(stderr, "%s: Couldn't open file for writing %s; %s\n",
-				program_invocation_short_name, file_Name, strerror(errno));
-		exit(EXIT_FAILURE);
-	} else {
-		return stream;
-	}
+FILE *safelyOpenForWriting(const char *fileName) {
+	assert(strcmp(fileName, ""));
+	return safelyOpenFile(fileName, "w");
+}
+
+FILE *safelyOpenForAppend(const char *fileName) {
+	assert(strcmp(fileName, ""));
+	return safelyOpenFile(fileName, "a");
 }
 
 void set_Format_For(char format[], const unsigned short number,

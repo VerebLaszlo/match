@@ -68,12 +68,12 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 			is_Good = calc_Matches_For_ParameterPair(prog, parameters, &second);
 			if (is_Good && parameters->match_Minimax > parameters->critical_Match) {
 				sprintf(file_Name, "%s/first%hd.txt", prog->folder, index);
-				file = safely_Open_File_For_Writing(file_Name);
+				file = safelyOpenForWriting(file_Name);
 				print_Two_Signals(file, &first, parameters->time_Sampling,
 						prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
 				fclose(file);
 				sprintf(file_Name, "%s/found%hd.txt", prog->folder, index);
-				file = safely_Open_File_For_Writing(file_Name);
+				file = safelyOpenForWriting(file_Name);
 				print_Two_Signals(file, &first, parameters->time_Sampling,
 						prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
 				fclose(file);
@@ -187,7 +187,7 @@ void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parame
 	srand(86);
 	sprintf(temp, "%s/%s%s%d.time", program_Parameters->folder, parameters->approx[0],
 			parameters->spin[0], parameters->amp_Code[0]);
-	FILE *file = safely_Open_File_For_Writing(temp);
+	FILE *file = safelyOpenForWriting(temp);
 	time(&start);
 	for (long i = 0; i < program_Parameters->number_Of_Runs; i++) {
 		generate_Parameters(parameters, limits);

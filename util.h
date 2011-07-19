@@ -1,8 +1,8 @@
 /**
  * @file util.h
  * @author László Veréb
- * @date 2010.03.27
- * @brief Contains some useful functions.
+ * @date 2011.07.19.
+ * @brief Contains useful functions.
  */
 
 #ifndef UTIL_H
@@ -15,6 +15,37 @@
 #ifndef NDEBUG
 #include <string.h>
 #endif
+
+typedef unsigned short ushort;
+
+/**	Opens the file with the given access mode. On error it terminates the program and prints an
+ * error message.
+ * @param[in]	fileName	: the file's path name relative to the program
+ * @param[in]	mode		: the mode with which the file is opened
+ * @return	pointer to the opened file
+ */
+FILE *safelyOpenFile(const char *fileName, const char *mode);
+
+/**	Opens the file just for reading. On error it terminates the program and prints an error
+ * message.
+ * @param[in]	fileName	: the file's path name relative to the program
+ * @return	pointer to the opened file
+ */
+FILE *safelyOpenForReading(const char *file_Name);
+
+/**	Opens the file just for writing. On error it terminates the program and prints an error
+ * message.
+ * @param[in]	fileName	: the file's path name relative to the program
+ * @return	pointer to the opened file
+ */
+FILE *safelyOpenForWriting(const char *file_Name);
+
+/**	Opens the file just for append. On error it terminates the program and prints an error
+ * message.
+ * @param[in]	fileName	: the file's path name relative to the program
+ * @return	pointer to the opened file
+ */
+FILE *safelyOpenForAppend(const char *fileName);
 
 /** Constants for output
  */
@@ -39,28 +70,6 @@ typedef struct OUTPUT_FORMAT_CONSTANTS {
 	char format_For_One_Number_To_Plot[FORMAT_LENGTH]; ///< contains the format-string for one number for plotting
 	char output_Folder[FILENAME_MAX]; ///< where to write files
 } OUTPUT_FORMAT_CONSTANTS;
-
-/**		Opens the file with the given access mode. On error it terminates the program and prints an
- * error message.
- * @param[in]	file_Name	: the file's path name relative to the program
- * @param[in]	mode		: the mode with which the file is opened
- * @return	pointer to the opened file
- */
-FILE * safely_Open_File(char *file_Name, char * mode);
-
-/**		Opens the file just for reading. On error it terminates the program and prints an error
- * message.
- * @param[in]	file_Name	: the file's path name relative to the program
- * @return	pointer to the opened file
- */
-FILE * safely_Open_File_For_Reading(char *file_Name);
-
-/**		Opens the file just for writing. On error it terminates the program and prints an error
- * message.
- * @param[in]	file_Name	: the file's path name relative to the program
- * @return	pointer to the opened file
- */
-FILE * safely_Open_File_For_Writing(char *file_Name);
 
 /**	Sets the format string for specific number of output.
  * @param[out] format
