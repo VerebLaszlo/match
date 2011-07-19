@@ -4,6 +4,7 @@
  * @date 2010.04.08.
  */
 
+#include <math.h>
 #include "match.h"
 
 /**

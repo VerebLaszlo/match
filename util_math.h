@@ -1,15 +1,55 @@
 /**
  * @file util_math.h
- * @date 2010-08-16 10.27.00
+ * @date 2011.07.19.
  * @author László Veréb
- * @brief Various utilities for math. @callgraph @callergraph
+ * @brief Various utilities for math.
  */
 
 #ifndef UTIL_MATH_H
 #define UTIL_MATH_H
 
-#include <math.h>
 #include "util.h"
+
+/**	Inserts the square of the number.
+ * @param[in] number
+ */
+#define square(number) \
+	({ typeof(number) _number = (number); _number*_number; })
+
+/**	Inserts the cube of the number.
+ * @param[in] number
+ */
+#define cube(number) \
+	({ typeof(number) _number = (number); square(_number)*_number; })
+
+/// @name Random numbers
+///@{
+
+/**  Returns a pseudo-random number in the range [0,1). Use srand() beforehand to initialize the
+ * random number generator.
+ * @return a random number
+ */
+double randomBetweenZeroAndOne(void);
+
+/**  Returns a pseudo-random number in the range [0,top). Use srand() beforehand to initialize
+ * the random number generator.
+ * @param[in]	top	: the upper limit of the generated number.
+ * @return a random number.
+ */
+double randomBetweenZeroAnd(double top);
+
+/**  Returns a pseudo-random number in the range [bottom,top). Use srand() beforehand to
+ * initialize the random number generator. It works when bottom is greater than top, too.
+ * @param[in]	bottom	: the lowest possible number
+ * @param[in]	top		: the upper limit of the generated numbers.
+ * @return a random number.
+ */
+double randomBetween(double bottom, double top);
+
+///@}
+
+/// @name OLD
+///@{
 
 /**	Calculates the square of the parameter.
  * The argument evaluates only once, so there is no undefined side effect
@@ -58,27 +98,6 @@ extern const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT;
 /** Contains constants to convert from and to various time and degree measurement units.
  */
 extern const CONVERSION_CONSTANTS CONVERSION_CONSTANT;
-
-/**  Returns a pseudo-random number in the range [0,top). Use srand() beforehand to initialize
- * the random number generator.
- * @param[in]	top	: the upper limit of the generated number.
- * @return a random number.
- */
-double random_From_Zero_To(double top);
-
-/**  Returns a pseudo-random number in the range [bottom,top). Use srand() beforehand to
- * initialize the random number generator. It works when bottom is greater than top, too.
- * @param[in]	bottom	: the lowest possible number
- * @param[in]	top		: the upper limit of the generated numbers.
- * @return a random number.
- */
-double random_Between(double bottom, double top);
-
-/**  Returns a pseudo-random number in the range [0,1). Use srand() beforehand to initialize the
- * random number generator.
- * @return a random number
- */
-double random_From_Zero_To_One(void);
 
 /**	Returns the smallest integral value that is not less than number and is the power of two.
  * @param[in]	number	: the number in question
@@ -156,5 +175,7 @@ double is_Equal(const double first, const double second);
  * @return
  */
 double is_Not_Equal(const double first, const double second);
+
+///@}
 
 #endif	// UTIL_MATH_H

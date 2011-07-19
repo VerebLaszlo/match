@@ -4,6 +4,7 @@
  * @date 2010.03.26.
  */
 
+#include <math.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -204,8 +205,8 @@ static void gen_Mass(binary_System *sys, binary_System *min, binary_System *max,
 	switch (mode) {
 	case ETAM:
 		do {
-			sys->M = random_Between(min->M, max->M);
-			sys->eta = random_Between(min->eta, max->eta);
+			sys->M = randomBetween(min->M, max->M);
+			sys->eta = randomBetween(min->eta, max->eta);
 			sys->bh[0].m = (1. + sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 			sys->bh[1].m = (1. - sqrt(1. - 4. * sys->eta)) * sys->M / 2.;
 		} while (min->bh[0].m > sys->bh[0].m || sys->bh[0].m > max->bh[0].m || min->bh[1].m
@@ -216,8 +217,8 @@ static void gen_Mass(binary_System *sys, binary_System *min, binary_System *max,
 		break;
 	case M1M2:
 		do {
-			sys->bh[0].m = random_Between(min->bh[0].m, max->bh[0].m);
-			sys->bh[1].m = random_Between(min->bh[1].m, max->bh[1].m);
+			sys->bh[0].m = randomBetween(min->bh[0].m, max->bh[0].m);
+			sys->bh[1].m = randomBetween(min->bh[1].m, max->bh[1].m);
 			sys->M = sys->bh[0].m + sys->bh[1].m;
 			sys->eta = sys->bh[0].m * sys->bh[1].m / SQR(sys->M);
 		} while (min->M > sys->M || sys->M > max->M || min->eta > sys->eta || sys->eta > max->eta);
@@ -256,25 +257,25 @@ static void gen_Chi(binary_System *sys, binary_System *min, binary_System *max, 
 		break;
 	case THETA_VPHI:
 		for (short i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].theta = acos(random_Between(cos(min->bh[i].theta), cos(max->bh[i].theta)));
-			sys->bh[i].varphi = random_Between(min->bh[i].varphi, max->bh[i].varphi);
+			sys->bh[i].chi_Amp = randomBetween(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].theta = acos(randomBetween(cos(min->bh[i].theta), cos(max->bh[i].theta)));
+			sys->bh[i].varphi = randomBetween(min->bh[i].varphi, max->bh[i].varphi);
 		}
 		convert_Spins(sys, FROM_THETA_VPHI);
 		break;
 	case THETA_PHI:
 		for (short i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].theta = acos(random_Between(cos(min->bh[i].theta), cos(max->bh[i].theta)));
-			sys->bh[i].phi = random_Between(min->bh[i].phi, max->bh[i].phi);
+			sys->bh[i].chi_Amp = randomBetween(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].theta = acos(randomBetween(cos(min->bh[i].theta), cos(max->bh[i].theta)));
+			sys->bh[i].phi = randomBetween(min->bh[i].phi, max->bh[i].phi);
 		}
 		convert_Spins(sys, FROM_THETA_PHI);
 		break;
 	case KAPPA_PSI:
 		for (short i = 0; i < 3; i++) {
-			sys->bh[i].chi_Amp = random_Between(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
-			sys->bh[i].kappa = acos(random_Between(cos(min->bh[i].kappa), cos(max->bh[i].kappa)));
-			sys->bh[i].psi = random_Between(min->bh[i].psi, max->bh[i].psi);
+			sys->bh[i].chi_Amp = randomBetween(min->bh[i].chi_Amp, max->bh[i].chi_Amp);
+			sys->bh[i].kappa = acos(randomBetween(cos(min->bh[i].kappa), cos(max->bh[i].kappa)));
+			sys->bh[i].psi = randomBetween(min->bh[i].psi, max->bh[i].psi);
 		}
 		convert_Spins(sys, FROM_KAPPA_PSI);
 		break;
@@ -296,13 +297,13 @@ static void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) 
 	assert(sys);
 	assert(min);
 	assert(max);
-	sys->dist = random_Between(min->dist, max->dist);
-	sys->coaPhase = random_Between(min->coaPhase, max->coaPhase);
-	sys->incl = random_Between(min->incl, max->incl);
-	sys->F.declination = random_Between(min->F.declination, max->F.declination);
-	sys->F.polarization = random_Between(min->F.polarization, max->F.polarization);
-	sys->F.right_Ascention = random_Between(min->F.right_Ascention, max->F.right_Ascention);
-	sys->F.gmst = random_Between(min->F.gmst, max->F.gmst);
+	sys->dist = randomBetween(min->dist, max->dist);
+	sys->coaPhase = randomBetween(min->coaPhase, max->coaPhase);
+	sys->incl = randomBetween(min->incl, max->incl);
+	sys->F.declination = randomBetween(min->F.declination, max->F.declination);
+	sys->F.polarization = randomBetween(min->F.polarization, max->F.polarization);
+	sys->F.right_Ascention = randomBetween(min->F.right_Ascention, max->F.right_Ascention);
+	sys->F.gmst = randomBetween(min->F.gmst, max->F.gmst);
 	calc_Antenna_Pattern_For(LH, &(sys->F));
 }
 

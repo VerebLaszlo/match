@@ -1,13 +1,34 @@
-/*
+/**
  * @file util_math.c
- * @date 2010-08-16 10.27.00
+ * @date 2011.07.19.
  * @author László Veréb
  * @brief Various utilities for math.
  */
 
+#include <math.h>
 #include <assert.h>
 #include <stdlib.h>
 #include "util_math.h"
+
+/// @name Random numbers
+///@{
+
+double randomBetweenZeroAndOne(void) {
+	return (double) rand() / ((double) RAND_MAX + 1.);
+}
+
+double randomBetweenZeroAnd(double top) {
+	return top * randomBetweenZeroAndOne();
+}
+
+double randomBetween(double bottom, double top) {
+	return (top - bottom) * randomBetweenZeroAndOne() + bottom;
+}
+
+///@}
+
+/// @name OLD
+///@{
 
 const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT = { 60.0, 1.0 / 60.0, //
 	60.0, 1.0 / 60.0,//
@@ -21,18 +42,6 @@ const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0,//
 	15.0, 1.0 / 15.0,//
 	15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0),//
 	15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
-
-inline double random_From_Zero_To(double top) {
-	return top * random_From_Zero_To_One();
-}
-
-inline double random_Between(double bottom, double top) {
-	return (top - bottom) * random_From_Zero_To_One() + bottom;
-}
-
-inline double random_From_Zero_To_One(void) {
-	return (double) rand() / ((double) RAND_MAX + 1.);
-}
 
 inline long greatest_Number_That_Less_Than(double number) {
 	assert(number>0.);
@@ -113,3 +122,5 @@ inline double is_Equal(const double first, const double second) {
 inline double is_Not_Equal(const double first, const double second) {
 	return islessgreater(first, second);
 }
+
+///@}
