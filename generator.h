@@ -7,81 +7,25 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
-#include <float.h>
+#include "binary_system.h"
 #include "util_math.h"
-#include "detector.h"
 
-/*
- typedef struct Masses {
- double mass[2];	///< masses of the black-holes in \f$M_\odot\f$
- double total_Mass;	///< total mass of the system in \f$M_\odot\f$
- double chirp_Mass;	///< chirp mass of the system in \f$M_\odot\f$
- double eta;	///< symmetric mass ratio of the system
- double mu;	///< reduced mass in \f$M_\odot\f$
- double nu;	///< mass ratio
- double mass1_mass2;	///< \f$m_1/m_2\f$
- } Masses;
+typedef conversionMode conversion_Mode_Spins;
+typedef conversionMode conversion_Mode_Masses;
+typedef generationMode gen_Mode_Masses;
+typedef generationMode gen_Mode_Spin;
+#define FROM_KAPPA_PSI FROM_PRECESSION_ANGLES
+#define FROM_THETA_VPHI FROM_FIXED_ANGLES
+#define FROM_XYZ FROM_FIXED_XYZ
+#define KAPPA_PSI GEN_PRECESSING_ANGLES
+#define THETA_VPHI GEN_FIXED_ANGLES
+#define XYZ GEN_FIXED_XYZ
+#define ETAM GEN_ETAM
+#define M1M2 GEN_M1M2
+#define ETACHRIP GEN_ETACHIRP
 
- typedef struct Vector {
- double elevation;	///< \f$[-\pi/2,\pi/2]\f$
- double inclination;	///< \f$[0,\pi]\f$
- double azimuth;	///< \f$[0,2\pi)\f$
- double magnitude;	///< \f$[0,1]\f$
- double component[3];
- double unity_Component[3];
- } Vector;
-
- typedef struct Binary_System {
- Masses masses;
- Vector spin[2];
- Vector angular_Momentum;
- //	coordinate system
- antenna_Func pattern;
- double distance;
- double coalescence_Time;
- double coalescence_Phase;
- } Binary_System;
- */
-
-/** Conversion modes for spin
- */
-typedef enum {
-	FROM_XYZ = 0, ///< FROM_XYZ
-	FROM_THETA_VPHI, ///< FROM_THETA_VPHI
-	FROM_CTHETA_VPHI,///< FROM_CTHETA_VPHI
-	FROM_THETA_PHI, ///< FROM_THETA_PHI
-	FROM_CTHETA_PHI, ///< FROM_CTHETA_PHI
-	FROM_KAPPA_PSI,
-///< FROM_KAPPA_PSI
-} conversion_Mode_Spins;///<a
-
-/** Conversion modes for mass
- */
-typedef enum {
-	FROM_M1M2 = 0, ///< from \f$m_1,m_2\f$
-	FROM_ETAM, ///< from \f$\eta,M\f$
-	FROM_ETACHIRP,
-///< from \f$\eta,M_{chirp}\f$
-} conversion_Mode_Masses;
-
-/** Generation mode for mass
- */
-typedef enum {
-	ETAM = 0,///< in \f$\eta,M\f$
-	ETACHRIP,///< in \f$\eta,M_{chirp}\f$
-	M1M2,
-///< in \f$m_1,m_2\f$
-} gen_Mode_Masses;///<a
-
-/** Generation mode for spin
- */
-typedef enum {
-	XYZ = 0, ///< in \f$x,y,z\f$
-	THETA_VPHI,///< in \f$\theta,\varphi\f$
-	THETA_PHI,///< in \f$\theta,\phi\f$
-	KAPPA_PSI,
-///< in \f$\kappa\psi\f$
-} gen_Mode_Spin;///<a
+#define FROM_THETA_PHI FROM_OTHER
+#define THETA_PHI GEN_OTHER
 
 /** Parameters of the black hole
  */
@@ -96,6 +40,8 @@ typedef struct {
 	double chi_Amp; ///< amplitude of the \f$\chi\f$ dimensionless spin
 	double chi[3]; ///< the componenet of the \f$\chi\f$ dimensionless spin
 } black_Hole;
+
+#include "detector.h"
 
 /** Parameters of the system
  */

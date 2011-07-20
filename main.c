@@ -4,6 +4,9 @@
  * @date Apr 8, 2011
  * @author vereb
  */
+
+#include <math.h>
+#include "binary_system.h"
 #include "match_qmss.h"
 
 extern char apr[2][FILENAME_MAX];

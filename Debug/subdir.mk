@@ -10,6 +10,7 @@ C_SRCS += \
 ../parameters.c \
 ../datatypes.c \
 ../generator.c \
+../binary_system.c \
 ../match.c \
 ../lal_wrapper.c \
 ../match_qmss.c \
@@ -23,6 +24,7 @@ OBJS += \
 ./detector.o \
 ./datatypes.o \
 ./generator.o \
+./binary_system.o \
 ./lal_wrapper.o \
 ./match.o \
 ./match_qmss.o \
@@ -36,6 +38,7 @@ C_DEPS += \
 ./detector.d \
 ./datatypes.d \
 ./generator.d \
+./binary_system.d \
 ./lal_wrapper.d \
 ./match.d \
 ./match_qmss.d \

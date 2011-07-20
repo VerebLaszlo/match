@@ -11,6 +11,17 @@
 #include <assert.h>
 #include <math.h>
 
+#define NUMBER_OF_VECTOR_DIMENSION 3
+
+typedef struct tagVector {
+	double magnitude;
+	double components[NUMBER_OF_VECTOR_DIMENSION];
+	double unity[NUMBER_OF_VECTOR_DIMENSION];
+	double azimuth;		///< \f[[0,2\pi)\f]
+	double inclination;	///< \f[[0,\pi]\f]
+	double elevation;	///< \f[[-\pi/2,\pi/2]\f]
+} vector;
+
 /**	Return the angle between the two vectors assuming their sizes are 3.
  * @param[in] left	: the first vector
  * @param[in] right	: the second vector
