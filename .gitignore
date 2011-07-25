@@ -4,10 +4,14 @@
 test
 main
 
+# compile files
+src/*.h
+
 # hidden files
 *.cx
 *~
 *.autosave
+*.bak
 
 # folders
 old

@@ -1,4 +1,4 @@
-/*
+/**
  * @file match.c
  * @author László Veréb
  * @date 2010.04.08.
@@ -9,9 +9,9 @@
 
 /**
  * Formulae given.
- * \f{gather*}{
+ * \f[
  * 	\inProd{h_1}{h_2}=4\Re\int_{f_{min}}^{f_{max}}\frac{\tilde{h}_1(f)\tilde{h}_2^*(f)}{S_h(f)}df
- * \f}
+ * \f]
  * @param left
  * @param right
  * @param norm
@@ -32,9 +32,9 @@ static double inner_Product(fftw_complex left[], fftw_complex right[], double no
 
 /**
  * Formulae given.
- * \f{gather*}{
+ * \f[
  * 	\tilde{e}=\frac{\tilde{h}}{\sqrt{\inProd{\tilde{h}}{\tilde{h}}}}
- * \f}
+ * \f]
  * @param in
  * @param out
  * @param min_Index
@@ -59,9 +59,9 @@ static void normalise(signalStruct *in, long min_Index, long max_Index, signalSt
 
 /**
  * Needs formulae.
- * \f{gather*}{
+ * \f[
  * 	\tilde{e}_\bot=\tilde{e}_\times-\tilde{e}_+\frac{\inProd{\tilde{e}_+}{\tilde{e}_\times}}{\inProd{\tilde{e}_+}{\tilde{e}_+}}
- * \f}
+ * \f]
  * @param in
  * @param out
  * @param min_Index

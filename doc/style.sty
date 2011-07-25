@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-%\ProvidesPackage{doxygen}
+\ProvidesPackage{doxygen}
 
 % Packages used by this style file
 \RequirePackage{alltt}
@@ -14,22 +14,23 @@
 \newcommand{\clearemptydoublepage}{%
   \newpage{\pagestyle{empty}\cleardoublepage}%
 }
+%\renewcommand{\chaptermark}[1]{%
 \newcommand{\chaptermark}[1]{%
   \markboth{#1}{}%
 }
 \renewcommand{\sectionmark}[1]{%
   \markright{\thesection\ #1}%
 }
-\lhead[\fancyplain{}{\bfseries\thepage}]{%
-  \fancyplain{}{\bfseries\rightmark}%
-}
-\rhead[\fancyplain{}{\bfseries\leftmark}]{%
-  \fancyplain{}{\bfseries\thepage}%
-}
-\rfoot[\fancyplain{}{\bfseries\scriptsize%
-  Generated on Sat Feb 26 2011 09:42:23 by doxygen\lfoot[]{\fancyplain{}{\bfseries\scriptsize%
-  Generated on Sat Feb 26 2011 09:42:23 by doxygen}}
-\cfoot{}
+%\lhead[\fancyplain{}{\bfseries\thepage}]{%
+%  \fancyplain{}{\bfseries\rightmark}%
+%}
+%\rhead[\fancyplain{}{\bfseries\leftmark}]{%
+%  \fancyplain{}{\bfseries\thepage}%
+%}
+%\rfoot[\fancyplain{}{\bfseries\scriptsize%
+%  Generated on Mon Jul 25 2011 17:19:42 for Match by doxygen\lfoot[]{\fancyplain{}{\bfseries\scriptsize%
+%  Generated on Mon Jul 25 2011 17:19:42 for Match by doxygen}}
+%\cfoot{}
 
 %---------- Internal commands used in this style file ----------------
 
@@ -353,5 +354,6 @@
 \definecolor{vhdlkeyword}{rgb}{0.43,0.0,0.43}
 \definecolor{vhdllogic}{rgb}{1.0,0.0,0.0}
 \definecolor{vhdlchar}{rgb}{0.0,0.0,0.0}
+
 \newcommand{\inProd}[2]{\left\langle#1\left|#2\right.\right\rangle}
 

@@ -25,16 +25,21 @@ errorExtraFlags += -Wcast-qual -Wcast-align -Wwrite-strings -Wlogical-op -Waggre
 errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wvla -Wdisabled-optimization
 errorFlags := -Wall -Wextra -Wformat-nonliteral -Wformat-security -Wmissing-include-dirs
 errorFlags += -Wswitch-default -Wswitch-enum -Wconversion -Wstrict-prototypes -Wold-style-definition $(errorExtraFlags)
-CFLAGS += -march=$(shell arch) $(errorFlags)
+CFLAGS += -march=$(shell arch) #$(errorFlags)
 
 srcdir := src
 incdir := include
 objdir := object_dir
-objects := $(addprefix $(objdir)/,$(patsubst %.c,%.o,$(wildcard $(srcdir)/*.c)))
+objects := $(patsubst $(srcdir)/%.c,$(objdir)/%.o,$(wildcard $(srcdir)/*.c))
+makes := $(patsubst $(srcdir)/%.c,$(objdir)/%.d,$(wildcard $(srcdir)/*.c))
 testdir := test
 
-vpath %.c $(srcdir):$(testdir)
+vpath
+vpath %.c $(srcdir)
+vpath %.c $(testdir)
 vpath %.h $(incdir)
+vpath %.o $(objdir)
+vpath %.d $(objdir)
 # EZT MÉG LE KELL ELLENŐRIZNI
 vpath lib%.so $(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L lalinspiral)))
 vpath lib%.a $(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L lalinspiral)))
@@ -43,18 +48,18 @@ LAL_INC := $(shell pkg-config --cflags lalinspiral)
 LAL_LIB := $(shell pkg-config --libs lalinspiral)
 
 proba :
-	$(info a fordító: $(CC))
-	@echo "$(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L lalinspiral)))"
-	@echo "$(CC)"
-	@echo "$(CFLAGS)"
-	@echo "$(LAL_INC)"
-	@echo "$(LAL_LIB)"
-	@echo "$(objdir)"
 	@echo "$(objects)"
+	@echo ''
+	@echo "$(makes)"
 
-all : main
+all : release
 
-release debug :
+release :
+	@echo "$(CFLAGS)"
+
+debug : CFLAGS += $(errorFlags)
+
+debug :
 	@echo "$(CFLAGS)"
 
 test : main
@@ -62,15 +67,30 @@ test : main
 main : $(objects)
 	$(CC) -o main $(objects)
 
-$(objdir)/%.o : %.c
-	@echo -e 'Building file: $<'
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@	# implicit szabál objektumok létrehozására
-	@echo -e 'Finished building: $<'
+$(objdir)/%.o : %.c | $(objdir)
+	@echo 'Building file: $<'
+	ln -s ../$(incdir)/$(subst o,h,$(notdir $@)) $(srcdir)/$(subst o,h,$(notdir $@))
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
+	@echo 'Finished building: $<'
+
+$(objdir)/%.d : %.c | $(objdir)
+	@set -e; rm -f $@; \
+		$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+		set 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+		rm -f $@.$$$$
+#	@set -e; rm -f $@; \
+		$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+		set 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+		rm -f $@.$$$$
 
 # kisegítők
-$(objects): | $(objdir)		# az objektumok előfeltétele a mappájuk, de nem kell mindig frissíteni
+$(objdir)/%.o: | $(objdir)		# NEM MŰKÖDIK!!!!!!!!!!!!!!!!!!!!!!!!!
+	@echo 'obj'
 
-$(objdir) :					# objektumok mappája
+$(objdir)/%.d: | $(objdir)		# NEM MŰKÖDIK!!!!!!!!!!!!!!!!!!!!!!!!!
+	@echo 'makes'
+
+$(objdir) :
 	mkdir $(objdir)
 
 print : %.c					# kilistázza a változtatott fájlokat az utolsó print óta
@@ -82,7 +102,19 @@ debug :
 release : CFLAGS += -O3
 
 # parancsok
-.PHONY : clean cleanobj cleanall all	# csak utasítás név, nem cél
+.PHONY : doxy cleandoxy clean cleanobj cleanall all	# csak utasítás név, nem cél
+
+doxy :
+	-mkdir doc
+	-mkdir doc/html
+	-mkdir doc/latex
+	-rm src/*.h
+	cp doc/style.sty doc/html/style.sty
+	cp doc/style.sty doc/latex/style.sty
+	doxygen
+
+cleandoxy :
+	-rm -R doc/*
 
 clean : cleanobj
 
@@ -90,87 +122,5 @@ cleanall : cleanobj
 	-rm main
 
 cleanobj :
-	-rm -f $(objects)
+	-rm $(objects)
 
-####################################################################################################
-# régi
-
-test: main_Test.c generator.o util_math.o detector.o match.o match_Multi.o variables.h match_Multi.h
-	${CC} -o test main_Test.c generator.o util_math.o detector.o match.o match_Multi.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
-
-testRun: test
-	${RUN} ./test ${PAR}
-
-OBJ=LALSQTPNWaveformInterface.o LALSQTPNWaveform.o LALSQTPNIntegrator.o
-NEWDEPS=main_Match.c match.o
-all: new
-
-gen: main_Generator.c generator.o util_math.o detector.o match.o match_Multi.o variables.h match_Multi.h
-	${CC} -o gen main_Generator.c generator.o util_math.o detector.o match.o match_Multi.o ${CFLAGS} ${LAL_INC} ${LAL_LIB}
-
-#main: main_Old_Match.c match.c detector.c
-#	${CC} -o main main_Old_Match.c match.c detector.c ${CFLAGS} ${LAL_INC} ${LAL_LIB} -lm
-
-mainRun: main
-	./main `head -n 1 input.data` twoPointFivePN ALL
-
-new: $(NEWDEPS)
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o new $(NEWDEPS)
-
-%.o: %.c %.h
-	${CC} -std=gnu99 -c ${CFLAGS} ${LAL_INC} $<
-
-newRun: new
-	${RUN} ./new $(shell head -n 1 input.data)
-
-matchRun: match
-	./match $(shell head -n 1 input.data)
-
-match: main_Spin_Match.c match.h match.c
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o match main_Spin_Match.c match.c
-
-
-lal: LALSTPNWaveformTestMod.c
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -o lal LALSTPNWaveformTestMod.c -lm
-	@echo ''
- 
-sqt: LALSTPNWaveformTest.c
-	${CC} ${CFLAGS} ${LAL_INC} ${LAL_LIB} -std=gnu99 -o sqt LALSTPNWaveformTest.c -lm
-	@echo ''
-
-clean:
-	rm -rf *.o *.out *.b
-	@echo ''
-
-cleanrun:
-	rm -rf lal sqt overlap lal.out sqt.out main match new gen
-	@echo ''
-
-#cleanall:
-#	make clean
-#	make cleanrun
-#	@echo ''
-
-run: sqt lal
-	@echo "`head -n 1 input.data`"
-	./sqt `head -n 1 input.data`
-	@echo "`tail -n 1 input.data`"
-	./lal `tail -n 1 input.data`
-
-val: sqt lal
-	@echo "valgrind `head -n 1 input.data` sqt.out `tail -n 1 input.data`"
-	valgrind ./sqt `head -n 1 input.data` sqt.out `tail -n 1 input.data`
-	@echo "valgrind `head -n 1 input.data` lal.out"
-	valgrind ./lal `head -n 1 input.data` lal.out
-help :
-	@echo 'all       : makes everything'
-	@echo 'lal       : makes just the LALSTPNWaveform.c part'
-	@echo 'sqt       : makes the whole sqt code'
-	@echo 'clean     : deletes the object files'
-	@echo 'cleanrun : deletes the exe files'
-	@echo 'cleanall : invokes the "clean" and "cleanrun" commands'
-	@echo 'run       : runs the two programs'
-	@echo 'help      : prints this message'
-	@echo ''
-
-.PHONY: all clean cleanall cleanrun run help
