@@ -1,3 +1,3 @@
-CFLAGS=-O3 -g2 -std=gnu89 -march=i686
-CC=colorgcc
+CFLAGS := -std=gnu99 -O3 -ggdb3
+CC := colorgcc
 
