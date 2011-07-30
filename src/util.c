@@ -6,15 +6,30 @@
  */
 
 #include <errno.h>
-#include <assert.h>
 #include <stdlib.h>
+#include "util.h"
 #ifndef NDEBUG
+#include <assert.h>
 #include <string.h>
 #endif
-#include "util.h"
+
+#ifdef TEST
+char previous_function[FILENAME_MAX];
+char function_file[FILENAME_MAX];
+ushort function_line;
+char normal[8] = "\e[0m";
+char err[8] = "\e[0;31m";
+char errBold[8] = "\e[1;31m";
+char ok[8] = "\e[0;36m";
+char okBold[8] = "\e[1;36m";
+#endif
 
 extern char * program_invocation_short_name;
 extern char * program_invocation_name;
+
+void neg(bool *var) {
+	*var = !*var;
+}
 
 FILE * safelyOpenFile(const char *fileName, const char *mode) {
 	assert(strcmp(fileName, ""));
@@ -57,69 +72,151 @@ FILE *safelyOpenForAppend(const char *fileName) {
 	return safelyOpenFile(fileName, "a");
 }
 
+static void printFormat(FILE *file, OutputFormat *format) {
+	fprintf(file, "prefision:             %u\n", format->precision);
+	fprintf(file, "width:                 %u\n", format->width);
+	fprintf(file, "width with separator:  %u\n", format->widthWithSeparator);
+	fprintf(file, "separator:             %c\n", format->separator);
+	fprintf(file, "left jusfified:        %d\n", format->leftJustified);
+	fprintf(file, "format for one number: %s\n", format->oneNumber);
+	fprintf(file, "name of the format:    %s\n", format->name);
+	fprintf(file, "code of the format:    %d\n", format->code);
+}
+
 /**	Sets the format string for one number.
  * @param[in,ou]	format	: the format
  */
 static void setFormatForOneNumber(OutputFormat *format) {
 	assert(format);
+	assert(format->width > 0);
 	if (format->leftJustified) {
 		sprintf(format->oneNumber, "%%- %d.%dlg", format->width, format->precision);
 	} else {
 		sprintf(format->oneNumber, "%% %d.%dlg", format->width, format->precision);
 	}
+	SET_FUNCTION_FILE_AND_NAME();
 }
 
-/**	Sets the format variables.
- * @param[out]	format			: format specific variables
- * @param[in]	precision		: user supplied precision of the format
- * @param[in]	width			: user supplied width of the format, its has a minimal value
- * @param[in]	separator		: user defined separator character
- * @param[in]	leftJustified	: left (true) or right (false) justified text
- * @param[in]	name			: user defined name of the format
- * @param[in]	code			: user defined code of the format
- */
-static void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
+void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
 		const char separator, bool leftJustified, nameString name, const ushort code) {
 	assert(format);
-	assert(precision < 100);
+	assert(width < MAXIMUM_WIDTH);
+	assert(precision < MAXIMUM_PRECISION);
 	assert(separator);
 	assert(name);
 	format->precision = precision;
-	format->width = width > format->precision + SPECIAL_CHARACTER_LENGTH ? width
-			: format->precision + SPECIAL_CHARACTER_LENGTH;
+	format->width =
+			width > format->precision + SPECIAL_CHARACTER_LENGTH ? width :
+					format->precision + SPECIAL_CHARACTER_LENGTH;
 	format->widthWithSeparator = format->width + SEPARATOR_LENGTH;
 	format->separator = separator;
 	format->leftJustified = leftJustified;
 	strcpy(format->name, name);
 	format->code = code;
 	setFormatForOneNumber(format);
+	SET_FUNCTION_FILE_AND_NAME();
 }
 
-/**	Set the format for given number of floating pint data to display.
- * @param[out] formatString	: the generated format string
- * @param[in] number		: number of the data
- * @param[in] format		: contains the format variables
- */
-static void setFormat(char formatString[], const ushort number, OutputFormat *format) {
+void setFormat(char formatString[], const ushort number, OutputFormat *format) {
 	assert(formatString);
 	assert(number);
 	assert(format);
-	char temp[number * format->widthWithSeparator];
-	strcpy(formatString, format->oneNumber);
+	char temp[number * format->widthWithSeparator];strcpy
+	(formatString, format->oneNumber);
 	for (ushort i = 1; i < number; i++) {
 		sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
 		strcpy(formatString, temp);
 	}
+	SET_FUNCTION_FILE_AND_NAME();
 }
 
+#ifdef TEST
+
+/// @name test functions
+///@{
+
+bool isOK_setFormatForOneNumber(void) {
+	OutputFormat format;
+	nameString result[2] = { "%- 10.5lg", "% 10.5lg" };
+	format.leftJustified = true;
+	format.precision = 5;
+	format.width = 10;
+	for (short i = 0; i < 2; i++, neg(&format.leftJustified)) {
+		SET_FUNCTION_LINE();
+		setFormatForOneNumber(&format);
+		if (strcmp(result[i], format.oneNumber)) {
+			PRINT_ERROR();
+			return false;
+		}
+	}
+	format.leftJustified = false;
+	for (short i = 0; i < 2; i++, neg(&format.leftJustified)) {
+		SET_FUNCTION_LINE();
+		setFormatForOneNumber(&format);
+		if (!strcmp(result[i], format.oneNumber)) {
+			PRINT_ERROR();
+			return false;
+		}
+	}
+	PRINT_OK();
+	SET_FUNCTION_FILE_AND_NAME();
+	return true;
+}
+
+bool isOK_setOutputFormat(void) {
+	if (!isOK_setFormatForOneNumber()) {
+		PRINT_ERROR_RECURSIVE();
+		return false;
+	}
+	OutputFormat format;
+	char separator = '%';
+	ushort code = 0;
+	nameString name[6] = { "ab", "bd", "cf", "dh", "ej", "fl" };
+	ushort precision = 2 * SPECIAL_CHARACTER_LENGTH;
+	bool leftJusfified = false;
+	ushort width;
+	for (short i = 0; i < 2; i++, neg(&leftJusfified)) {
+		width = precision - 2 * SPECIAL_CHARACTER_LENGTH;
+		for (short j = 0; j < 3; j++, code++) {
+			short k = 3 * i + j;
+			SET_FUNCTION_LINE();
+			setOutputFormat(&format, precision, width, separator, leftJusfified, name[k], code);
+			if (format.precision != precision) {
+				PRINT_ERROR();
+				return false;
+			}
+			if (format.width < width) {
+				PRINT_ERROR();
+				return false;
+			}
+			if (format.width < precision) {
+				PRINT_ERROR();
+				return false;
+			}
+			if (!strcmp(name[k], format.name)) {
+				PRINT_ERROR();
+				return false;
+			}
+			printFormat(stdout, &format);
+			width += 2 * SPECIAL_CHARACTER_LENGTH;
+		}
+	}
+	PRINT_OK();
+	SET_FUNCTION_FILE_AND_NAME();
+	return true;
+}
+
+///@}
+
+#endif // TEST
 /// @name OLD
 ///@{
 
 void set_Format_For(char format[], const unsigned short number,
 		OUTPUT_FORMAT_CONSTANTS*format_Constants) {
 	assert(number);
-	char temp[number * format_Constants->width_Of_Number_Width_Separator];
-	sprintf(format, "%s", format_Constants->format_For_One_Number);
+	char temp[number * format_Constants->width_Of_Number_Width_Separator];sprintf
+	(format, "%s", format_Constants->format_For_One_Number);
 	if (number == 1) {
 		return;
 	}
@@ -133,8 +230,8 @@ void set_Format_For(char format[], const unsigned short number,
 void set_Plot_Format_For(char format[], const unsigned short number,
 		OUTPUT_FORMAT_CONSTANTS*format_Constants) {
 	assert(number);
-	char temp[number * format_Constants->width_Of_Number_To_Plot_Width_Separator];
-	sprintf(format, "%s", format_Constants->format_For_One_Number_To_Plot);
+	char temp[number * format_Constants->width_Of_Number_To_Plot_Width_Separator];sprintf
+	(format, "%s", format_Constants->format_For_One_Number_To_Plot);
 	if (number == 1) {
 		return;
 	}

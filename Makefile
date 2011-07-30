@@ -22,10 +22,10 @@ include config.mk
 
 errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wbad-function-cast
 errorExtraFlags += -Wcast-qual -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return
-errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wvla -Wdisabled-optimization
+errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wdisabled-optimization
 errorFlags := -Wall -Wextra -Wformat-nonliteral -Wformat-security -Wmissing-include-dirs
-errorFlags += -Wswitch-default -Wswitch-enum -Wconversion -Wstrict-prototypes -Wold-style-definition $(errorExtraFlags)
-CFLAGS += -march=$(shell arch) #$(errorFlags)
+errorFlags += -Wswitch-default -Wswitch-enum -Wstrict-prototypes -Wold-style-definition $(errorExtraFlags)
+CFLAGS += -march=$(shell arch) $(errorFlags) -Wno-sign-conversion # -Wconversion
 
 srcdir := src
 incdir := include
@@ -33,6 +33,9 @@ objdir := object_dir
 objects := $(patsubst $(srcdir)/%.c,$(objdir)/%.o,$(wildcard $(srcdir)/*.c))
 makes := $(patsubst $(srcdir)/%.c,$(objdir)/%.d,$(wildcard $(srcdir)/*.c))
 testdir := test
+objects += $(patsubst $(testdir)/%.c,$(objdir)/%.o,$(wildcard $(testdir)/*.c))
+makes += $(patsubst $(testdir)/%.c,$(objdir)/%.d,$(wildcard $(testdir)/*.c))
+includes := -I$(incdir) #-I/usr/include
 
 vpath
 vpath %.c $(srcdir)
@@ -62,33 +65,28 @@ debug : CFLAGS += $(errorFlags)
 debug :
 	@echo "$(CFLAGS)"
 
-test : main
+test : macros := -DTEST
+
+test : main_test.o util.o
+	$(CC) $(CFLAGS) $(macros) -o test $^
 
 main : $(objects)
 	$(CC) -o main $(objects)
 
+$(objdir)/%.o : %.h
+
 $(objdir)/%.o : %.c | $(objdir)
 	@echo 'Building file: $<'
-	ln -s ../$(incdir)/$(subst o,h,$(notdir $@)) $(srcdir)/$(subst o,h,$(notdir $@))
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(includes) $(macros) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
 	@echo 'Finished building: $<'
-
-$(objdir)/%.d : %.c | $(objdir)
-	@set -e; rm -f $@; \
-		$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
-		set 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-		rm -f $@.$$$$
-#	@set -e; rm -f $@; \
-		$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
-		set 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-		rm -f $@.$$$$
+	@echo ' '
 
 # kisegítők
-$(objdir)/%.o: | $(objdir)		# NEM MŰKÖDIK!!!!!!!!!!!!!!!!!!!!!!!!!
-	@echo 'obj'
+#$(objdir)/%.o: | $(objdir)		# NEM MŰKÖDIK!!!!!!!!!!!!!!!!!!!!!!!!!
+#	@echo 'obj'
 
-$(objdir)/%.d: | $(objdir)		# NEM MŰKÖDIK!!!!!!!!!!!!!!!!!!!!!!!!!
-	@echo 'makes'
+#$(objdir)/%.d: | $(objdir)		# NEM MŰKÖDIK!!!!!!!!!!!!!!!!!!!!!!!!!
+#	@echo 'makes'
 
 $(objdir) :
 	mkdir $(objdir)
@@ -102,7 +100,7 @@ debug :
 release : CFLAGS += -O3
 
 # parancsok
-.PHONY : doxy cleandoxy clean cleanobj cleanall all	# csak utasítás név, nem cél
+.PHONY : doxy cleandoxy clean cleanobj cleanall all # csak utasítás név, nem cél
 
 doxy :
 	-mkdir doc
@@ -119,8 +117,9 @@ cleandoxy :
 clean : cleanobj
 
 cleanall : cleanobj
-	-rm main
+	-rm $(objdir)/*.d
+	-rm main test
 
 cleanobj :
-	-rm $(objects)
+	-rm $(objdir)/*.o
 
