@@ -20,13 +20,16 @@ CC := gcc
 CFLAGS := -std=gnu99 -O3 -ggdb3
 include config.mk
 
-errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wbad-function-cast
-errorExtraFlags += -Wcast-qual -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return
-errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wdisabled-optimization
-errorFlags := -Wall -Wextra -Wformat-nonliteral -Wformat-security -Wmissing-include-dirs
-errorFlags += -Wswitch-default -Wswitch-enum -Wstrict-prototypes -Wold-style-definition $(errorExtraFlags)
-CFLAGS += -march=$(shell arch) $(errorFlags) -Wno-sign-conversion # -Wconversion
+errorFlags := -Wall -Wextra -Wformat-security -Wmissing-include-dirs -Wswitch-default -Wswitch-enum
+errorFlags += -Wstrict-prototypes -Wold-style-definition
 
+errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wbad-function-cast -Wcast-qual
+errorExtraFlags += -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return -Wredundant-decls
+errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wdisabled-optimization
+
+errorOptionalFlags := -Wformat-nonliteral -Wconversion
+
+CFLAGS += -march=$(shell arch) $(errorFlags)
 srcdir := src
 incdir := include
 objdir := object_dir
@@ -60,12 +63,14 @@ all : release
 release :
 	@echo "$(CFLAGS)"
 
-debug : CFLAGS += $(errorFlags)
+debug : CFLAGS += $(errorExtraFlags)
 
 debug :
 	@echo "$(CFLAGS)"
 
 test : macros := -DTEST
+
+test : CFLAGS += $(errorExtraFlags)
 
 test : main_test.o util_IO.o util.o
 	@echo -e '\e[36mLinking: $@ from $^\e[0m'
@@ -112,6 +117,7 @@ doxy :
 	-rm src/*.h
 	cp doc/style.sty doc/html/style.sty
 	cp doc/style.sty doc/latex/style.sty
+	clear scr
 	doxygen
 
 cleandoxy :

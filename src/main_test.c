@@ -12,6 +12,6 @@
 int main(int argc, char *argv[]) {
 	argc = argc;
 	argv = argv;
-	isOK_setOutputFormat();
+	areIOFunctionsGood();
 	exit(0);
 }

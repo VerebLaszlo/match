@@ -130,7 +130,7 @@ static void printFormat(FILE *file, OutputFormat *format) {
 /// @name test functions
 ///@{
 
-bool isOK_setFormatForOneNumber(void) {
+static bool isOK_setFormatForOneNumber(void) {
 	OutputFormat format;
 	nameString result[2] = { "%- 10.5lg", "% 10.5lg" };
 	format.leftJustified = true;
@@ -158,7 +158,7 @@ bool isOK_setFormatForOneNumber(void) {
 	return true;
 }
 
-bool isOK_setOutputFormat(void) {
+static bool isOK_setOutputFormat(void) {
 	if (!isOK_setFormatForOneNumber()) {
 		PRINT_ERROR_RECURSIVE();
 		return false;
@@ -199,6 +199,46 @@ bool isOK_setOutputFormat(void) {
 	PRINT_OK();
 	SET_FUNCTION_FILE_AND_NAME();
 	return true;
+}
+
+static bool isOK_setFormat(void) {
+	if (!isOK_setOutputFormat()) {
+		PRINT_ERROR_RECURSIVE();
+		return false;
+	}
+	OutputFormat format;
+	char separator = '%';
+	ushort code = 1;
+	nameString name = "multiformat";
+	ushort precision = 5;
+	bool leftJusfified = false;
+	ushort width = 12;
+	nameString output;
+	nameString result[2][2] = { { "% 12.5lg", "% 12.5lg %% % 12.5lg" }, //
+			{ "%- 12.5lg", "%- 12.5lg %% %- 12.5lg" } };
+	for (short i = 0; i < 2; i++, neg(&leftJusfified)) {
+		setOutputFormat(&format, precision, width, separator, leftJusfified, name, code);
+		setFormat(output, 1, &format);
+		if (strcmp(result[i][0], output)) {
+			PRINT_ERROR();
+			return false;
+		}
+		setFormat(output, 2, &format);
+		if (strcmp(result[i][1], output)) {
+			PRINT_ERROR();
+			return false;
+		}
+	}
+	PRINT_OK();
+	SET_FUNCTION_FILE_AND_NAME();
+	return true;
+}
+
+bool areIOFunctionsGood(void) {
+	if (isOK_setFormat()) {
+		return true;
+	}
+	return false;
 }
 
 ///@}
