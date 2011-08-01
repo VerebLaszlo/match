@@ -3,13 +3,12 @@
  *
  * @date Aug 1, 2011
  * @author vereb
- * @brief
+ * @brief Handles input-output specific events.
  */
 
 #ifndef UTIL_IO_H_
 #define UTIL_IO_H_
 
-#include <stdbool.h>
 #include <stdio.h>
 #include "util.h"
 
@@ -29,14 +28,14 @@ FILE *safelyOpenFile(const char *fileName, const char *mode);
  * @param[in]	fileName	: the file's path name relative to the program
  * @return	pointer to the opened file
  */
-FILE *safelyOpenForReading(const char *file_Name);
+FILE *safelyOpenForReading(const char *fileName);
 
 /**	Opens the file just for writing. On error it terminates the program and prints an error
  * message.
  * @param[in]	fileName	: the file's path name relative to the program
  * @return	pointer to the opened file
  */
-FILE *safelyOpenForWriting(const char *file_Name);
+FILE *safelyOpenForWriting(const char *fileName);
 
 /**	Opens the file just for append. On error it terminates the program and prints an error
  * message.
@@ -51,23 +50,27 @@ FILE *safelyOpenForAppend(const char *fileName);
 /** Constants for output
  */
 typedef enum OUTPUT_CONSTANTS {
-	SPECIAL_CHARACTER_LENGTH = 6, MAXIMUM_WIDTH = 99, MAXIMUM_PRECISION = MAXIMUM_WIDTH
-			- SPECIAL_CHARACTER_LENGTH, SEPARATOR_LENGTH = 3, FORMAT_LENGTH = 11, NAMES_LENGTH = 100,
-} OUTPUT_CONSTANTS;
+	SPECIAL_CHARACTER_LENGTH = 6, ///< number of the special characters in the format string: sign, exponents
+	MAXIMUM_WIDTH = 99, ///< maximum width of the number
+	MAXIMUM_PRECISION = MAXIMUM_WIDTH - SPECIAL_CHARACTER_LENGTH,	///< maximum precision ot the number
+	SEPARATOR_LENGTH = 3,	///< length of the separator string: separator character and two spaces on the sides
+	FORMAT_LENGTH = 11,	///< length fo the format string
+	NAMES_LENGTH = 100,	///< maximum length of the names
+} OUTPUT_CONSTANTS;	///<
 
-typedef char nameString[NAMES_LENGTH];
+typedef char nameString[NAMES_LENGTH]; ///< shorthand for string containing names
 
 /**	Contains values to format an output.
  */
 typedef struct tagOutputFormat {
-	ushort precision;
-	ushort width;
-	ushort widthWithSeparator;
-	char separator;
-	bool leftJustified;
-	char oneNumber[FORMAT_LENGTH];
-	nameString name;
-	ushort code;
+	ushort precision; ///< how many digits are after the decimal point
+	ushort width; ///< width of the format including the sign and exponent
+	ushort widthWithSeparator; ///< width of the format including the sign, exponent and separator character
+	char separator; ///< column separator for gnuplot
+	bool leftJustified; ///< it's true if the format is left justified, otherwise false
+	char oneNumber[FORMAT_LENGTH]; ///< format string form one number
+	nameString name; ///< string representation of the format, e.g.: plot, data
+	ushort code; ///< numerical representation of the format
 } OutputFormat;
 
 /**	Sets the format variables.
@@ -94,14 +97,13 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format);
 /// @name test functions
 ///@{
 
-bool isOK_setFormatForOneNumber(void);
-
-bool isOK_setOutputFormat(void);
+/**	Tests if the input/output functions are correctly written.
+ * @return true or false
+ */bool areIOFunctionsGood(void);
 
 ///@}
 
 #endif // TEST
-
 ///@}
 
 #endif /* UTIL_IO_H_ */

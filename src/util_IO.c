@@ -3,7 +3,7 @@
  *
  * @date Aug 1, 2011
  * @author vereb
- * @brief
+ * @brief Handles input-output specific events.
  */
 
 #include <errno.h>
@@ -14,13 +14,13 @@
 #include <string.h>
 #endif
 
-extern char * program_invocation_short_name;
-extern char * program_invocation_name;
+extern char * program_invocation_short_name;	///< short name of the program
+extern char * program_invocation_name;			///< long name of the program
 
 /// @name File handling functions
 ///@{
 
-FILE * safelyOpenFile(const char *fileName, const char *mode) {
+FILE *safelyOpenFile(const char *fileName, const char *mode) {
 	assert(strcmp(fileName, ""));
 	assert(strcmp(mode, ""));
 	FILE *stream;
@@ -66,7 +66,7 @@ FILE *safelyOpenForAppend(const char *fileName) {
 ///@{
 
 /**	Sets the format string for one number.
- * @param[in,ou]	format	: the format
+ * @param[in,out]	format	: the format
  */
 static void setFormatForOneNumber(OutputFormat *format) {
 	assert(format);
@@ -109,6 +109,8 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format) {
 		sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
 		strcpy(formatString, temp);
 	}
+	//strcpy(temp, formatString);
+	//sprintf(formatString, "%s\n", temp);
 	SET_FUNCTION_FILE_AND_NAME();
 }
 
