@@ -67,8 +67,11 @@ debug :
 
 test : macros := -DTEST
 
-test : main_test.o util.o
+test : main_test.o util_IO.o util.o
+	@echo -e '\e[36mLinking: $@ from $^\e[0m'
 	$(CC) $(CFLAGS) $(macros) -o test $^
+	@echo -e '\e[35mFinished linking: $@\e[0m'
+	@echo ' '
 
 main : $(objects)
 	$(CC) -o main $(objects)
@@ -76,9 +79,9 @@ main : $(objects)
 $(objdir)/%.o : %.h
 
 $(objdir)/%.o : %.c | $(objdir)
-	@echo 'Building file: $<'
+	@echo -e '\e[36mBuilding file: $<\e[0m'
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(includes) $(macros) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
-	@echo 'Finished building: $<'
+	@echo -e '\e[35mFinished building: $<\e[0m'
 	@echo ' '
 
 # kisegítők
