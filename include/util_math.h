@@ -22,6 +22,74 @@
 #define cube(number) \
 	({ typeof(number) _number = (number); square(_number)*_number; })
 
+/// @name Trigonometric functions
+///@{
+
+/**	Better sine function. Returns \f$0\f$ at \f$\pi, 2\pi\f$. @warning Use the normaliseRadians()
+ * function beforehand, if the argument is not between \f$[0, 2\pi)\f$.
+ * @param[in] number : argument
+ * @return \f$\sin(number)\f$
+ */
+double sinGood(double number);
+
+/**	Better cosine function. Returns \f$0\f$ at \f$\pi/2, 3\pi/2\f$. @warning Use the normaliseRadians()
+ * function beforehand, if the argument is not between \f$[0, 2\pi)\f$.
+ * @param[in] number : argument
+ * @return \f$\cos(number)\f$
+ */
+double cosGood(double number);
+
+/**	Better tangent function. Returns \f$0\f$ at \f$\pi\f$, and \f$\infty\f$ at \f$\pi/2, 3\pi/2\f$.
+ * @warning Use the normaliseRadians() function beforehand, if the argument is not between
+ * \f$[0, 2\pi)\f$.
+ * @param[in] number : argument
+ * @return \f$\tan(number)\f$
+ */
+double tanGood(double number);
+
+/**	Returns the normalized angle between \f$[0,2\pi)\f$.
+ * @param[in] number : argument
+ * @return normalized angle
+ */
+double normaliseRadians(double number);
+
+/**	Converts angle units.
+ * @param[in] degree
+ * @return
+ */
+double radianFromDegree(double degree);
+
+/**	Converts angle units.
+ * @param[in] turn
+ * @return
+ */
+double radianFromTurn(double turn);
+
+/**	Converts angle units.
+ * @param[in] radian
+ * @return
+ */
+double turnFromRadian(double radian);
+
+/**	Converts angle units.
+ * @param[in] degree
+ * @return
+ */
+double turnFromDegree(double degree);
+
+/**	Converts angle units.
+ * @param[in] radian
+ * @return
+ */
+double degreeFromRadian(double radian);
+
+/**	Converts angle units.
+ * @param[in] turn
+ * @return
+ */
+double degreeFromTurn(double turn);
+
+///@}
 /// @name Random numbers
 ///@{
 
@@ -50,14 +118,6 @@ double randomBetween(double bottom, double top);
 
 /// @name OLD
 ///@{
-
-/**	Calculates the square of the parameter.
- * The argument evaluates only once, so there is no undefined side effect
- * @todo examine the side effects
- * @param[in] number
- */
-#define SQR(number) \
-	({ typeof(number) _number = (number); _number*_number; })
 
 /** Time conversion constants
  */
@@ -128,31 +188,6 @@ double convert_Time_To_Radian(double hour, double minute, double second);
 double convert_Time_To_Degree(double hour, double minute, double second);
 
 // trigonometric functions
-
-/**	Returns the cosine of the number more accurately at \f$\pi/2\f$ and \f$3\pi/2\f$ radians, too.
- * @param[in] number
- * @return
- */
-double cos_good(double number);
-
-/**	Returns the sine of the number more accurately at \f$\pi\f$ and \f$2\pi\f$ radians, too.
- * @param[in] number
- * @return
- */
-double sin_good(double number);
-
-/**	Returns the tangent of the number more accurately at \f$0\f$, \f$\pi/4\f$, \f$\pi/2\f$,
- * \f$3\pi/4\f$, \f$\pi\f$, \f$5\pi/4\f$, \f$3\pi/2\f$ and \f$7\pi/4\f$ radians, too.
- * @param[in] number
- * @return
- */
-double tan_good(double number);
-
-/**	Returns normalised radians between \f$[0,2\pi)\f$.
- * @param[in] number
- * @return
- */
-double normalise_Radians(double number);
 
 /**	Returns nonzero value, if the difference is less then epsilon.
  * @param[in] first
