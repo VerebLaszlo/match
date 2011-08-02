@@ -18,14 +18,14 @@ static const double DEGREE_PER_TURN = 360.0;	///< turn to degree conversion cons
 ///@{
 
 double sinGood(double number) {
-	if (number == M_PI || number = M_PI + M_PI) {
+	if (number == M_PI || number == M_PI + M_PI) {
 		return 0.0;
 	}
 	return sin(number);
 }
 
 double cosGood(double number) {
-	if (number == M_PI_2 || number = M_PI_2 + M_PI) {
+	if (number == M_PI_2 || number == M_PI_2 + M_PI) {
 		return 0.0;
 	}
 	return cos(number);
