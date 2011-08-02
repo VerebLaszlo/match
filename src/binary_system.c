@@ -11,6 +11,9 @@
 #include "util_math.h"
 #include "binary_system.h"
 
+/// @name Helper functions
+///@{
+
 /** Calculates \f$\nu, m_1, m_2\f$ from \f$\eta, M\f$.
  * @param[in,out] mass	: all mass parameters.
  */
@@ -18,8 +21,9 @@ static void m1m2ToRemainingMass(massParameters *mass) {
 	assert(mass);
 	assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
 	mass->m1_m2 = mass->mass[0] / mass->mass[1];
-	mass->nu = mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] : mass->mass[1]
-			/ mass->mass[0];
+	mass->nu =
+			mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] :
+					mass->mass[1] / mass->mass[0];
 }
 
 /** Returns the magnitude of the spins.
@@ -101,6 +105,7 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
 	return true;
 }
 
+///@}
 /// @name Conversion functions
 ///@{
 
@@ -147,8 +152,8 @@ static void convertSpinsFromXyzToAngles(spinParameters spin[NUMBER_OF_BLACKHOLES
 		const ushort index) {
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
 		spin[i].inclination[index] = acos(spin[i].component[index][Z] / spin[i].magnitude);
-		spin[i].azimuth[index] = -acos(spin[i].component[index][X] / spin[i].magnitude / sin(
-				spin[i].inclination[index]));
+		spin[i].azimuth[index] = -acos(
+				spin[i].component[index][X] / spin[i].magnitude / sin(spin[i].inclination[index]));
 		if (spin[i].component[index][Y] < 0.0) {
 			spin[i].azimuth[index] *= -1.0;
 		}
@@ -166,12 +171,12 @@ static void convertSpinFromAnglesToXzy(spinParameters spin[], const ushort index
 	double cosAzimuth, cosInclination;
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
 		cosAzimuth = spin[i].azimuth[index] == M_PI_2 ? 0.0 : cos(spin[i].azimuth[index]);
-		cosInclination = spin[i].inclination[index] == M_PI_2 ? 0.0 : cos(
-				spin[i].inclination[index]);
+		cosInclination =
+				spin[i].inclination[index] == M_PI_2 ? 0.0 : cos(spin[i].inclination[index]);
 		spin[i].component[index][X] = spin[i].magnitude * sin(spin[i].inclination[index])
 				* cosAzimuth;
-		spin[i].component[index][Y] = spin[i].magnitude * sin(spin[i].inclination[index]) * sin(
-				spin[i].azimuth[index]);
+		spin[i].component[index][Y] = spin[i].magnitude * sin(spin[i].inclination[index])
+				* sin(spin[i].azimuth[index]);
 		spin[i].component[index][Z] = spin[i].magnitude * cosInclination;
 	}
 }
@@ -185,13 +190,13 @@ static void convertSpinsFromFixedFrame(spinParameters spin[NUMBER_OF_BLACKHOLES]
 	assert(spin);
 	double theta[2] = { +0.0, inclination };
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-		spin[i].component[PRECESSING][X] = spin[i].component[FIXED][X] * cos(theta[0]) * cos(
-				theta[1]) + spin[i].component[FIXED][Y] * sin(theta[0]) * cos(theta[1])
+		spin[i].component[PRECESSING][X] = spin[i].component[FIXED][X] * cos(theta[0])
+				* cos(theta[1]) + spin[i].component[FIXED][Y] * sin(theta[0]) * cos(theta[1])
 				- spin[i].component[FIXED][Z] * sin(theta[1]);
 		spin[i].component[PRECESSING][Y] = -spin[i].component[FIXED][X] * sin(theta[0])
 				+ spin[i].component[FIXED][Y] * cos(theta[0]);
-		spin[i].component[PRECESSING][Z] = spin[i].component[FIXED][X] * cos(theta[0]) * sin(
-				theta[1]) + spin[i].component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
+		spin[i].component[PRECESSING][Z] = spin[i].component[FIXED][X] * cos(theta[0])
+				* sin(theta[1]) + spin[i].component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
 				+ spin[i].component[FIXED][Z] * cos(theta[1]);
 	}
 }
@@ -205,14 +210,17 @@ static void convertSpinsFromPrecessionFrame(spinParameters spin[NUMBER_OF_BLACKH
 	assert(spin);
 	double theta[2] = { -0.0, inclination };
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-		spin[i].component[FIXED][X] = spin[i].magnitude * (+spin[i].component[PRECESSING][X] * cos(
-				theta[0]) * cos(theta[1]) + spin[i].component[PRECESSING][Y] * sin(theta[0])
-				- spin[i].component[PRECESSING][Z] * cos(theta[0]) * sin(theta[1]));
-		spin[i].component[FIXED][Y] = spin[i].magnitude * (-spin[i].component[PRECESSING][X] * sin(
-				theta[0]) * sin(theta[1]) + spin[i].component[PRECESSING][Y] * cos(theta[0])
-				+ spin[i].component[PRECESSING][Z] * sin(theta[0]) * sin(theta[1]));
-		spin[i].component[FIXED][Z] = spin[i].magnitude * (+spin[i].component[PRECESSING][X] * sin(
-				theta[1]) + spin[i].component[PRECESSING][Y] * cos(theta[1]));
+		spin[i].component[FIXED][X] = spin[i].magnitude
+				* (+spin[i].component[PRECESSING][X] * cos(theta[0]) * cos(theta[1])
+						+ spin[i].component[PRECESSING][Y] * sin(theta[0])
+						- spin[i].component[PRECESSING][Z] * cos(theta[0]) * sin(theta[1]));
+		spin[i].component[FIXED][Y] = spin[i].magnitude
+				* (-spin[i].component[PRECESSING][X] * sin(theta[0]) * sin(theta[1])
+						+ spin[i].component[PRECESSING][Y] * cos(theta[0])
+						+ spin[i].component[PRECESSING][Z] * sin(theta[0]) * sin(theta[1]));
+		spin[i].component[FIXED][Z] = spin[i].magnitude
+				* (+spin[i].component[PRECESSING][X] * sin(theta[1])
+						+ spin[i].component[PRECESSING][Y] * cos(theta[1]));
 	}
 }
 
@@ -344,8 +352,8 @@ static void generateSpin(spinParameters *spin, spinParameters limits[], double i
 				spin[i].magnitude = randomBetween(limits[MIN].magnitude, limits[MAX].magnitude);
 				spin[i].azimuth[PRECESSING] = randomBetween(limits[MIN].azimuth[PRECESSING],
 						limits[MAX].azimuth[PRECESSING]);
-				spin[i].inclination[PRECESSING] = randomBetween(
-						limits[MIN].inclination[PRECESSING], limits[MAX].inclination[PRECESSING]);
+				spin[i].inclination[PRECESSING] = randomBetween(limits[MIN].inclination[PRECESSING],
+						limits[MAX].inclination[PRECESSING]);
 			}
 			convertSpins(spin, inclination, mode);
 		} while (!isSpinBetweenLimits(spin, limits));
