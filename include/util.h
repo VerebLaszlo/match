@@ -19,6 +19,7 @@ typedef unsigned short ushort;	///< shorthand for unsigned short int type
 void neg(bool *var);
 
 #ifdef TEST
+#include <string.h>
 
 /*
 typedef enum {
@@ -71,6 +72,11 @@ extern char okBold[];	///< bold color code for ok messages
 	fprintf(stderr, "The error was detected in \"%s%s%s\" at %s%d%s line in \"%s%s()%s\" function from \"%s%s()%s\" function in \"%s%s%s\" file at \"%s%d%s\" line.%s\n", \
 		errBold, __FILE__, err, errBold, __LINE__, err, errBold, __func__, err, errBold, previous_function, err, errBold, function_file, err, errBold, function_line, err , normal)
 
+/**	Prints that everything is OK.
+ */
+#define PRINT_ERROR_FILE() \
+	fprintf(stderr, "%sSomething in the \"%s%s%s\" file is WRONG.%s\n", err, errBold, __FILE__, err, normal)
+
 /**	Prints where was the recursive error.
  */
 #define PRINT_ERROR_RECURSIVE() \
@@ -82,6 +88,11 @@ extern char okBold[];	///< bold color code for ok messages
  */
 #define PRINT_OK() \
 	fprintf(stderr, "%sThe \"%s%s()%s\" function is OK.%s\n", ok, okBold, previous_function, ok, normal)
+
+/**	Prints that everything is OK.
+ */
+#define PRINT_OK_FILE() \
+	fprintf(stderr, "%sEverything in the \"%s%s%s\" file is OK.%s\n", ok, okBold, __FILE__, ok, normal)
 
 #else
 #define SET_FUNCTION_NAME()

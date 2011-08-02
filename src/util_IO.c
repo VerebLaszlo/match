@@ -238,8 +238,10 @@ static bool isOK_setFormat(void) {
 
 bool areIOFunctionsGood(void) {
 	if (isOK_setFormat()) {
+		PRINT_OK_FILE();
 		return true;
 	}
+	PRINT_ERROR_FILE();
 	return false;
 }
 
