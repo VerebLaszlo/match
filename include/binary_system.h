@@ -93,4 +93,20 @@ typedef struct tagBinarySystem {
 	double coalescenceTime; ///< the length of the gravitational wave at the coalescence in \f$s\f$
 } binarySystem;
 
+/**	Generates the binary systems parameters according the generation modes.
+ * @param[out]	system	: generated system parameters
+ * @param[in]	limits	: limits of the system parameters
+ * @param[in]	genMass	: mass generation mode
+ * @param[in]	genSpin	: spin generation mode
+ */
+void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
+		generationMode genMass, generationMode genSpin);
+
+/**
+ * @param file
+ * @param system
+ * @param format
+ */
+void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format);
+
 #endif /* BINARY_SYSTEM_H_ */

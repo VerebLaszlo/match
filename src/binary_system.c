@@ -8,6 +8,7 @@
 
 #include <math.h>
 #include <assert.h>
+#include "util_IO.h"
 #include "util_math.h"
 #include "binary_system.h"
 
@@ -363,13 +364,7 @@ static void generateSpin(spinParameters *spin, spinParameters limits[], double i
 	}
 }
 
-/**	Generates the binary systems parameters according the generation modes.
- * @param[out]	system	: generated system parameters
- * @param[in]	limits	: limits of the system parameters
- * @param[in]	genMass	: mass generation mode
- * @param[in]	genSpin	: spin generation mode
- */
-static void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
+void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 		generationMode genMass, generationMode genSpin) {
 	assert(system);
 	assert(limits);
@@ -383,6 +378,57 @@ static void generateBinarySystemParameters(binarySystem *system, binarySystem li
 	spinParameters spin[4] = { limits[MIN].spin[0], limits[MAX].spin[0], limits[MIN].spin[0],
 			limits[MAX].spin[0] };
 	generateSpin(system->spin, spin, system->inclination, genSpin);
+}
+
+///@}
+/// @name Printing functions
+///@{
+
+/**
+ * @param file
+ * @param mass
+ * @param format
+ */
+static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
+	ushort number = 4;
+	string formatString[number * format->widthWithSeparator];setFormat
+	(formatString, number, format);
+	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);
+	fprintf(file, formatString, mass->chirpMass, mass->mu, mass->nu, mass->m1_m2);
+}
+
+/**
+ * @param file
+ * @param spin
+ * @param format
+ */
+static void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {
+	ushort number = 3;
+	string formatString[number * format->widthWithSeparator];setFormat
+	(formatString, number, format);
+	for (ushort i = FIXED; i < COORDINATE_CONVENTIONS; i++) {
+		fprintf(file, formatString, spin->component[i][X], spin->component[i][Y],
+				spin->component[i][Z]);
+		fprintf(file, formatString, spin->unity[i][X], spin->unity[i][Y], spin->unity[i][Z]);
+		fprintf(file, formatString, spin->azimuth[i], spin->inclination[i], spin->elevation);
+		fprintf(file, format->oneNumber, spin->magnitude);
+	}
+}
+
+void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format) {
+	printMassParameters(file, &system->mass, format);
+	fputs("\n", file);
+	printSpinParameters(file, &system->spin[0], format);
+	fputs("\n", file);
+	printSpinParameters(file, &system->spin[1], format);
+	fputs("\n", file);
+	ushort number = 3;
+	string formatString[number * format->widthWithSeparator];setFormat
+	(formatString, number, format);
+	fprintf(file, formatString, system->flatness[0], system->flatness[1], system->inclination);
+	fprintf(file, formatString, system->distance, system->coalescencePhase,
+			system->coalescenceTime);
+	fputs("\n", file);
 }
 
 ///@}
