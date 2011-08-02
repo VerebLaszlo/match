@@ -80,7 +80,7 @@ double degreeFromTurn(double turn) {
 ///@{
 
 double randomBetweenZeroAndOne(void) {
-	return (double) rand() / ((double) RAND_MAX + 1.);
+	return (double) rand() / ((double) RAND_MAX + 1.0);
 }
 
 double randomBetweenZeroAnd(double top) {

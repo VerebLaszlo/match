@@ -25,6 +25,7 @@ static void m1m2ToRemainingMass(massParameters *mass) {
 	mass->nu =
 			mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] :
 					mass->mass[1] / mass->mass[0];
+	SET_FUNCTION_FILE_AND_NAME();
 }
 
 /** Returns the magnitude of the spins.
@@ -38,6 +39,7 @@ static void magnitudeOfSpins(spinParameters spin[]) {
 		}
 		spin[i].magnitude = sqrt(spin[i].magnitude);
 	}
+	SET_FUNCTION_FILE_AND_NAME();
 }
 
 /**	Returns true, if the mass parameters are between their limits.
@@ -67,8 +69,9 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 		return false;
 	}
 	if (limits[MIN].m1_m2 > mass->m1_m2 || mass->m1_m2 > limits[MAX].m1_m2) {
-
+		return false;
 	}
+	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 
@@ -391,8 +394,8 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
  */
 static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
 	ushort number = 4;
-	string formatString[number * format->widthWithSeparator];setFormat
-	(formatString, number, format);
+	char formatString[number * format->widthWithSeparator];
+	setFormat(formatString, number, format);
 	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);
 	fprintf(file, formatString, mass->chirpMass, mass->mu, mass->nu, mass->m1_m2);
 }
@@ -404,7 +407,7 @@ static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *
  */
 static void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {
 	ushort number = 3;
-	string formatString[number * format->widthWithSeparator];setFormat
+	char formatString[number * format->widthWithSeparator];setFormat
 	(formatString, number, format);
 	for (ushort i = FIXED; i < COORDINATE_CONVENTIONS; i++) {
 		fprintf(file, formatString, spin->component[i][X], spin->component[i][Y],
@@ -423,12 +426,140 @@ void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat 
 	printSpinParameters(file, &system->spin[1], format);
 	fputs("\n", file);
 	ushort number = 3;
-	string formatString[number * format->widthWithSeparator];setFormat
+	char formatString[number * format->widthWithSeparator];setFormat
 	(formatString, number, format);
 	fprintf(file, formatString, system->flatness[0], system->flatness[1], system->inclination);
 	fprintf(file, formatString, system->distance, system->coalescencePhase,
 			system->coalescenceTime);
 	fputs("\n", file);
+}
+
+///@}
+/// @name Testing functions
+///@{
+
+static bool isOK_m1m2ToRemainingMass(void) {
+	massParameters mass;
+	mass.mass[0] = 1.0;
+	mass.mass[1] = 2.0;
+	SET_FUNCTION_LINE();
+	m1m2ToRemainingMass(&mass);
+	if (mass.m1_m2 != 0.5) {
+		PRINT_ERROR();
+		return false;
+	}
+	if (mass.nu != 0.5) {
+		PRINT_ERROR();
+		return false;
+	}
+	mass.mass[0] = 2.0;
+	mass.mass[1] = 1.0;
+	SET_FUNCTION_LINE();
+	m1m2ToRemainingMass(&mass);
+	if (mass.m1_m2 != 2.0) {
+		PRINT_ERROR();
+		return false;
+	}
+	if (mass.nu != 0.5) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	SET_FUNCTION_FILE_AND_NAME();
+	return true;
+}
+
+static bool isOK_magnitudeOfSpins(void) {
+	double sign = 1.0;
+	spinParameters spin[NUMBER_OF_BLACKHOLES];
+	for (ushort i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+		sign *= (i == 0 ? 1.0 : -1.0);
+		for (ushort j = 0; j < COORDINATE_CONVENTIONS; j++) {
+			spin[i].component[j][X] = 2.0;
+			spin[i].component[j][Y] = 3.0;
+			spin[i].component[j][Z] = sign * sqrt(12.0);
+		}
+	}
+	SET_FUNCTION_LINE();
+	magnitudeOfSpins(spin);
+	if (spin[0].magnitude != 5.0 && spin[1].magnitude != 5.0) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	SET_FUNCTION_FILE_AND_NAME();
+	return true;
+}
+
+static bool isOK_isMassBetweenLimits(void) {
+	double mult = 3.0;
+	massParameters mass, limits[2];
+	limits[MAX].mass[0] = mult * (limits[MIN].mass[0] = 7.0);
+	limits[MAX].mass[1] = mult * (limits[MIN].mass[1] = 3.0);
+	limits[MAX].eta = mult * (limits[MIN].eta = 0.1);
+	limits[MAX].totalMass = mult * (limits[MIN].totalMass = 5.0);
+	limits[MAX].chirpMass = mult * (limits[MIN].chirpMass = 4.0);
+	limits[MAX].mu = mult * (limits[MIN].mu = 0.4);
+	limits[MAX].nu = mult * (limits[MIN].nu = 0.7);
+	limits[MAX].m1_m2 = mult * (limits[MIN].m1_m2 = 1.0);
+	for (ushort i = 1; i < mult; i++) {
+		mass.mass[0] = limits[MAX].mass[0] / (double) i;
+		mass.mass[1] = limits[MAX].mass[1] / (double) i;
+		mass.eta = limits[MAX].eta / (double) i;
+		mass.totalMass = limits[MAX].totalMass / (double) i;
+		mass.chirpMass = limits[MAX].chirpMass / (double) i;
+		mass.mu = limits[MAX].mu / (double) i;
+		mass.nu = limits[MAX].nu / (double) i;
+		mass.m1_m2 = limits[MAX].m1_m2 / (double) i;
+		printf("%d\n", i);
+		SET_FUNCTION_LINE();
+		if (!isMassBetweenLimits(&mass, limits)) {
+			PRINT_ERROR();
+			return false;
+		}
+	}
+	mass.mass[0] = limits[MAX].mass[0] / 4.0;
+	mass.mass[1] = limits[MAX].mass[1] / 4.0;
+	mass.eta = limits[MAX].eta / 4.0;
+	mass.totalMass = limits[MAX].totalMass / 4.0;
+	mass.chirpMass = limits[MAX].chirpMass / 4.0;
+	mass.mu = limits[MAX].mu / 4.0;
+	mass.nu = limits[MAX].nu / 4.0;
+	mass.m1_m2 = limits[MAX].m1_m2 / 4.0;
+	SET_FUNCTION_LINE();
+	if (isMassBetweenLimits(&mass, limits)) {
+		PRINT_ERROR();
+		return false;
+	}
+	mass.mass[0] = limits[MAX].mass[0] * 2.0;
+	mass.mass[1] = limits[MAX].mass[1] * 2.0;
+	mass.eta = limits[MAX].eta * 2.0;
+	mass.totalMass = limits[MAX].totalMass * 2.0;
+	mass.chirpMass = limits[MAX].chirpMass * 2.0;
+	mass.mu = limits[MAX].mu * 2.0;
+	mass.nu = limits[MAX].nu * 2.0;
+	mass.m1_m2 = limits[MAX].m1_m2 * 2.0;
+	SET_FUNCTION_LINE();
+	if (isMassBetweenLimits(&mass, limits)) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	SET_FUNCTION_FILE_AND_NAME();
+	return true;
+}
+
+static bool isOK_isSpinBetweenLimits(void) {
+	PRINT_OK();
+	SET_FUNCTION_FILE_AND_NAME();
+	return true;
+}
+
+bool areBinarySystemFunctionsGood(void) {
+	if (isOK_m1m2ToRemainingMass() && isOK_magnitudeOfSpins() && isOK_isMassBetweenLimits()) {
+		return true;
+	}
+	return false;
 }
 
 ///@}

@@ -20,14 +20,14 @@ CC := gcc
 CFLAGS := -std=gnu99 -O3 -ggdb3
 include config.mk
 
-errorFlags := -Wall -Wextra -Wformat-security -Wmissing-include-dirs -Wswitch-default -Wswitch-enum
+errorFlags := -Wall -Wextra -Wformat-security -Wmissing-include-dirs -Wswitch-default
 errorFlags += -Wstrict-prototypes -Wold-style-definition
 
-errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wbad-function-cast -Wcast-qual
+errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wcast-qual
 errorExtraFlags += -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return -Wredundant-decls
 errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wdisabled-optimization
 
-errorOptionalFlags := -Wformat-nonliteral -Wconversion
+errorOptionalFlags := -Wformat-nonliteral -Wconversion -Wswitch-enum -Wbad-function-cast
 
 CFLAGS += -march=$(shell arch) $(errorFlags)
 srcdir := src
@@ -72,7 +72,7 @@ test : macros := -DTEST
 
 test : CFLAGS += $(errorExtraFlags)
 
-test : main_test.o util_IO.o util.o
+test : main_test.o binary_system.o util_math.o util_IO.o util.o -lm
 	@echo -e '\e[36mLinking: $@ from $^\e[0m'
 	$(CC) $(CFLAGS) $(macros) -o test $^
 	@echo -e '\e[35mFinished linking: $@\e[0m'

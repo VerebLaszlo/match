@@ -109,4 +109,6 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
  */
 void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format);
 
+bool areBinarySystemFunctionsGood(void);
+
 #endif /* BINARY_SYSTEM_H_ */
