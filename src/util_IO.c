@@ -129,7 +129,7 @@ static void printFormat(FILE *file, OutputFormat *format) {
 
 #ifdef TEST
 
-/// @name test functions
+/// @name Test functions
 ///@{
 
 static bool isOK_setFormatForOneNumber(void) {

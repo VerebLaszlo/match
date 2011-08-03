@@ -46,6 +46,7 @@ FILE *safelyOpenForAppend(const char *fileName);
 
 ///@}
 /// @name Output formatting functions and types
+///@{
 
 /** Constants for output
  */
@@ -94,12 +95,14 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format);
 
 #ifdef TEST
 
-/// @name test functions
+///@}
+/// @name Test functions
 ///@{
 
 /**	Tests if the input/output functions are correctly written.
  * @return true or false
- */bool areIOFunctionsGood(void);
+ */
+bool areIOFunctionsGood(void);
 
 ///@}
 
