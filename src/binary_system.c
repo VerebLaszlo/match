@@ -19,8 +19,7 @@
  * @param[in,out] mass	: all mass parameters.
  */
 static void m1m2ToRemainingMass(massParameters *mass) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(mass);
+	SAVE_FUNCTION_FOR_TESTING();assert(mass);
 	assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
 	mass->m1_m2 = mass->mass[0] / mass->mass[1];
 	mass->nu =
@@ -31,15 +30,13 @@ static void m1m2ToRemainingMass(massParameters *mass) {
 /** Returns the magnitude of the spins.
  * @param[in,out] spin	: spin components
  */
-static void magnitudeOfSpins(spinParameters spin[]) {
+static void magnitudeOfSpin(spinParameters *spin) {
 	SAVE_FUNCTION_FOR_TESTING();
-	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-		spin[i].magnitude = 0.0;
-		for (short j = 0; j < DIMENSION; j++) {
-			spin[i].magnitude += square(spin[i].component[FIXED][j]);
-		}
-		spin[i].magnitude = sqrt(spin[i].magnitude);
+	spin->magnitude = 0.0;
+	for (short j = 0; j < DIMENSION; j++) {
+		spin->magnitude += square(spin->component[FIXED][j]);
 	}
+	spin->magnitude = sqrt(spin->magnitude);
 }
 
 /**	Returns true, if the mass parameters are between their limits.
@@ -120,8 +117,7 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
  * @param[in]	  convert	: specifies the initial parameters
  */
 static void convertMasses(massParameters *mass, conversionMode convert) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(mass);
+	SAVE_FUNCTION_FOR_TESTING();assert(mass);
 	switch (convert) {
 	case FROM_M1M2:
 		assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
@@ -155,19 +151,16 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
  * @param[in,out]	spin	: spin parameters
  * @param[in]		index	: frame
  */
-static void convertSpinsFromXyzToAngles(spinParameters spin[NUMBER_OF_BLACKHOLES],
-		const ushort index) {
+static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort index) {
 	SAVE_FUNCTION_FOR_TESTING();
-	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-		spin[i].inclination[index] = acos(spin[i].component[index][Z] / spin[i].magnitude);
-		spin[i].azimuth[index] = -acos(
-				spin[i].component[index][X] / spin[i].magnitude / sin(spin[i].inclination[index]));
-		if (spin[i].component[index][Y] < 0.0) {
-			spin[i].azimuth[index] *= -1.0;
-		}
-		if (!isfinite(spin[i].azimuth[index])) {
-			spin[i].azimuth[index] = 0.0;
-		}
+	spin->inclination[index] = acos(spin->component[index][Z] / spin->magnitude);
+	spin->azimuth[index] = -acos(
+			spin->component[index][X] / spin->magnitude / sin(spin->inclination[index]));
+	if (spin->component[index][Y] < 0.0) {
+		spin->azimuth[index] *= -1.0;
+	}
+	if (!isfinite(spin->azimuth[index])) {
+		spin->azimuth[index] = 0.0;
 	}
 }
 
@@ -175,64 +168,52 @@ static void convertSpinsFromXyzToAngles(spinParameters spin[NUMBER_OF_BLACKHOLES
  * @param[in,out]	spin	: spin parameters
  * @param[in]		index	: frame
  */
-static void convertSpinFromAnglesToXzy(spinParameters spin[], const ushort index) {
+static void convertSpinFromAnglesToXzy(spinParameters *spin, const ushort index) {
 	SAVE_FUNCTION_FOR_TESTING();
 	double cosAzimuth, cosInclination;
-	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-		cosAzimuth = spin[i].azimuth[index] == M_PI_2 ? 0.0 : cos(spin[i].azimuth[index]);
-		cosInclination =
-				spin[i].inclination[index] == M_PI_2 ? 0.0 : cos(spin[i].inclination[index]);
-		spin[i].component[index][X] = spin[i].magnitude * sin(spin[i].inclination[index])
-				* cosAzimuth;
-		spin[i].component[index][Y] = spin[i].magnitude * sin(spin[i].inclination[index])
-				* sin(spin[i].azimuth[index]);
-		spin[i].component[index][Z] = spin[i].magnitude * cosInclination;
-	}
+	cosAzimuth = spin->azimuth[index] == M_PI_2 ? 0.0 : cos(spin->azimuth[index]);
+	cosInclination = spin->inclination[index] == M_PI_2 ? 0.0 : cos(spin->inclination[index]);
+	spin->component[index][X] = spin->magnitude * sin(spin->inclination[index]) * cosAzimuth;
+	spin->component[index][Y] = spin->magnitude * sin(spin->inclination[index])
+			* sin(spin->azimuth[index]);
+	spin->component[index][Z] = spin->magnitude * cosInclination;
 }
 
 /**	Converts spin parameters from the fixed frame to the precessing frame.
  * @param[in,out]	spin		: spin parameters
  * @param[in]		inclination	: inclination of the precessing frame
  */
-static void convertSpinsFromFixedFrame(spinParameters spin[NUMBER_OF_BLACKHOLES],
-		const double inclination) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(spin);
+static void convertSpinFromFixedFrame(spinParameters *spin, const double inclination) {
+	SAVE_FUNCTION_FOR_TESTING();assert(spin);
 	double theta[2] = { +0.0, inclination };
-	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-		spin[i].component[PRECESSING][X] = spin[i].component[FIXED][X] * cos(theta[0])
-				* cos(theta[1]) + spin[i].component[FIXED][Y] * sin(theta[0]) * cos(theta[1])
-				- spin[i].component[FIXED][Z] * sin(theta[1]);
-		spin[i].component[PRECESSING][Y] = -spin[i].component[FIXED][X] * sin(theta[0])
-				+ spin[i].component[FIXED][Y] * cos(theta[0]);
-		spin[i].component[PRECESSING][Z] = spin[i].component[FIXED][X] * cos(theta[0])
-				* sin(theta[1]) + spin[i].component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
-				+ spin[i].component[FIXED][Z] * cos(theta[1]);
-	}
+	spin->component[PRECESSING][X] = spin->component[FIXED][X] * cos(theta[0]) * cos(theta[1])
+			+ spin->component[FIXED][Y] * sin(theta[0]) * cos(theta[1])
+			- spin->component[FIXED][Z] * sin(theta[1]);
+	spin->component[PRECESSING][Y] = -spin->component[FIXED][X] * sin(theta[0])
+			+ spin->component[FIXED][Y] * cos(theta[0]);
+	spin->component[PRECESSING][Z] = spin->component[FIXED][X] * cos(theta[0]) * sin(theta[1])
+			+ spin->component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
+			+ spin->component[FIXED][Z] * cos(theta[1]);
 }
 
 /**	Converts spin parameters from the precessing frame to the fixed frame.
  * @param[in,out]	spin		: spin parameters
  * @param[in]		inclination	: inclination of the precessing frame
  */
-static void convertSpinsFromPrecessionFrame(spinParameters spin[NUMBER_OF_BLACKHOLES],
-		const double inclination) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(spin);
+static void convertSpinFromPrecessionFrame(spinParameters *spin, const double inclination) {
+	SAVE_FUNCTION_FOR_TESTING();assert(spin);
 	double theta[2] = { -0.0, inclination };
-	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-		spin[i].component[FIXED][X] = spin[i].magnitude
-				* (+spin[i].component[PRECESSING][X] * cos(theta[0]) * cos(theta[1])
-						+ spin[i].component[PRECESSING][Y] * sin(theta[0])
-						- spin[i].component[PRECESSING][Z] * cos(theta[0]) * sin(theta[1]));
-		spin[i].component[FIXED][Y] = spin[i].magnitude
-				* (-spin[i].component[PRECESSING][X] * sin(theta[0]) * sin(theta[1])
-						+ spin[i].component[PRECESSING][Y] * cos(theta[0])
-						+ spin[i].component[PRECESSING][Z] * sin(theta[0]) * sin(theta[1]));
-		spin[i].component[FIXED][Z] = spin[i].magnitude
-				* (+spin[i].component[PRECESSING][X] * sin(theta[1])
-						+ spin[i].component[PRECESSING][Y] * cos(theta[1]));
-	}
+	spin->component[FIXED][X] = spin->magnitude
+			* (+spin->component[PRECESSING][X] * cos(theta[0]) * cos(theta[1])
+					+ spin->component[PRECESSING][Y] * sin(theta[0])
+					- spin->component[PRECESSING][Z] * cos(theta[0]) * sin(theta[1]));
+	spin->component[FIXED][Y] = spin->magnitude
+			* (-spin->component[PRECESSING][X] * sin(theta[0]) * sin(theta[1])
+					+ spin->component[PRECESSING][Y] * cos(theta[0])
+					+ spin->component[PRECESSING][Z] * sin(theta[0]) * sin(theta[1]));
+	spin->component[FIXED][Z] = spin->magnitude
+			* (+spin->component[PRECESSING][X] * sin(theta[1])
+					+ spin->component[PRECESSING][Y] * cos(theta[1]));
 }
 
 /**	Converts spin parameters according the conversion parameter.
@@ -240,32 +221,31 @@ static void convertSpinsFromPrecessionFrame(spinParameters spin[NUMBER_OF_BLACKH
  * @param[in]		inclination	: inclination fo the precessing frame
  * @param[in]		convert		: conversion mode
  */
-static void convertSpins(spinParameters spin[NUMBER_OF_BLACKHOLES], const double inclination,
+static void convertSpin(spinParameters spin[NUMBER_OF_BLACKHOLES], const double inclination,
 		conversionMode convert) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(spin);
+	SAVE_FUNCTION_FOR_TESTING();assert(spin);
 	switch (convert) {
 	case FROM_FIXED_XYZ:
-		magnitudeOfSpins(spin);
-		convertSpinsFromFixedFrame(spin, inclination);
-		convertSpinsFromXyzToAngles(spin, FIXED);
-		convertSpinsFromXyzToAngles(spin, PRECESSING);
+		magnitudeOfSpin(spin);
+		convertSpinFromFixedFrame(spin, inclination);
+		convertSpinFromXyzToAngles(spin, FIXED);
+		convertSpinFromXyzToAngles(spin, PRECESSING);
 		break;
 	case FROM_FIXED_ANGLES:
 		convertSpinFromAnglesToXzy(spin, FIXED);
-		convertSpinsFromFixedFrame(spin, inclination);
-		convertSpinsFromXyzToAngles(spin, PRECESSING);
+		convertSpinFromFixedFrame(spin, inclination);
+		convertSpinFromXyzToAngles(spin, PRECESSING);
 		break;
 	case FROM_PRECESSION_XZY:
-		magnitudeOfSpins(spin);
-		convertSpinsFromXyzToAngles(spin, FIXED);
-		convertSpinsFromPrecessionFrame(spin, inclination);
-		convertSpinsFromXyzToAngles(spin, PRECESSING);
+		magnitudeOfSpin(spin);
+		convertSpinFromXyzToAngles(spin, FIXED);
+		convertSpinFromPrecessionFrame(spin, inclination);
+		convertSpinFromXyzToAngles(spin, PRECESSING);
 		break;
 	case FROM_PRECESSION_ANGLES:
 		convertSpinFromAnglesToXzy(spin, PRECESSING);
-		convertSpinsFromPrecessionFrame(spin, inclination);
-		convertSpinsFromXyzToAngles(spin, FIXED);
+		convertSpinFromPrecessionFrame(spin, inclination);
+		convertSpinFromXyzToAngles(spin, FIXED);
 		break;
 	default:
 		break;
@@ -282,8 +262,7 @@ static void convertSpins(spinParameters spin[NUMBER_OF_BLACKHOLES], const double
  * @param[in]	mode	: generation mode
  */
 static void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(mass);
+	SAVE_FUNCTION_FOR_TESTING();assert(mass);
 	assert(limits);
 	switch (mode) {
 	case GEN_ETAM:
@@ -321,56 +300,54 @@ static void generateMass(massParameters *mass, massParameters *limits, generatio
  */
 static void generateSpin(spinParameters *spin, spinParameters limits[], double inclination,
 		conversionMode mode) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(spin);
+	SAVE_FUNCTION_FOR_TESTING();assert(spin);
 	assert(limits);
 	switch (mode) {
 	case GEN_FIXED_XYZ:
-		do {
-			for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+			do {
 				for (short j = 0; j < DIMENSION; j++) {
-					spin[i].component[FIXED][j] = randomBetween(
-							limits[MIN + 2 * i].component[FIXED][j],
+					spin[i].component[FIXED][j] = randomBetween(limits[MIN].component[FIXED][j],
 							limits[MAX].component[FIXED][j]);
 				}
-			}
-			convertSpins(spin, inclination, mode);
-		} while (!isSpinBetweenLimits(spin, limits));
+				convertSpin(&spin[i], inclination, mode);
+			} while (!isSpinBetweenLimits(&spin[i], limits));
+		}
 		break;
 	case GEN_FIXED_ANGLES:
-		do {
-			for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+			do {
 				spin[i].magnitude = randomBetween(limits[MIN].magnitude, limits[MAX].magnitude);
 				spin[i].azimuth[FIXED] = randomBetween(limits[MIN].azimuth[FIXED],
 						limits[MAX].azimuth[FIXED]);
 				spin[i].inclination[FIXED] = randomBetween(limits[MIN].inclination[FIXED],
 						limits[MAX].inclination[FIXED]);
-			}
-			convertSpins(spin, inclination, mode);
-		} while (!isSpinBetweenLimits(spin, limits));
+				convertSpin(&spin[i], inclination, mode);
+			} while (!isSpinBetweenLimits(&spin[i], limits));
+		}
 		break;
 	case GEN_PRECESSING_XYZ:
-		do {
-			for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+			do {
 				for (short j = 0; j < DIMENSION; j++) {
 					spin[i].component[FIXED][j] = randomBetween(limits[MIN].component[FIXED][j],
 							limits[MAX].component[FIXED][j]);
 				}
-			}
-			convertSpins(spin, inclination, mode);
-		} while (!isSpinBetweenLimits(spin, limits));
+				convertSpin(&spin[i], inclination, mode);
+			} while (!isSpinBetweenLimits(&spin[i], limits));
+		}
 		break;
 	case GEN_PRECESSING_ANGLES:
-		do {
-			for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+			do {
 				spin[i].magnitude = randomBetween(limits[MIN].magnitude, limits[MAX].magnitude);
 				spin[i].azimuth[PRECESSING] = randomBetween(limits[MIN].azimuth[PRECESSING],
 						limits[MAX].azimuth[PRECESSING]);
 				spin[i].inclination[PRECESSING] = randomBetween(limits[MIN].inclination[PRECESSING],
 						limits[MAX].inclination[PRECESSING]);
-			}
-			convertSpins(spin, inclination, mode);
-		} while (!isSpinBetweenLimits(spin, limits));
+				convertSpin(&spin[i], inclination, mode);
+			} while (!isSpinBetweenLimits(&spin[i], limits));
+		}
 		break;
 	default:
 		break;
@@ -379,8 +356,7 @@ static void generateSpin(spinParameters *spin, spinParameters limits[], double i
 
 void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 		generationMode genMass, generationMode genSpin) {
-	SAVE_FUNCTION_FOR_TESTING();
-	assert(system);
+	SAVE_FUNCTION_FOR_TESTING();assert(system);
 	assert(limits);
 	system->inclination = randomBetween(limits[MIN].inclination, limits[MAX].inclination);
 	system->distance = randomBetween(limits[MIN].distance, limits[MAX].distance);
@@ -389,9 +365,12 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 	}
 	massParameters mass[2] = { limits[MIN].mass, limits[MAX].mass };
 	generateMass(&system->mass, mass, genMass);
-	spinParameters spin[4] = { limits[MIN].spin[0], limits[MAX].spin[0], limits[MIN].spin[0],
-			limits[MAX].spin[0] };
-	generateSpin(system->spin, spin, system->inclination, genSpin);
+	spinParameters spin[2];
+	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
+		spin[MIN] = limits[MIN].spin[0];
+		spin[MAX] = limits[MAX].spin[0];
+		generateSpin(&system->spin[i], spin, system->inclination, genSpin);
+	}
 }
 
 ///@}
@@ -492,12 +471,12 @@ static bool isOK_magnitudeOfSpins(void) {
 			spin[i].component[j][Y] = 3.0;
 			spin[i].component[j][Z] = sign * sqrt(12.0);
 		}
-	}
-	SAVE_FUNCTION_CALLER();
-	magnitudeOfSpins(spin);
-	if (spin[0].magnitude != 5.0 && spin[1].magnitude != 5.0) {
-		PRINT_ERROR();
-		return false;
+		SAVE_FUNCTION_CALLER();
+		magnitudeOfSpin(&spin[i]);
+		if (spin[i].magnitude != 5.0) {
+			PRINT_ERROR();
+			return false;
+		}
 	}
 	PRINT_OK();
 	return true;
@@ -565,7 +544,8 @@ static bool isOK_isSpinBetweenLimits(void) {
 }
 
 bool areBinarySystemFunctionsGood(void) {
-	if (isOK_m1m2ToRemainingMass() && isOK_magnitudeOfSpins() && isOK_isMassBetweenLimits()) {
+	if (isOK_m1m2ToRemainingMass() && isOK_magnitudeOfSpins() && isOK_isMassBetweenLimits()
+			&& isOK_isSpinBetweenLimits()) {
 		return true;
 	}
 	return false;
