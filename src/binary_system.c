@@ -19,19 +19,20 @@
  * @param[in,out] mass	: all mass parameters.
  */
 static void m1m2ToRemainingMass(massParameters *mass) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(mass);
 	assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
 	mass->m1_m2 = mass->mass[0] / mass->mass[1];
 	mass->nu =
 			mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] :
 					mass->mass[1] / mass->mass[0];
-	SET_FUNCTION_FILE_AND_NAME();
 }
 
 /** Returns the magnitude of the spins.
  * @param[in,out] spin	: spin components
  */
 static void magnitudeOfSpins(spinParameters spin[]) {
+	SAVE_FUNCTION_FOR_TESTING();
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
 		spin[i].magnitude = 0.0;
 		for (short j = 0; j < DIMENSION; j++) {
@@ -39,7 +40,6 @@ static void magnitudeOfSpins(spinParameters spin[]) {
 		}
 		spin[i].magnitude = sqrt(spin[i].magnitude);
 	}
-	SET_FUNCTION_FILE_AND_NAME();
 }
 
 /**	Returns true, if the mass parameters are between their limits.
@@ -48,31 +48,32 @@ static void magnitudeOfSpins(spinParameters spin[]) {
  * @return true or false
  */
 static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
+	SAVE_FUNCTION_FOR_TESTING();
+	bool between = true;
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
 		if (limits[MIN].mass[i] > mass->mass[i] || mass->mass[i] > limits[MAX].mass[i]) {
-			return false;
+			between = false;
 		}
 	}
 	if (limits[MIN].eta > mass->eta || mass->eta > limits[MAX].eta) {
-		return false;
+		between = false;
 	}
 	if (limits[MIN].totalMass > mass->totalMass || mass->totalMass > limits[MAX].totalMass) {
-		return false;
+		between = false;
 	}
 	if (limits[MIN].chirpMass > mass->chirpMass || mass->chirpMass > limits[MAX].chirpMass) {
-		return false;
+		between = false;
 	}
 	if (limits[MIN].mu > mass->mu || mass->mu > limits[MAX].mu) {
-		return false;
+		between = false;
 	}
-	if (limits[MIN].nu > mass->nu || mass->nu || limits[MAX].nu) {
-		return false;
+	if (limits[MIN].nu > mass->nu || mass->nu > limits[MAX].nu) {
+		between = false;
 	}
 	if (limits[MIN].m1_m2 > mass->m1_m2 || mass->m1_m2 > limits[MAX].m1_m2) {
-		return false;
+		between = false;
 	}
-	SET_FUNCTION_FILE_AND_NAME();
-	return true;
+	return between;
 }
 
 /**	Returns true, if the mass parameters are between their limits.
@@ -81,6 +82,7 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
  * @return true or false
  */
 static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
+	SAVE_FUNCTION_FOR_TESTING();
 	if (limits[MIN].magnitude > spin->magnitude || spin->magnitude > limits[MAX].magnitude) {
 		return false;
 	}
@@ -118,6 +120,7 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
  * @param[in]	  convert	: specifies the initial parameters
  */
 static void convertMasses(massParameters *mass, conversionMode convert) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(mass);
 	switch (convert) {
 	case FROM_M1M2:
@@ -154,6 +157,7 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
  */
 static void convertSpinsFromXyzToAngles(spinParameters spin[NUMBER_OF_BLACKHOLES],
 		const ushort index) {
+	SAVE_FUNCTION_FOR_TESTING();
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
 		spin[i].inclination[index] = acos(spin[i].component[index][Z] / spin[i].magnitude);
 		spin[i].azimuth[index] = -acos(
@@ -172,6 +176,7 @@ static void convertSpinsFromXyzToAngles(spinParameters spin[NUMBER_OF_BLACKHOLES
  * @param[in]		index	: frame
  */
 static void convertSpinFromAnglesToXzy(spinParameters spin[], const ushort index) {
+	SAVE_FUNCTION_FOR_TESTING();
 	double cosAzimuth, cosInclination;
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
 		cosAzimuth = spin[i].azimuth[index] == M_PI_2 ? 0.0 : cos(spin[i].azimuth[index]);
@@ -191,6 +196,7 @@ static void convertSpinFromAnglesToXzy(spinParameters spin[], const ushort index
  */
 static void convertSpinsFromFixedFrame(spinParameters spin[NUMBER_OF_BLACKHOLES],
 		const double inclination) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(spin);
 	double theta[2] = { +0.0, inclination };
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
@@ -211,6 +217,7 @@ static void convertSpinsFromFixedFrame(spinParameters spin[NUMBER_OF_BLACKHOLES]
  */
 static void convertSpinsFromPrecessionFrame(spinParameters spin[NUMBER_OF_BLACKHOLES],
 		const double inclination) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(spin);
 	double theta[2] = { -0.0, inclination };
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
@@ -235,6 +242,7 @@ static void convertSpinsFromPrecessionFrame(spinParameters spin[NUMBER_OF_BLACKH
  */
 static void convertSpins(spinParameters spin[NUMBER_OF_BLACKHOLES], const double inclination,
 		conversionMode convert) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(spin);
 	switch (convert) {
 	case FROM_FIXED_XYZ:
@@ -274,6 +282,7 @@ static void convertSpins(spinParameters spin[NUMBER_OF_BLACKHOLES], const double
  * @param[in]	mode	: generation mode
  */
 static void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(mass);
 	assert(limits);
 	switch (mode) {
@@ -312,6 +321,7 @@ static void generateMass(massParameters *mass, massParameters *limits, generatio
  */
 static void generateSpin(spinParameters *spin, spinParameters limits[], double inclination,
 		conversionMode mode) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(spin);
 	assert(limits);
 	switch (mode) {
@@ -369,6 +379,7 @@ static void generateSpin(spinParameters *spin, spinParameters limits[], double i
 
 void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 		generationMode genMass, generationMode genSpin) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(system);
 	assert(limits);
 	system->inclination = randomBetween(limits[MIN].inclination, limits[MAX].inclination);
@@ -393,9 +404,10 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
  * @param format
  */
 static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
+	SAVE_FUNCTION_FOR_TESTING();
 	ushort number = 4;
-	char formatString[number * format->widthWithSeparator];
-	setFormat(formatString, number, format);
+	char formatString[number * format->widthWithSeparator];setFormat
+	(formatString, number, format);
 	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);
 	fprintf(file, formatString, mass->chirpMass, mass->mu, mass->nu, mass->m1_m2);
 }
@@ -406,6 +418,7 @@ static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *
  * @param format
  */
 static void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {
+	SAVE_FUNCTION_FOR_TESTING();
 	ushort number = 3;
 	char formatString[number * format->widthWithSeparator];setFormat
 	(formatString, number, format);
@@ -419,6 +432,7 @@ static void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *
 }
 
 void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format) {
+	SAVE_FUNCTION_FOR_TESTING();
 	printMassParameters(file, &system->mass, format);
 	fputs("\n", file);
 	printSpinParameters(file, &system->spin[0], format);
@@ -442,7 +456,7 @@ static bool isOK_m1m2ToRemainingMass(void) {
 	massParameters mass;
 	mass.mass[0] = 1.0;
 	mass.mass[1] = 2.0;
-	SET_FUNCTION_LINE();
+	SAVE_FUNCTION_CALLER();
 	m1m2ToRemainingMass(&mass);
 	if (mass.m1_m2 != 0.5) {
 		PRINT_ERROR();
@@ -454,7 +468,7 @@ static bool isOK_m1m2ToRemainingMass(void) {
 	}
 	mass.mass[0] = 2.0;
 	mass.mass[1] = 1.0;
-	SET_FUNCTION_LINE();
+	SAVE_FUNCTION_CALLER();
 	m1m2ToRemainingMass(&mass);
 	if (mass.m1_m2 != 2.0) {
 		PRINT_ERROR();
@@ -465,7 +479,6 @@ static bool isOK_m1m2ToRemainingMass(void) {
 		return false;
 	}
 	PRINT_OK();
-	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 
@@ -480,14 +493,13 @@ static bool isOK_magnitudeOfSpins(void) {
 			spin[i].component[j][Z] = sign * sqrt(12.0);
 		}
 	}
-	SET_FUNCTION_LINE();
+	SAVE_FUNCTION_CALLER();
 	magnitudeOfSpins(spin);
 	if (spin[0].magnitude != 5.0 && spin[1].magnitude != 5.0) {
 		PRINT_ERROR();
 		return false;
 	}
 	PRINT_OK();
-	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 
@@ -511,8 +523,7 @@ static bool isOK_isMassBetweenLimits(void) {
 		mass.mu = limits[MAX].mu / (double) i;
 		mass.nu = limits[MAX].nu / (double) i;
 		mass.m1_m2 = limits[MAX].m1_m2 / (double) i;
-		printf("%d\n", i);
-		SET_FUNCTION_LINE();
+		SAVE_FUNCTION_CALLER();
 		if (!isMassBetweenLimits(&mass, limits)) {
 			PRINT_ERROR();
 			return false;
@@ -526,7 +537,7 @@ static bool isOK_isMassBetweenLimits(void) {
 	mass.mu = limits[MAX].mu / 4.0;
 	mass.nu = limits[MAX].nu / 4.0;
 	mass.m1_m2 = limits[MAX].m1_m2 / 4.0;
-	SET_FUNCTION_LINE();
+	SAVE_FUNCTION_CALLER();
 	if (isMassBetweenLimits(&mass, limits)) {
 		PRINT_ERROR();
 		return false;
@@ -539,19 +550,17 @@ static bool isOK_isMassBetweenLimits(void) {
 	mass.mu = limits[MAX].mu * 2.0;
 	mass.nu = limits[MAX].nu * 2.0;
 	mass.m1_m2 = limits[MAX].m1_m2 * 2.0;
-	SET_FUNCTION_LINE();
-	if (isMassBetweenLimits(&mass, limits)) {
+	SAVE_FUNCTION_CALLER();
+	if (!isMassBetweenLimits(&mass, limits)) {
 		PRINT_ERROR();
 		return false;
 	}
 	PRINT_OK();
-	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 
 static bool isOK_isSpinBetweenLimits(void) {
 	PRINT_OK();
-	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 

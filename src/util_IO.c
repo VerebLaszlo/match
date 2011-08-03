@@ -69,6 +69,7 @@ FILE *safelyOpenForAppend(const char *fileName) {
  * @param[in,out]	format	: the format
  */
 static void setFormatForOneNumber(OutputFormat *format) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(format);
 	assert(format->width > 0);
 	if (format->leftJustified) {
@@ -76,11 +77,11 @@ static void setFormatForOneNumber(OutputFormat *format) {
 	} else {
 		sprintf(format->oneNumber, "%% %d.%dlg", format->width, format->precision);
 	}
-	SET_FUNCTION_FILE_AND_NAME();
 }
 
 void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
 		const char separator, bool leftJustified, nameString name, const ushort code) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(format);
 	assert(width < MAXIMUM_WIDTH);
 	assert(precision < MAXIMUM_PRECISION);
@@ -96,10 +97,10 @@ void setOutputFormat(OutputFormat *format, const ushort precision, const ushort 
 	strcpy(format->name, name);
 	format->code = code;
 	setFormatForOneNumber(format);
-	SET_FUNCTION_FILE_AND_NAME();
 }
 
 void setFormat(char formatString[], const ushort number, OutputFormat *format) {
+	SAVE_FUNCTION_FOR_TESTING();
 	assert(formatString);
 	assert(number);
 	assert(format);
@@ -111,7 +112,6 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format) {
 	}
 	//strcpy(temp, formatString);
 	//sprintf(formatString, "%s\n", temp);
-	SET_FUNCTION_FILE_AND_NAME();
 }
 
 static void printFormat(FILE *file, OutputFormat *format) {
@@ -139,7 +139,7 @@ static bool isOK_setFormatForOneNumber(void) {
 	format.precision = 5;
 	format.width = 10;
 	for (short i = 0; i < 2; i++, neg(&format.leftJustified)) {
-		SET_FUNCTION_LINE();
+		SAVE_FUNCTION_CALLER();
 		setFormatForOneNumber(&format);
 		if (strcmp(result[i], format.oneNumber)) {
 			PRINT_ERROR();
@@ -148,7 +148,7 @@ static bool isOK_setFormatForOneNumber(void) {
 	}
 	format.leftJustified = false;
 	for (short i = 0; i < 2; i++, neg(&format.leftJustified)) {
-		SET_FUNCTION_LINE();
+		SAVE_FUNCTION_CALLER();
 		setFormatForOneNumber(&format);
 		if (!strcmp(result[i], format.oneNumber)) {
 			PRINT_ERROR();
@@ -156,13 +156,11 @@ static bool isOK_setFormatForOneNumber(void) {
 		}
 	}
 	PRINT_OK();
-	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 
 static bool isOK_setOutputFormat(void) {
 	if (!isOK_setFormatForOneNumber()) {
-		PRINT_ERROR_RECURSIVE();
 		return false;
 	}
 	OutputFormat format;
@@ -176,7 +174,7 @@ static bool isOK_setOutputFormat(void) {
 		width = precision - 2 * SPECIAL_CHARACTER_LENGTH;
 		for (short j = 0; j < 3; j++, code++) {
 			short k = 3 * i + j;
-			SET_FUNCTION_LINE();
+			SAVE_FUNCTION_CALLER();
 			setOutputFormat(&format, precision, width, separator, leftJusfified, name[k], code);
 			if (format.precision != precision) {
 				PRINT_ERROR();
@@ -199,13 +197,11 @@ static bool isOK_setOutputFormat(void) {
 	}
 	/// @todo a hibás bemenet nincs leellenőrizve!!!
 	PRINT_OK();
-	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 
 static bool isOK_setFormat(void) {
 	if (!isOK_setOutputFormat()) {
-		PRINT_ERROR_RECURSIVE();
 		return false;
 	}
 	OutputFormat format;
@@ -220,11 +216,13 @@ static bool isOK_setFormat(void) {
 			{ "%- 12.5lg", "%- 12.5lg %% %- 12.5lg" } };
 	for (short i = 0; i < 2; i++, neg(&leftJusfified)) {
 		setOutputFormat(&format, precision, width, separator, leftJusfified, name, code);
+		SAVE_FUNCTION_CALLER();
 		setFormat(output, 1, &format);
 		if (strcmp(result[i][0], output)) {
 			PRINT_ERROR();
 			return false;
 		}
+		SAVE_FUNCTION_CALLER();
 		setFormat(output, 2, &format);
 		if (strcmp(result[i][1], output)) {
 			PRINT_ERROR();
@@ -232,7 +230,6 @@ static bool isOK_setFormat(void) {
 		}
 	}
 	PRINT_OK();
-	SET_FUNCTION_FILE_AND_NAME();
 	return true;
 }
 

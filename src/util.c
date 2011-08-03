@@ -5,7 +5,6 @@
  * @brief Contains useful functions.
  */
 
-#include <stdlib.h>
 #include "util.h"
 
 void neg(bool *var) {
@@ -13,7 +12,7 @@ void neg(bool *var) {
 }
 
 #ifdef TEST
-#include <stdio.h>
+_sourceLocation sourceLocation;
 char previous_function[FILENAME_MAX];
 char function_file[FILENAME_MAX];
 ushort function_line;
