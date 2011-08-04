@@ -95,6 +95,8 @@ void setOutputFormat(OutputFormat *format, const ushort precision, const ushort 
  */
 void setFormat(char formatString[], const ushort number, OutputFormat *format);
 
+void setFormatEnd(char formatString[], const ushort number, OutputFormat *format);
+
 #ifdef TEST
 
 ///@}

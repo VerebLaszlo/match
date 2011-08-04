@@ -385,9 +385,10 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
 	SAVE_FUNCTION_FOR_TESTING();
 	ushort number = 4;
-	char formatString[number * format->widthWithSeparator];
-	setFormat(formatString, number, format);
+	char formatString[number * format->widthWithSeparator];setFormat
+	(formatString, number, format);
 	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);
+	setFormatEnd(formatString, number, format);
 	fprintf(file, formatString, mass->chirpMass, mass->mu, mass->nu, mass->m1_m2);
 }
 
@@ -399,32 +400,30 @@ static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *
 static void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {
 	SAVE_FUNCTION_FOR_TESTING();
 	ushort number = 3;
-	char formatString[number * format->widthWithSeparator];setFormat
-	(formatString, number, format);
-	for (ushort i = FIXED; i < COORDINATE_CONVENTIONS; i++) {
+	char formatString[number * format->widthWithSeparator];for
+(	ushort i = FIXED; i < COORDINATE_CONVENTIONS; i++) {
+		setFormat(formatString, number, format);
 		fprintf(file, formatString, spin->component[i][X], spin->component[i][Y],
-				spin->component[i][Z]);
+		spin->component[i][Z]);
 		fprintf(file, formatString, spin->unity[i][X], spin->unity[i][Y], spin->unity[i][Z]);
 		fprintf(file, formatString, spin->azimuth[i], spin->inclination[i], spin->elevation);
-		fprintf(file, format->oneNumber, spin->magnitude);
+		setFormatEnd(formatString, 1, format);
+		fprintf(file, formatString, spin->magnitude);
 	}
 }
 
 void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format) {
 	SAVE_FUNCTION_FOR_TESTING();
 	printMassParameters(file, &system->mass, format);
-	fputs("\n", file);
 	printSpinParameters(file, &system->spin[0], format);
-	fputs("\n", file);
 	printSpinParameters(file, &system->spin[1], format);
-	fputs("\n", file);
 	ushort number = 3;
 	char formatString[number * format->widthWithSeparator];setFormat
 	(formatString, number, format);
 	fprintf(file, formatString, system->flatness[0], system->flatness[1], system->inclination);
+	setFormatEnd(formatString, number, format);
 	fprintf(file, formatString, system->distance, system->coalescencePhase,
 			system->coalescenceTime);
-	fputs("\n", file);
 }
 
 ///@}
@@ -613,15 +612,13 @@ static bool isOK_isSpinBetweenLimits(void) {
 	return true;
 }
 
-/*
 static bool isOK_printMassParameters(void) {
 	massParameters mass = { { 30.0, 3.0 }, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0 };
-	//SAVE_FUNCTION_CALLER();
-	//printMassParameters(stdout, &mass, defaultFormat);
+	SAVE_FUNCTION_CALLER();
+	printMassParameters(stdout, &mass, defaultFormat);
 	PRINT_OK();
 	return true;
 }
-*/
 
 bool areBinarySystemFunctionsGood(void) {
 	if (isOK_m1m2ToRemainingMass() && isOK_magnitudeOfSpins() && isOK_isMassBetweenLimits()

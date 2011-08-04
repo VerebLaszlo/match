@@ -102,28 +102,50 @@ void setOutputFormat(OutputFormat *format, const ushort precision, const ushort 
 	setFormatForOneNumber(format);
 }
 
-void setFormat(char formatString[], const ushort number, OutputFormat *format) {
+static void setFormats(char formatString[], const ushort number, OutputFormat *format) {
 	SAVE_FUNCTION_FOR_TESTING();
 	assert(formatString);
 	assert(number);
 	assert(format);
 	char temp[number * format->widthWithSeparator];
 	strcpy(formatString, format->oneNumber);
-	if (number > 1) {
-		if (format->separator == '%') {
-			for (ushort i = 1; i < number; i++) {
-				sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
-				strcpy(formatString, temp);
-			}
-		} else {
-			for (ushort i = 1; i < number; i++) {
-				sprintf(temp, "%s %c %s", formatString, format->separator, format->oneNumber);
-				strcpy(formatString, temp);
-			}
+	if (format->separator == '%') {
+		for (ushort i = 1; i < number; i++) {
+			sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
+			strcpy(formatString, temp);
+		}
+	} else {
+		for (ushort i = 1; i < number; i++) {
+			sprintf(temp, "%s %c %s", formatString, format->separator, format->oneNumber);
+			strcpy(formatString, temp);
 		}
 	}
-	//strcpy(temp, formatString);
-	//sprintf(formatString, "%s\n", temp);
+}
+
+void setFormat(char formatString[], const ushort number, OutputFormat *format) {
+	SAVE_FUNCTION_FOR_TESTING();
+	assert(formatString);
+	assert(number);
+	assert(format);
+	setFormats(formatString, number, format);
+	char temp[number * format->widthWithSeparator];
+	strcpy(temp, formatString);
+	if (format->separator == '%') {
+		sprintf(formatString, "%s %%%c", temp, format->separator);
+	} else {
+		sprintf(formatString, "%s %c", temp, format->separator);
+	}
+}
+
+void setFormatEnd(char formatString[], const ushort number, OutputFormat *format) {
+	SAVE_FUNCTION_FOR_TESTING();
+	assert(formatString);
+	assert(number);
+	assert(format);
+	setFormats(formatString, number, format);
+	char temp[number * format->widthWithSeparator];
+	strcpy(temp, formatString);
+	sprintf(formatString, "%s\n", temp);
 }
 
 static void printFormat(FILE *file, OutputFormat *format) {
@@ -229,13 +251,13 @@ static bool isOK_setFormat(void) {
 	for (ushort i = 0; i < 2; i++) {
 		setOutputFormat(&format, precision, width, separator[i], leftJusfified, name, code);
 		SAVE_FUNCTION_CALLER();
-		setFormat(output, 1, &format);
+		setFormats(output, 1, &format);
 		if (strcmp(result[i][0], output)) {
 			PRINT_ERROR();
 			return false;
 		}
 		SAVE_FUNCTION_CALLER();
-		setFormat(output, 2, &format);
+		setFormats(output, 2, &format);
 		if (strcmp(result[i][1], output)) {
 			PRINT_ERROR();
 			return false;
