@@ -74,6 +74,8 @@ typedef struct tagOutputFormat {
 	ushort code; ///< numerical representation of the format
 } OutputFormat;
 
+extern OutputFormat *defaultFormat;
+
 /**	Sets the format variables.
  * @param[out]	format			: format specific variables
  * @param[in]	precision		: user supplied precision of the format

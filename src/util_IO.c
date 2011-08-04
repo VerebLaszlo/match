@@ -14,8 +14,8 @@
 #include <string.h>
 #endif
 
-extern char * program_invocation_short_name;	///< short name of the program
-extern char * program_invocation_name;			///< long name of the program
+extern char * program_invocation_short_name; ///< short name of the program
+extern char * program_invocation_name; ///< long name of the program
 
 /// @name File handling functions
 ///@{
@@ -65,6 +65,9 @@ FILE *safelyOpenForAppend(const char *fileName) {
 /// @name Output formatting functions and types
 ///@{
 
+OutputFormat _defaultFormat = { 1, 4, 4, ' ', true, "%- 1.5lg", "default", 0 };
+OutputFormat *defaultFormat = &_defaultFormat;
+
 /**	Sets the format string for one number.
  * @param[in,out]	format	: the format
  */
@@ -104,11 +107,20 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format) {
 	assert(formatString);
 	assert(number);
 	assert(format);
-	char temp[number * format->widthWithSeparator];strcpy
-	(formatString, format->oneNumber);
-	for (ushort i = 1; i < number; i++) {
-		sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
-		strcpy(formatString, temp);
+	char temp[number * format->widthWithSeparator];
+	strcpy(formatString, format->oneNumber);
+	if (number > 1) {
+		if (format->separator == '%') {
+			for (ushort i = 1; i < number; i++) {
+				sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
+				strcpy(formatString, temp);
+			}
+		} else {
+			for (ushort i = 1; i < number; i++) {
+				sprintf(temp, "%s %c %s", formatString, format->separator, format->oneNumber);
+				strcpy(formatString, temp);
+			}
+		}
 	}
 	//strcpy(temp, formatString);
 	//sprintf(formatString, "%s\n", temp);
@@ -205,7 +217,7 @@ static bool isOK_setFormat(void) {
 		return false;
 	}
 	OutputFormat format;
-	char separator = '%';
+	char separator[] = { '%', 'X' };
 	ushort code = 1;
 	nameString name = "multiformat";
 	ushort precision = 5;
@@ -213,9 +225,9 @@ static bool isOK_setFormat(void) {
 	ushort width = 12;
 	nameString output;
 	nameString result[2][2] = { { "% 12.5lg", "% 12.5lg %% % 12.5lg" }, //
-			{ "%- 12.5lg", "%- 12.5lg %% %- 12.5lg" } };
-	for (short i = 0; i < 2; i++, neg(&leftJusfified)) {
-		setOutputFormat(&format, precision, width, separator, leftJusfified, name, code);
+			{ "% 12.5lg", "% 12.5lg X % 12.5lg" } };
+	for (ushort i = 0; i < 2; i++) {
+		setOutputFormat(&format, precision, width, separator[i], leftJusfified, name, code);
 		SAVE_FUNCTION_CALLER();
 		setFormat(output, 1, &format);
 		if (strcmp(result[i][0], output)) {
