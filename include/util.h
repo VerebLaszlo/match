@@ -57,10 +57,14 @@ extern char errBold[]; ///< bold color code for error messages
 extern char ok[]; ///< color code for ok messages
 extern char okBold[]; ///< bold color code for ok messages
 
+#define BACKUP_DEFINITION_LINE()\
+	static size_t __line_of_definition__;\
+	__line_of_definition__ = __LINE__ - 2;
+
 /** Saves the function's name, the name of the file containing it and the line number of the
  * definition of the function. Put it right after the declaration, before everything else!!! */
 #define SAVE_FUNCTION_FOR_TESTING() \
-	sourceLocation.line = __LINE__ - 1;\
+	sourceLocation.line = __line_of_definition__;\
 	strcpy(sourceLocation.function, __func__);\
 	strcpy(sourceLocation.file, __FILE__);
 

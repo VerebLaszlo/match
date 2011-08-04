@@ -19,24 +19,28 @@
  * @param[in,out] mass	: all mass parameters.
  */
 static void m1m2ToRemainingMass(massParameters *mass) {
-	SAVE_FUNCTION_FOR_TESTING();assert(mass);
+	BACKUP_DEFINITION_LINE(); //
+	assert(mass);
 	assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
 	mass->m1_m2 = mass->mass[0] / mass->mass[1];
 	mass->nu =
 			mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] :
 					mass->mass[1] / mass->mass[0];
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /** Returns the magnitude of the spins.
  * @param[in,out] spin	: spin components
  */
 static void magnitudeOfSpin(spinParameters *spin) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE(); //
+	assert(spin);
 	spin->magnitude = 0.0;
 	for (short j = 0; j < DIMENSION; j++) {
 		spin->magnitude += square(spin->component[FIXED][j]);
 	}
 	spin->magnitude = sqrt(spin->magnitude);
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Returns true, if the mass parameters are between their limits.
@@ -45,7 +49,9 @@ static void magnitudeOfSpin(spinParameters *spin) {
  * @return true or false
  */
 static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE(); //
+	assert(mass);
+	assert(limits);
 	bool between = true;
 	for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
 		if (limits[MIN].mass[i] > mass->mass[i] || mass->mass[i] > limits[MAX].mass[i]) {
@@ -71,6 +77,7 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 		between = false;
 	}
 	return between;
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Returns true, if the mass parameters are between their limits.
@@ -79,7 +86,9 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
  * @return true or false
  */
 static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE(); //
+	assert(spin);
+	assert(limits);
 	if (limits[MIN].magnitude > spin->magnitude || spin->magnitude > limits[MAX].magnitude) {
 		return false;
 	}
@@ -106,6 +115,7 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
 		}
 	}
 	return true;
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 ///@}
@@ -117,7 +127,8 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
  * @param[in]	  convert	: specifies the initial parameters
  */
 static void convertMasses(massParameters *mass, conversionMode convert) {
-	SAVE_FUNCTION_FOR_TESTING();assert(mass);
+	BACKUP_DEFINITION_LINE(); //
+	assert(mass);
 	switch (convert) {
 	case FROM_M1M2:
 		assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
@@ -145,6 +156,7 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
 	default:
 		break;
 	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Converts spin components to angles in the specified frame.
@@ -152,7 +164,7 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
  * @param[in]		index	: frame
  */
 static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort index) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE();
 	spin->inclination[index] = acos(spin->component[index][Z] / spin->magnitude);
 	spin->azimuth[index] = -acos(
 			spin->component[index][X] / spin->magnitude / sin(spin->inclination[index]));
@@ -162,6 +174,7 @@ static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort index)
 	if (!isfinite(spin->azimuth[index])) {
 		spin->azimuth[index] = 0.0;
 	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Converts spin angles to components in the specified frame.
@@ -169,7 +182,7 @@ static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort index)
  * @param[in]		index	: frame
  */
 static void convertSpinFromAnglesToXzy(spinParameters *spin, const ushort index) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE();
 	double cosAzimuth, cosInclination;
 	cosAzimuth = spin->azimuth[index] == M_PI_2 ? 0.0 : cos(spin->azimuth[index]);
 	cosInclination = spin->inclination[index] == M_PI_2 ? 0.0 : cos(spin->inclination[index]);
@@ -177,6 +190,7 @@ static void convertSpinFromAnglesToXzy(spinParameters *spin, const ushort index)
 	spin->component[index][Y] = spin->magnitude * sin(spin->inclination[index])
 			* sin(spin->azimuth[index]);
 	spin->component[index][Z] = spin->magnitude * cosInclination;
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Converts spin parameters from the fixed frame to the precessing frame.
@@ -184,7 +198,8 @@ static void convertSpinFromAnglesToXzy(spinParameters *spin, const ushort index)
  * @param[in]		inclination	: inclination of the precessing frame
  */
 static void convertSpinFromFixedFrame(spinParameters *spin, const double inclination) {
-	SAVE_FUNCTION_FOR_TESTING();assert(spin);
+	BACKUP_DEFINITION_LINE(); //
+	assert(spin);
 	double theta[2] = { +0.0, inclination };
 	spin->component[PRECESSING][X] = spin->component[FIXED][X] * cos(theta[0]) * cos(theta[1])
 			+ spin->component[FIXED][Y] * sin(theta[0]) * cos(theta[1])
@@ -194,6 +209,7 @@ static void convertSpinFromFixedFrame(spinParameters *spin, const double inclina
 	spin->component[PRECESSING][Z] = spin->component[FIXED][X] * cos(theta[0]) * sin(theta[1])
 			+ spin->component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
 			+ spin->component[FIXED][Z] * cos(theta[1]);
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Converts spin parameters from the precessing frame to the fixed frame.
@@ -201,7 +217,8 @@ static void convertSpinFromFixedFrame(spinParameters *spin, const double inclina
  * @param[in]		inclination	: inclination of the precessing frame
  */
 static void convertSpinFromPrecessionFrame(spinParameters *spin, const double inclination) {
-	SAVE_FUNCTION_FOR_TESTING();assert(spin);
+	BACKUP_DEFINITION_LINE(); //
+	assert(spin);
 	double theta[2] = { -0.0, inclination };
 	spin->component[FIXED][X] = spin->magnitude
 			* (+spin->component[PRECESSING][X] * cos(theta[0]) * cos(theta[1])
@@ -214,6 +231,7 @@ static void convertSpinFromPrecessionFrame(spinParameters *spin, const double in
 	spin->component[FIXED][Z] = spin->magnitude
 			* (+spin->component[PRECESSING][X] * sin(theta[1])
 					+ spin->component[PRECESSING][Y] * cos(theta[1]));
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Converts spin parameters according the conversion parameter.
@@ -223,7 +241,8 @@ static void convertSpinFromPrecessionFrame(spinParameters *spin, const double in
  */
 static void convertSpin(spinParameters spin[NUMBER_OF_BLACKHOLES], const double inclination,
 		conversionMode convert) {
-	SAVE_FUNCTION_FOR_TESTING();assert(spin);
+	BACKUP_DEFINITION_LINE(); //
+	assert(spin);
 	switch (convert) {
 	case FROM_FIXED_XYZ:
 		magnitudeOfSpin(spin);
@@ -250,6 +269,7 @@ static void convertSpin(spinParameters spin[NUMBER_OF_BLACKHOLES], const double 
 	default:
 		break;
 	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 ///@}
@@ -262,7 +282,8 @@ static void convertSpin(spinParameters spin[NUMBER_OF_BLACKHOLES], const double 
  * @param[in]	mode	: generation mode
  */
 static void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
-	SAVE_FUNCTION_FOR_TESTING();assert(mass);
+	BACKUP_DEFINITION_LINE(); //
+	assert(mass);
 	assert(limits);
 	switch (mode) {
 	case GEN_ETAM:
@@ -290,6 +311,7 @@ static void generateMass(massParameters *mass, massParameters *limits, generatio
 	default:
 		break;
 	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /** Generates the spin parameters according the generation mode.
@@ -300,7 +322,8 @@ static void generateMass(massParameters *mass, massParameters *limits, generatio
  */
 static void generateSpin(spinParameters *spin, spinParameters limits[], double inclination,
 		conversionMode mode) {
-	SAVE_FUNCTION_FOR_TESTING();assert(spin);
+	BACKUP_DEFINITION_LINE(); //
+	assert(spin);
 	assert(limits);
 	switch (mode) {
 	case GEN_FIXED_XYZ:
@@ -352,11 +375,13 @@ static void generateSpin(spinParameters *spin, spinParameters limits[], double i
 	default:
 		break;
 	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 		generationMode genMass, generationMode genSpin) {
-	SAVE_FUNCTION_FOR_TESTING();assert(system);
+	BACKUP_DEFINITION_LINE(); //
+	assert(system);
 	assert(limits);
 	system->inclination = randomBetween(limits[MIN].inclination, limits[MAX].inclination);
 	system->distance = randomBetween(limits[MIN].distance, limits[MAX].distance);
@@ -371,6 +396,7 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 		spin[MAX] = limits[MAX].spin[0];
 		generateSpin(&system->spin[i], spin, system->inclination, genSpin);
 	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 ///@}
@@ -383,13 +409,14 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
  * @param format
  */
 static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE();
 	ushort number = 4;
 	char formatString[number * format->widthWithSeparator];setFormat
 	(formatString, number, format);
 	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);
 	setFormatEnd(formatString, number, format);
 	fprintf(file, formatString, mass->chirpMass, mass->mu, mass->nu, mass->m1_m2);
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**
@@ -398,7 +425,7 @@ static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *
  * @param format
  */
 static void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE();
 	ushort number = 3;
 	char formatString[number * format->widthWithSeparator];for
 (	ushort i = FIXED; i < COORDINATE_CONVENTIONS; i++) {
@@ -410,10 +437,11 @@ static void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *
 		setFormatEnd(formatString, 1, format);
 		fprintf(file, formatString, spin->magnitude);
 	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format) {
-	SAVE_FUNCTION_FOR_TESTING();
+	BACKUP_DEFINITION_LINE();
 	printMassParameters(file, &system->mass, format);
 	printSpinParameters(file, &system->spin[0], format);
 	printSpinParameters(file, &system->spin[1], format);
@@ -424,6 +452,7 @@ void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat 
 	setFormatEnd(formatString, number, format);
 	fprintf(file, formatString, system->distance, system->coalescencePhase,
 			system->coalescenceTime);
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 ///@}
