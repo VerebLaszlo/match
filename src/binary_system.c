@@ -76,8 +76,8 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 	if (limits[MIN].m1_m2 > mass->m1_m2 || mass->m1_m2 > limits[MAX].m1_m2) {
 		between = false;
 	}
-	return between;
 	SAVE_FUNCTION_FOR_TESTING();
+	return between;
 }
 
 /**	Returns true, if the mass parameters are between their limits.
@@ -114,8 +114,8 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
 			}
 		}
 	}
-	return true;
 	SAVE_FUNCTION_FOR_TESTING();
+	return true;
 }
 
 ///@}
@@ -672,6 +672,72 @@ static bool isOK_isSpinBetweenLimits(void) {
 	return true;
 }
 
+static bool isOK_convertMassesFromM1M2(void) {
+	if (!isOK_m1m2ToRemainingMass()) {
+		return false;
+	}
+	massParameters mass, result;
+	mass.mass[0] = result.mass[0] = 90.0;
+	mass.mass[1] = result.mass[1] = 10.0;
+	result.totalMass = 100.0;
+	result.mu = 9.0;
+	result.eta = 0.09;
+	result.chirpMass = calcChirpMass(result.totalMass, result.eta);
+	m1m2ToRemainingMass(&result);
+	SAVE_FUNCTION_CALLER();
+	convertMassesFromM1M2(&mass);
+	if (memcmp(&mass, &result, sizeof(massParameters))) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	return true;
+}
+
+static bool isOK_convertMassesEtaM(void) {
+	if (!isOK_m1m2ToRemainingMass()) {
+		return false;
+	}
+	massParameters mass, result;
+	mass.totalMass = result.totalMass = 100.0;
+	mass.eta = result.eta = 0.09;
+	result.mass[0] = 90.0;
+	result.mass[1] = 10.0;
+	result.mu = 9.0;
+	result.chirpMass = calcChirpMass(result.totalMass, result.eta);
+	m1m2ToRemainingMass(&result);
+	SAVE_FUNCTION_CALLER();
+	convertMassesFromEtaM(&mass);
+	if (memcmp(&mass, &result, sizeof(massParameters))) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	return true;
+}
+
+static bool isOK_convertMassesEtaChirp(void) {
+	if (!isOK_m1m2ToRemainingMass()) {
+		return false;
+	}
+	massParameters mass, result;
+	result.totalMass = 100.0;
+	mass.eta = result.eta = 0.09;
+	mass.chirpMass = result.chirpMass = calcChirpMass(result.totalMass, result.eta);
+	result.mass[0] = 90.0;
+	result.mass[1] = 10.0;
+	result.mu = 9.0;
+	m1m2ToRemainingMass(&result);
+	SAVE_FUNCTION_CALLER();
+	convertMassesFromEtaChirp(&mass);
+	if (memcmp(&mass, &result, sizeof(massParameters))) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	return true;
+}
+
 static bool isOK_printMassParameters(void) {
 	massParameters mass = { { 30.0, 3.0 }, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0 };
 	SAVE_FUNCTION_CALLER();
@@ -681,8 +747,9 @@ static bool isOK_printMassParameters(void) {
 }
 
 bool areBinarySystemFunctionsGood(void) {
-	if (isOK_m1m2ToRemainingMass() && isOK_magnitudeOfSpins() && isOK_isMassBetweenLimits()
-			&& isOK_isSpinBetweenLimits()) {
+	if (isOK_magnitudeOfSpins() && isOK_isSpinBetweenLimits() && isOK_isMassBetweenLimits()
+			&& isOK_convertMassesFromM1M2() && isOK_convertMassesEtaM()
+			&& isOK_convertMassesEtaChirp()) {
 		return true;
 	}
 	return false;
