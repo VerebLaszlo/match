@@ -122,6 +122,51 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
 /// @name Conversion functions
 ///@{
 
+static double calcChirpMass(double totalMass, double eta) {
+	return pow(eta, 3.0 / 5.0) * totalMass;
+}
+
+/**	Converts mass parameters from \f$m_1, m_2\f$.
+ * @param[in,out] mass : mass parameters
+ */
+static void convertMassesFromM1M2(massParameters *mass) {
+	BACKUP_DEFINITION_LINE(); //
+	assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
+	mass->totalMass = mass->mass[0] + mass->mass[1];
+	mass->mu = mass->mass[0] * mass->mass[1] / mass->totalMass;
+	mass->eta = mass->mu / mass->totalMass;
+	mass->chirpMass = calcChirpMass(mass->totalMass, mass->eta);
+	m1m2ToRemainingMass(mass);
+	SAVE_FUNCTION_FOR_TESTING();
+}
+
+/**	Converts mass parameters from \f$\eta, M\f$.
+ * @param[in,out] mass : mass parameters
+ */
+static void convertMassesFromEtaM(massParameters *mass) {
+	BACKUP_DEFINITION_LINE(); //
+	assert(mass->totalMass > 0.0 && mass->eta > 0.0 && mass->eta <= 0.25);
+	mass->mass[0] = (1.0 + sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
+	mass->mass[1] = (1.0 - sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
+	mass->mu = mass->eta * mass->totalMass;
+	mass->chirpMass = calcChirpMass(mass->totalMass, mass->eta);
+	m1m2ToRemainingMass(mass);
+	SAVE_FUNCTION_FOR_TESTING();
+}
+
+/**	Converts mass parameters from \f$\eta, \mathcal{M}\f$.
+ * @param[in,out] mass : mass parameters
+ */
+static void convertMassesFromEtaChirp(massParameters *mass) {
+	BACKUP_DEFINITION_LINE(); //
+	assert(mass->chirpMass > 0.0 &&mass->eta > 0.0 && mass->eta <= 0.25);
+	mass->totalMass = mass->chirpMass / pow(mass->eta, 3.0 / 5.0);
+	mass->mass[0] = (1.0 + sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
+	mass->mass[1] = (1.0 - sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
+	m1m2ToRemainingMass(mass);
+	SAVE_FUNCTION_FOR_TESTING();
+}
+
 /** Converts mass parameters according
  * @param[in,out] mass		: initial and calculated mass parameters
  * @param[in]	  convert	: specifies the initial parameters
@@ -131,27 +176,13 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
 	assert(mass);
 	switch (convert) {
 	case FROM_M1M2:
-		assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
-		mass->totalMass = mass->mass[0] + mass->mass[1];
-		mass->mu = mass->mass[0] * mass->mass[1] / mass->totalMass;
-		mass->eta = mass->mu / mass->totalMass;
-		mass->chirpMass = pow(mass->eta, 3.0 / 5.0) * mass->totalMass;
-		m1m2ToRemainingMass(mass);
+		convertMassesFromM1M2(mass);
 		break;
 	case FROM_ETAM:
-		assert(mass->totalMass > 0.0 && mass->eta > 0.0 && mass->eta <= 0.25);
-		mass->mass[0] = (1.0 + sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
-		mass->mass[1] = (1.0 - sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
-		mass->mu = mass->eta * mass->totalMass;
-		mass->chirpMass = pow(mass->eta, 3.0 / 5.0) * mass->totalMass;
-		m1m2ToRemainingMass(mass);
+		convertMassesFromEtaM(mass);
 		break;
 	case FROM_ETACHIRP:
-		assert(mass->chirpMass > 0.0 &&mass->eta > 0.0 && mass->eta <= 0.25);
-		mass->totalMass = mass->chirpMass / pow(mass->eta, 3.0 / 5.0);
-		mass->mass[0] = (1.0 + sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
-		mass->mass[1] = (1.0 - sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
-		m1m2ToRemainingMass(mass);
+		convertMassesFromEtaChirp(mass);
 		break;
 	default:
 		break;
