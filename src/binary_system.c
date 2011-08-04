@@ -385,8 +385,8 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 static void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
 	SAVE_FUNCTION_FOR_TESTING();
 	ushort number = 4;
-	char formatString[number * format->widthWithSeparator];setFormat
-	(formatString, number, format);
+	char formatString[number * format->widthWithSeparator];
+	setFormat(formatString, number, format);
 	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);
 	fprintf(file, formatString, mass->chirpMass, mass->mu, mass->nu, mass->m1_m2);
 }
@@ -508,29 +508,31 @@ static bool isOK_isMassBetweenLimits(void) {
 			return false;
 		}
 	}
-	mass.mass[0] = limits[MAX].mass[0] / 4.0;
-	mass.mass[1] = limits[MAX].mass[1] / 4.0;
-	mass.eta = limits[MAX].eta / 4.0;
-	mass.totalMass = limits[MAX].totalMass / 4.0;
-	mass.chirpMass = limits[MAX].chirpMass / 4.0;
-	mass.mu = limits[MAX].mu / 4.0;
-	mass.nu = limits[MAX].nu / 4.0;
-	mass.m1_m2 = limits[MAX].m1_m2 / 4.0;
+	double multMod = mult + 1.0;
+	mass.mass[0] = limits[MAX].mass[0] / multMod;
+	mass.mass[1] = limits[MAX].mass[1] / multMod;
+	mass.eta = limits[MAX].eta / multMod;
+	mass.totalMass = limits[MAX].totalMass / multMod;
+	mass.chirpMass = limits[MAX].chirpMass / multMod;
+	mass.mu = limits[MAX].mu / multMod;
+	mass.nu = limits[MAX].nu / multMod;
+	mass.m1_m2 = limits[MAX].m1_m2 / multMod;
 	SAVE_FUNCTION_CALLER();
 	if (isMassBetweenLimits(&mass, limits)) {
 		PRINT_ERROR();
 		return false;
 	}
-	mass.mass[0] = limits[MAX].mass[0] * 2.0;
-	mass.mass[1] = limits[MAX].mass[1] * 2.0;
-	mass.eta = limits[MAX].eta * 2.0;
-	mass.totalMass = limits[MAX].totalMass * 2.0;
-	mass.chirpMass = limits[MAX].chirpMass * 2.0;
-	mass.mu = limits[MAX].mu * 2.0;
-	mass.nu = limits[MAX].nu * 2.0;
-	mass.m1_m2 = limits[MAX].m1_m2 * 2.0;
+	multMod = mult - 1.0;
+	mass.mass[0] = limits[MAX].mass[0] * multMod;
+	mass.mass[1] = limits[MAX].mass[1] * multMod;
+	mass.eta = limits[MAX].eta * multMod;
+	mass.totalMass = limits[MAX].totalMass * multMod;
+	mass.chirpMass = limits[MAX].chirpMass * multMod;
+	mass.mu = limits[MAX].mu * multMod;
+	mass.nu = limits[MAX].nu * multMod;
+	mass.m1_m2 = limits[MAX].m1_m2 * multMod;
 	SAVE_FUNCTION_CALLER();
-	if (!isMassBetweenLimits(&mass, limits)) {
+	if (isMassBetweenLimits(&mass, limits)) {
 		PRINT_ERROR();
 		return false;
 	}
@@ -539,9 +541,87 @@ static bool isOK_isMassBetweenLimits(void) {
 }
 
 static bool isOK_isSpinBetweenLimits(void) {
+	double mult = 3.0;
+	spinParameters spin, limits[2];
+	limits[MAX].magnitude = mult * (limits[MIN].magnitude = 0.9);
+	for (ushort coordinate = 0; coordinate < COORDINATE_CONVENTIONS; coordinate++) {
+		limits[MAX].azimuth[coordinate] = mult
+				* (limits[MIN].azimuth[coordinate] = 0.3 + (double) coordinate);
+		limits[MAX].inclination[coordinate] = mult
+				* (limits[MIN].inclination[coordinate] = 0.3 + (double) coordinate);
+		limits[MAX].elevation[coordinate] = mult
+				* (limits[MIN].elevation[coordinate] = 0.3 + (double) coordinate);
+		for (ushort dim = 0; dim < DIMENSION; dim++) {
+			limits[MAX].component[coordinate][dim] = mult
+					* (limits[MIN].component[coordinate][dim] = 0.3 + (double) (coordinate + dim));
+			limits[MAX].unity[coordinate][dim] = mult
+					* (limits[MIN].unity[coordinate][dim] = 0.1 + (double) (coordinate + dim));
+		}
+	}
+	for (ushort i = 1; i < mult; i++) {
+		spin.magnitude = limits[MAX].magnitude / (double) i;
+		for (ushort coordinate = 0; coordinate < COORDINATE_CONVENTIONS; coordinate++) {
+			spin.azimuth[coordinate] = limits[MAX].azimuth[coordinate] / (double) i;
+			spin.inclination[coordinate] = limits[MAX].inclination[coordinate] / (double) i;
+			spin.elevation[coordinate] = limits[MAX].elevation[coordinate] / (double) i;
+			for (ushort dim = 0; dim < DIMENSION; dim++) {
+				spin.component[coordinate][dim] = limits[MAX].component[coordinate][dim]
+						/ (double) i;
+				spin.unity[coordinate][dim] = limits[MAX].unity[coordinate][dim] / (double) i;
+			}
+		}
+		SAVE_FUNCTION_CALLER();
+		if (!isSpinBetweenLimits(&spin, limits)) {
+			PRINT_ERROR();
+			return false;
+		}
+	}
+	double multMod = mult + 1.0;
+	spin.magnitude = limits[MAX].magnitude / (double) multMod;
+	for (ushort coordinate = 0; coordinate < COORDINATE_CONVENTIONS; coordinate++) {
+		spin.azimuth[coordinate] = limits[MAX].azimuth[coordinate] / (double) multMod;
+		spin.inclination[coordinate] = limits[MAX].inclination[coordinate] / (double) multMod;
+		spin.elevation[coordinate] = limits[MAX].elevation[coordinate] / (double) multMod;
+		for (ushort dim = 0; dim < DIMENSION; dim++) {
+			spin.component[coordinate][dim] = limits[MAX].component[coordinate][dim]
+					/ (double) multMod;
+			spin.unity[coordinate][dim] = limits[MAX].unity[coordinate][dim] / (double) multMod;
+		}
+	}
+	SAVE_FUNCTION_CALLER();
+	if (isSpinBetweenLimits(&spin, limits)) {
+		PRINT_ERROR();
+		return false;
+	}
+	multMod = mult - 1.0;
+	spin.magnitude = limits[MAX].magnitude * multMod;
+	for (ushort coordinate = 0; coordinate < COORDINATE_CONVENTIONS; coordinate++) {
+		spin.azimuth[coordinate] = limits[MAX].azimuth[coordinate] * multMod;
+		spin.inclination[coordinate] = limits[MAX].inclination[coordinate] * multMod;
+		spin.elevation[coordinate] = limits[MAX].elevation[coordinate] * multMod;
+		for (ushort dim = 0; dim < DIMENSION; dim++) {
+			spin.component[coordinate][dim] = limits[MAX].component[coordinate][dim] * multMod;
+			spin.unity[coordinate][dim] = limits[MAX].unity[coordinate][dim] * multMod;
+		}
+	}
+	SAVE_FUNCTION_CALLER();
+	if (isSpinBetweenLimits(&spin, limits)) {
+		PRINT_ERROR();
+		return false;
+	}
 	PRINT_OK();
 	return true;
 }
+
+/*
+static bool isOK_printMassParameters(void) {
+	massParameters mass = { { 30.0, 3.0 }, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0 };
+	//SAVE_FUNCTION_CALLER();
+	//printMassParameters(stdout, &mass, defaultFormat);
+	PRINT_OK();
+	return true;
+}
+*/
 
 bool areBinarySystemFunctionsGood(void) {
 	if (isOK_m1m2ToRemainingMass() && isOK_magnitudeOfSpins() && isOK_isMassBetweenLimits()

@@ -30,5 +30,6 @@ int main(int argc, char *argv[]) {
 	}
 	generateBinarySystemParameters(&system, limits, FROM_M1M2, FROM_FIXED_ANGLES);
 	printBinarySystemParameters(stdout, &system, &format);*/
+	puts("\nOK");
 	return 0;
 }
