@@ -9,66 +9,7 @@
 #ifndef BINARY_SYSTEM_H_
 #define BINARY_SYSTEM_H_
 
-/**	Conversion mode codes.
- */
-typedef enum tagConversionMode {
-	FROM_M1M2 = 0, ///< convert from \f$m_1, m_2\f$
-	FROM_ETAM, ///< convert from \f$\eta, M\f$
-	FROM_ETACHIRP, ///< convert from \f$\eta, \mathcal{M}\f$
-	MASS_CONVERSIONS, ///< number of mass conversion modes
-	FROM_FIXED_XYZ = 0, ///< convert from \f$x, y, z\f$ in fixed convention
-	FROM_FIXED_ANGLES, ///< convert from inclination and azimuth in fixed convention
-	FROM_PRECESSION_XZY, ///< convert from \f$x, y, z\f$ in precessing convention
-	FROM_PRECESSION_ANGLES, ///< convert from inclination and azimuth in precessing convention
-	SPIN_CONVERSIONS, ///< number of spin conversion modes
-	FROM_OTHER = 100,
-///< ???
-} conversionMode;
-
-/** Generation mode codes.
- */
-typedef enum tagGenerationMode {
-	GEN_M1M2 = FROM_M1M2, ///< generate in \f$m_1, m_2\f$
-	GEN_ETAM = FROM_ETAM, ///< generate in \f$\eta, M\f$
-	GEN_ETACHIRP = FROM_ETACHIRP, ///< generate in \f$\eta, \mathcal{M}\f$
-	MASS_GENERATIONS = MASS_CONVERSIONS, ///< number of mass generation modes
-	GEN_FIXED_XYZ = FROM_FIXED_XYZ, ///< generate in \f$x, y, z\f$ in fixed convention
-	GEN_FIXED_ANGLES = FROM_FIXED_ANGLES, ///< generate in inclination and azimuth in fixed convention
-	GEN_PRECESSING_XYZ = FROM_PRECESSION_XZY, ///< generate in \f$x, y, z\f$ in precessing convention
-	GEN_PRECESSING_ANGLES = FROM_PRECESSION_ANGLES, ///< generate in inclination and azimuth in precessing convention
-	SPIN_GENERATIONS = SPIN_CONVERSIONS, ///< number of spin generation modes
-	GEN_OTHER = FROM_OTHER,
-///< ???
-} generationMode;
-
-/**	Various constants for the binary system.
- */
-typedef enum tagSystemConstants {
-	X = 0, ///< x component
-	Y, ///< y component
-	Z, ///< z component
-	DIMENSION, ///< number of the dimensions
-	MIN = 0, ///< MIN
-	MAX, ///< MAX
-	FIXED = 0, ///< fixed convention
-	PRECESSING, ///< precessing convention
-	COORDINATE_CONVENTIONS = 2, ///< number of the spin conventions
-	NUMBER_OF_BLACKHOLES = 2,
-///< number of the blackholes
-///< NUMBER_OF_BLACKHOLES
-} systemConstants;
-
-/**	Contains the mass parameters.
- */
-typedef struct tagMassParameters {
-	double mass[NUMBER_OF_BLACKHOLES]; ///< \f$m_1,m_2\f$ in \f$M_\odot\f$
-	double totalMass; ///< \f$M=m_1+m_2\f$ in \f$M_\odot\f$
-	double eta; ///< \f$\eta=m_1m_2/M^2\f$
-	double mu; ///< \f$\mu=m_1m_2/M\f$ in \f$M_\odot\f$
-	double chirpMass; ///< \f$\mathcal{M}=M\eta^{3/5}\f$ in \f$M_\odot\f$
-	double nu; ///< \f$\min(m_1,m_2)/\max(m_1,m_2)\f$
-	double m1_m2; ///< \f$m_1/m_2\f$
-} massParameters;
+#include "binary_system_mass.h"
 
 /**	Contains the spin parameters.
  */
@@ -109,6 +50,10 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
  */
 void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format);
 
+#ifdef TEST
+
 bool areBinarySystemFunctionsGood(void);
+
+#endif // TEST
 
 #endif /* BINARY_SYSTEM_H_ */

@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
 	argc = argc;
 	argv = argv;
 	areIOFunctionsGood();
+	areBinarySystemMassFunctionsGood();
 	areBinarySystemFunctionsGood();
 	/*OutputFormat format;
 	setOutputFormat(&format, 5, 5, '%', true, "plot", 0);
