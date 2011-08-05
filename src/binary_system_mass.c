@@ -358,6 +358,27 @@ static bool isOK_convertMasses(void) {
 	return true;
 }
 
+static bool isOK_generateMass(void) {
+	if (!isOK_isMassBetweenLimits() || !isOK_convertMasses() || !isOK_randomBetween()) {
+		return false;
+	}
+	massParameters mass, limits[2];
+	limits[MIN].mass[0] = 3.0 * (limits[MIN].mass[1] = 3.0);
+	limits[MAX].mass[0] = 2.0 * (limits[MAX].mass[1] = 30.0);
+	convertMassesFromM1M2(&limits[MIN]);
+	convertMassesFromM1M2(&limits[MAX]);
+	SAVE_FUNCTION_CALLER();
+	generateMass(&mass, limits, GEN_M1M2);
+	if (!isMassBetweenLimits(&mass, limits)) {
+		generateMass(&mass, limits, GEN_M1M2);
+		PRINT_ERROR();
+		return false;
+	}
+	generateMass(&mass, limits, GEN_M1M2);
+	PRINT_OK();
+	return true;
+}
+
 static bool isOK_printMassParameters(void) {
 	massParameters mass = { { 30.0, 3.0 }, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0 };
 	SAVE_FUNCTION_CALLER();
@@ -367,19 +388,13 @@ static bool isOK_printMassParameters(void) {
 }
 
 bool areBinarySystemMassFunctionsGood(void) {
-	bool isOK = true;
-	if (!isOK_isMassBetweenLimits()) {
-		isOK = false;
-	}
-	if (!isOK_convertMasses()) {
-		isOK = false;
-	}
-	if (isOK) {
-		PRINT_OK_FILE();
-	} else {
+	if (!isOK_generateMass()) {
 		PRINT_ERROR_FILE();
+		return false;
+	} else {
+		PRINT_OK_FILE();
+		return true;
 	}
-	return isOK;
 }
 
 #endif	// TEST
