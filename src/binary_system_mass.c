@@ -40,20 +40,16 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 	}
 	if (limits[MIN].eta > mass->eta || mass->eta > limits[MAX].eta) {
 		between = false;
-	}
-	if (limits[MIN].totalMass > mass->totalMass || mass->totalMass > limits[MAX].totalMass) {
+	} else if (limits[MIN].totalMass > mass->totalMass || mass->totalMass > limits[MAX].totalMass) {
 		between = false;
-	}
-	if (limits[MIN].chirpMass > mass->chirpMass || mass->chirpMass > limits[MAX].chirpMass) {
+	} else if (limits[MIN].chirpMass > mass->chirpMass || mass->chirpMass > limits[MAX].chirpMass) {
 		between = false;
-	}
-	if (limits[MIN].mu > mass->mu || mass->mu > limits[MAX].mu) {
+	} else if (limits[MIN].mu > mass->mu || mass->mu > limits[MAX].mu) {
 		between = false;
-	}
-	if (limits[MIN].nu > mass->nu || mass->nu > limits[MAX].nu) {
+	} else if (limits[MIN].nu > mass->nu || mass->nu > limits[MAX].nu) {
 		between = false;
-	}
-	if (limits[MIN].m1_m2 > mass->m1_m2 || mass->m1_m2 > limits[MAX].m1_m2) {
+	} else if ((limits[MIN].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MAX].m1_m2)
+			&& (limits[MAX].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MIN].m1_m2)) {
 		between = false;
 	}
 	SAVE_FUNCTION_FOR_TESTING();
