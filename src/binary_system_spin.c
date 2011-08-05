@@ -68,14 +68,30 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
  */
 static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort index) {
 	BACKUP_DEFINITION_LINE();
-	spin->inclination[index] = acos(spin->component[index][Z] / spin->magnitude);
-	spin->azimuth[index] = -acos(
-			spin->component[index][X] / spin->magnitude / sin(spin->inclination[index]));
-	if (spin->component[index][Y] < 0.0) {
-		spin->azimuth[index] *= -1.0;
-	}
-	if (!isfinite(spin->azimuth[index])) {
-		spin->azimuth[index] = 0.0;
+	if (spin->component[index][X] == 0.0 && spin->component[index][Y] == 0.0
+			&& spin->component[index][Z] == 0.0) {
+		memset(spin, 0, sizeof(spinParameters));
+		spin->inclination[index] = spin->elevation[index] = spin->azimuth[index] = NAN;
+	} else {
+		if (spin->component[index][X] == 0.0 && spin->component[index][Y] == 0.0) {
+			spin->azimuth[index] = NAN;
+		} else if (spin->component[index][Y] == 0.0) {
+			if (spin->component[index][X] > 0.0) {
+				spin->azimuth[index] = 0.0;
+			} else {
+				spin->azimuth[index] = M_PI;
+			}
+		} else if (spin->component[index][X] == 0.0) {
+			if (spin->component[index][Y] > 0.0) {
+				spin->azimuth[index] = M_PI_2;
+			} else {
+				spin->azimuth[index] = -M_PI_2;
+			}
+		} else {
+			spin->azimuth[index] = atan2(spin->component[index][Y], spin->component[index][X]);
+		}
+		spin->inclination[index] = acos(spin->component[index][Z] / spin->magnitude);
+		spin->elevation[index] = M_PI_2 - spin->inclination[index];
 	}
 	SAVE_FUNCTION_FOR_TESTING();
 }
@@ -242,9 +258,8 @@ void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format)
 		setFormat(formatString, number, format);
 		fprintf(file, formatString, spin->component[i][X], spin->component[i][Y],
 				spin->component[i][Z]);
-		//fprintf(file, formatString, spin->unity[i][X], spin->unity[i][Y], spin->unity[i][Z]);
-		fprintf(file, formatString, radianFromDegree(spin->azimuth[i]),
-				radianFromDegree(spin->inclination[i]), radianFromDegree(spin->elevation[i]));
+		fprintf(file, formatString, spin->unity[i][X], spin->unity[i][Y], spin->unity[i][Z]);
+		fprintf(file, formatString, spin->azimuth[i], spin->inclination[i], spin->elevation[i]);
 		setFormatEnd(formatString, 1, format);
 		fprintf(file, formatString, spin->magnitude);
 	}
