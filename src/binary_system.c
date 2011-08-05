@@ -23,6 +23,7 @@ static void m1m2ToRemainingMass(massParameters *mass) {
 	assert(mass);
 	assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
 	mass->m1_m2 = mass->mass[0] / mass->mass[1];
+	mass->mu = mass->eta * mass->totalMass;
 	mass->nu =
 			mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] :
 					mass->mass[1] / mass->mass[0];
@@ -133,8 +134,7 @@ static void convertMassesFromM1M2(massParameters *mass) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(mass->mass[0] > 0.0 && mass->mass[1] > 0.0);
 	mass->totalMass = mass->mass[0] + mass->mass[1];
-	mass->mu = mass->mass[0] * mass->mass[1] / mass->totalMass;
-	mass->eta = mass->mu / mass->totalMass;
+	mass->eta = mass->mass[0] * mass->mass[1] / square(mass->totalMass);
 	mass->chirpMass = calcChirpMass(mass->totalMass, mass->eta);
 	m1m2ToRemainingMass(mass);
 	SAVE_FUNCTION_FOR_TESTING();
@@ -148,7 +148,6 @@ static void convertMassesFromEtaM(massParameters *mass) {
 	assert(mass->totalMass > 0.0 && mass->eta > 0.0 && mass->eta <= 0.25);
 	mass->mass[0] = (1.0 + sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
 	mass->mass[1] = (1.0 - sqrt(1.0 - 4.0 * mass->eta)) * mass->totalMass / 2.0;
-	mass->mu = mass->eta * mass->totalMass;
 	mass->chirpMass = calcChirpMass(mass->totalMass, mass->eta);
 	m1m2ToRemainingMass(mass);
 	SAVE_FUNCTION_FOR_TESTING();
