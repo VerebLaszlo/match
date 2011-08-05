@@ -7,9 +7,7 @@ $@ a cél															\
 $? változtatott fájlok												\
 $* ??????															\
 #####################################################################
-# értékadás															\
-:= értékadás														\
-?= csak ha nincs definiálva											\
+# ?= csak ha nincs definiálva										\
 #####################################################################
 
 include system.mk
@@ -72,7 +70,7 @@ test : macros := -DTEST
 
 test : CFLAGS += $(errorExtraFlags)
 
-test : main_test.o binary_system.o binary_system_mass.o util_math.o util_IO.o util.o -lm
+test : main_test.o binary_system.o binary_system_mass.o binary_system_spin.o util_math.o util_IO.o util.o -lm
 	@echo -e '\e[36mLinking: $@ from $^\e[0m'
 	$(CC) $(CFLAGS) $(macros) -o test $^
 	@echo -e '\e[35mFinished linking: $@\e[0m'

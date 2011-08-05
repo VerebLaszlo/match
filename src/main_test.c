@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 	areUtilMathFunctionsOK();
 	areIOFunctionsGood();
 	areBinarySystemMassFunctionsGood();
-	areBinarySystemFunctionsGood();
+	areBinarySystemSpinFunctionsGood();
 	/*OutputFormat format;
 	setOutputFormat(&format, 5, 5, '%', true, "plot", 0);
 	binarySystem system, limits[2];
