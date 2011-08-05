@@ -116,6 +116,13 @@ double randomBetween(double bottom, double top);
 
 ///@}
 
+#ifdef TEST
+
+bool isOK_randomBetween(void);
+
+bool areUtilMathFunctionsOK(void);
+
+#endif	// TEST
 /// @name OLD
 ///@{
 

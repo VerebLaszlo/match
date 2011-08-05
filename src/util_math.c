@@ -10,9 +10,9 @@
 #include <stdlib.h>
 #include "util_math.h"
 
-static const double RADIAN_PER_DEGREE = M_PI / 180.0;	///< degree to radian conversion constant
-static const double RADIAN_PER_TURN = M_PI + M_PI;	///< turn to radian conversion constant
-static const double DEGREE_PER_TURN = 360.0;	///< turn to degree conversion constant
+static const double RADIAN_PER_DEGREE = M_PI / 180.0; ///< degree to radian conversion constant
+static const double RADIAN_PER_TURN = M_PI + M_PI; ///< turn to radian conversion constant
+static const double DEGREE_PER_TURN = 360.0; ///< turn to degree conversion constant
 
 /// @name Trigonometric functions
 ///@{
@@ -84,15 +84,80 @@ double randomBetweenZeroAndOne(void) {
 }
 
 double randomBetweenZeroAnd(double top) {
+	BACKUP_DEFINITION_LINE();
+	SAVE_FUNCTION_FOR_TESTING();
 	return top * randomBetweenZeroAndOne();
 }
 
 double randomBetween(double bottom, double top) {
+	BACKUP_DEFINITION_LINE();
+	SAVE_FUNCTION_FOR_TESTING();
 	return (top - bottom) * randomBetweenZeroAndOne() + bottom;
 }
 
 ///@}
 
+#ifdef TEST
+
+#include "util.h"
+
+static bool isOK_randomBetweenZeroAndN(void) {
+	double range = +1.0;
+	SAVE_FUNCTION_CALLER();
+	if (randomBetweenZeroAnd(range) < 0) {
+		PRINT_ERROR();
+		return false;
+	}
+	range = -1.0;
+	SAVE_FUNCTION_CALLER();
+	if (randomBetweenZeroAnd(range) > 0) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	return true;
+}
+
+bool isOK_randomBetween(void) {
+	ushort number = 4;
+	double one[] = { +0.0, +0.0, -1.0, +1.0 };
+	double two[] = { -1.0, +1.0, +0.0, +0.0 };
+	double x;
+	for (ushort i = 0; i < number; i += 2) {
+		SAVE_FUNCTION_CALLER();
+		x = randomBetween(one[i], two[i]);
+		if (x > 0) {
+			PRINT_ERROR();
+			return false;
+		}
+		SAVE_FUNCTION_CALLER();
+		x = randomBetween(one[i + 1], two[i + 1]);
+		if (x < 0) {
+			PRINT_ERROR();
+			return false;
+		}
+	}
+	PRINT_OK();
+	return true;
+}
+
+bool areUtilMathFunctionsOK(void) {
+	bool isOK = true;
+	if (!isOK_randomBetweenZeroAndN()) {
+		isOK = false;
+	}
+	if (!isOK_randomBetween()) {
+		isOK = false;
+	}
+	if (isOK) {
+		PRINT_OK_FILE();
+	} else {
+		PRINT_ERROR_FILE();
+	}
+	return isOK;
+}
+
+#endif	// TEST
 /// @name OLD
 ///@{
 
