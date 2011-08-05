@@ -110,7 +110,13 @@ release : CFLAGS += -O3
 # parancsok
 .PHONY : doxy cleandoxy clean cleanobj cleanall all # csak utasítás név, nem cél
 
-doxy :
+doxy : doxyutil
+	doxygen Doxyfile
+
+doxytest : doxyutil
+	doxygen DoxyfileTest
+
+doxyutil :
 	-mkdir doc
 	-mkdir doc/html
 	-mkdir doc/latex
@@ -118,7 +124,6 @@ doxy :
 	cp doc/style.sty doc/html/style.sty
 	cp doc/style.sty doc/latex/style.sty
 	clear scr
-	doxygen
 
 cleandoxy :
 	-rm -R doc/*

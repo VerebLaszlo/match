@@ -97,9 +97,8 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format);
 
 void setFormatEnd(char formatString[], const ushort number, OutputFormat *format);
 
-#ifdef TEST
-
 ///@}
+#ifdef TEST
 /// @name Test functions
 ///@{
 
