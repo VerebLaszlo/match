@@ -13,8 +13,8 @@
 
 #include <math.h>
 #include <assert.h>
-#include "binary_system_spin.h"
 #include "util_math.h"
+#include "binary_system.h"
 
 /** Returns the magnitude of the spins.
  * @param[in,out] spin	: spin components
