@@ -6,7 +6,14 @@
  * @brief
  */
 
+#ifdef TEST
+#include "test.h"
+#endif
+
 #include "binary_system_mass.h"
+#include <math.h>
+#include <assert.h>
+#include "util_math.h"
 
 /** Calculates \f$\nu, m_1, m_2\f$ from \f$\eta, M\f$.
  * @param[in,out] mass	: all mass parameters.
@@ -51,7 +58,7 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 	} else if ((limits[MIN].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MAX].m1_m2)
 		&& (limits[MAX].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MIN].m1_m2)) {
 		between = false;
-	} SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 	return between;
 }
 
@@ -117,7 +124,7 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
 		break;
 	default:
 		break;
-	} SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
@@ -149,7 +156,7 @@ void generateMass(massParameters *mass, massParameters *limits, generationMode m
 		break;
 	default:
 		break;
-	} SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**

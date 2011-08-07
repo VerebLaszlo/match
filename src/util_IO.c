@@ -6,6 +6,10 @@
  * @brief Handles input-output specific events.
  */
 
+#ifdef TEST
+#include "test.h"
+#endif
+
 #include <errno.h>
 #include <stdlib.h>
 #include "util_IO.h"

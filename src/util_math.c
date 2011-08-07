@@ -5,6 +5,10 @@
  * @brief Various utilities for math.
  */
 
+#ifdef TEST
+#include "test.h"
+#endif
+
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -104,8 +108,6 @@ bool isNear(const double first, const double second, const double epsilon) {
 }
 
 #ifdef TEST
-
-#include "util.h"
 
 static bool isOK_randomBetweenZeroAndN(void) {
 	double range = +1.0;

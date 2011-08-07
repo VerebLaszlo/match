@@ -6,6 +6,12 @@
  * @brief Binary system specific
  */
 
+#ifdef TEST
+#include "test.h"
+#endif
+
+#include <assert.h>
+#include "util_math.h"
 #include "binary_system.h"
 
 /// @name Generation functions

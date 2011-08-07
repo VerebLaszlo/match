@@ -10,7 +10,7 @@
 #define UTIL_IO_H_
 
 #include <stdio.h>
-#include "util.h"
+#include <stdbool.h>
 
 /// @name File handling functions
 ///@{

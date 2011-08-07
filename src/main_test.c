@@ -6,10 +6,8 @@
  * @brief
  */
 
-#include <math.h>
 #include <time.h>
 #include <stdlib.h>
-#include "util_IO.h"
 #include "util_math.h"
 #include "binary_system.h"
 

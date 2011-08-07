@@ -6,9 +6,15 @@
  * @brief
  */
 
+#ifdef TEST
+#include "test.h"
+#include <stdlib.h>
+#endif
+
 #include <math.h>
 #include <assert.h>
 #include "binary_system_spin.h"
+#include "util_math.h"
 
 /** Returns the magnitude of the spins.
  * @param[in,out] spin	: spin components
@@ -244,7 +250,7 @@ void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format)
 	}SAVE_FUNCTION_FOR_TESTING();
 }
 
-//#ifdef TEST
+#ifdef TEST
 /// @name Testing functions
 ///@{
 
@@ -441,4 +447,4 @@ bool areBinarySystemSpinFunctionsGood(void) {
 	return isOK;
 }
 ///@}
-//#endif	// TEST
+#endif	// TEST

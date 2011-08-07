@@ -1,32 +1,20 @@
-/*
+/**
  * @file test.c
- *
- * @date Apr 1, 2011
- * @author vereb
+ * @author László Veréb
+ * @date 2011.08.07.
+ * @brief Macros for testing functions.
  */
 
 #include "test.h"
 
-struct CONSTANTSSTRUCT;
-
-CONSTANTS XX;
-
-void set_Values(void) {
-	XX.EGY = 1;
-	XX.PI = 3.14;
-}
-
-int get_Int(void) {
-	return XX.EGY;
-}
-
-double get_Double(void) {
-	return XX.PI;
-}
-
-COnstants get_Constants(void) {
-	COnstants temp;
-	temp.EGY = XX.EGY;
-	temp.PI = XX.PI;
-	return temp;
-}
+#ifdef TEST
+_sourceLocation sourceLocation;
+char previous_function[FILENAME_MAX];
+char function_file[FILENAME_MAX];
+ushort function_line;
+char normal[8] = "\e[0m";
+char err[8] = "\e[0;31m";
+char errBold[8] = "\e[1;31m";
+char ok[8] = "\e[0;36m";
+char okBold[8] = "\e[1;36m";
+#endif
