@@ -97,6 +97,12 @@ double randomBetween(double bottom, double top) {
 
 ///@}
 
+const double EPSILON = 1.110223024625157e-16;
+
+bool isNear(const double first, const double second, const double epsilon) {
+	return fabs(first - second) < epsilon;
+}
+
 #ifdef TEST
 
 #include "util.h"
@@ -120,8 +126,8 @@ static bool isOK_randomBetweenZeroAndN(void) {
 
 bool isOK_randomBetween(void) {
 	ushort number = 4;
-	double one[] = { +0.0, +0.0, -1.0, +1.0 };
-	double two[] = { -1.0, +1.0, +0.0, +0.0 };
+	double one[] = {+0.0, +0.0, -1.0, +1.0};
+	double two[] = {-1.0, +1.0, +0.0, +0.0};
 	double x;
 	for (ushort i = 0; i < number; i += 2) {
 		SAVE_FUNCTION_CALLER();
@@ -195,12 +201,6 @@ inline double convert_Time_To_Radian(double hour, double minute, double second) 
 }
 
 // trigonometric functions
-
-const double epsilon = 1.0e-14;
-
-inline double is_Near(const double first, const double second, const double epsilon) {
-	return fabs(first - second) < epsilon;
-}
 
 inline double is_Equal(const double first, const double second) {
 	return !islessgreater(first, second);

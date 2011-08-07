@@ -116,6 +116,10 @@ double randomBetween(double bottom, double top);
 
 ///@}
 
+extern const double EPSILON;
+
+bool isNear(const double first, const double second, const double epsilon);
+
 #ifdef TEST
 
 bool isOK_randomBetween(void);
