@@ -53,10 +53,11 @@ FILE *safelyOpenForAppend(const char *fileName);
 typedef enum OUTPUT_CONSTANTS {
 	SPECIAL_CHARACTER_LENGTH = 6, ///< number of the special characters in the format string: sign, exponents
 	MAXIMUM_WIDTH = 99, ///< maximum width of the number
-	MAXIMUM_PRECISION = MAXIMUM_WIDTH - SPECIAL_CHARACTER_LENGTH,	///< maximum precision ot the number
-	SEPARATOR_LENGTH = 3,	///< length of the separator string: separator character and two spaces on the sides
+	MAXIMUM_PRECISION = MAXIMUM_WIDTH - SPECIAL_CHARACTER_LENGTH, ///< maximum precision ot the number
+	SEPARATOR_LENGTH = 3, ///< length of the separator string: separator character and two spaces on the sides
 	FORMAT_LENGTH = 11,	///< length fo the format string
-	NAMES_LENGTH = 100,	///< maximum length of the names
+	NAMES_LENGTH = 100,
+///< maximum length of the names
 } OUTPUT_CONSTANTS;	///<
 
 typedef char nameString[NAMES_LENGTH]; ///< shorthand for string containing names
@@ -86,7 +87,7 @@ extern OutputFormat *defaultFormat;
  * @param[in]	code			: user defined code of the format
  */
 void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
-		const char separator, bool leftJustified, nameString name, const ushort code);
+	const char separator, bool leftJustified, nameString name, const ushort code);
 
 /**	Set the format for given number of floating pint data to display.
  * @param[out] formatString	: the generated format string

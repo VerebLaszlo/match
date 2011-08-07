@@ -14,7 +14,7 @@
 #include <time.h>
 
 #define MOD_SPIN_INDEX 0///<C
-short is_First;///<a
+short is_First; ///<a
 
 /** Amplitude code
  */
@@ -36,7 +36,7 @@ void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Para
  * @param limits
  */
 void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits,
-		gen_Mode_Masses mass);
+	gen_Mode_Masses mass);
 
 /**
  * Done
@@ -62,7 +62,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
  * @return
  */
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig);
+	signalStruct *sig);
 
 /**
  * Done.
@@ -72,7 +72,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
  * @return
  */
 short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig);
+	signalStruct *sig);
 
 //void find_Waveform_Errors_At_Parameter(Program_Parameters *prog, System_Parameters *parameters,
 //		long index);
@@ -82,6 +82,6 @@ short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Paramet
  * @param parameters
  */
 void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters,
-		short sampling);
+	short sampling);
 
 #endif /* MATCH_QMSS_H_ */

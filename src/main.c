@@ -149,8 +149,7 @@ int main(int argc, char *argv[]) {
 			//print_Two_Signals_With_HPHC(file, &sig, parameters.time_Sampling,
 			//		program_Parameters.width_Of_Number_To_Plot, program_Parameters.precision_To_Plot);
 			print_Two_Signals(file, &sig, parameters.time_Sampling,
-					program_Parameters.width_Of_Number_To_Plot,
-					program_Parameters.precision_To_Plot);
+				program_Parameters.width_Of_Number_To_Plot, program_Parameters.precision_To_Plot);
 			destroy_Signal_Struct1(&sig);
 		}
 		fclose(file);
@@ -184,8 +183,7 @@ int main(int argc, char *argv[]) {
 			file = safelyOpenForWriting(file_Name);
 			print_System_Parameters_For_Plot(file, &parameters);
 			print_Two_Signals(file, &sig, parameters.time_Sampling,
-					program_Parameters.width_Of_Number_To_Plot,
-					program_Parameters.precision_To_Plot);
+				program_Parameters.width_Of_Number_To_Plot, program_Parameters.precision_To_Plot);
 			destroy_Signal_Struct(&sig);
 			fclose(file);
 			//if (xx++ == 0) {
@@ -210,8 +208,7 @@ int main(int argc, char *argv[]) {
 			sprintf(file_Name, "%s/%s.txt", program_Parameters.folder, parameters.name[0]);
 			file = safelyOpenForWriting(file_Name);
 			print_Two_Signals(file, &sig, parameters.time_Sampling,
-					program_Parameters.width_Of_Number_To_Plot,
-					program_Parameters.precision_To_Plot);
+				program_Parameters.width_Of_Number_To_Plot, program_Parameters.precision_To_Plot);
 			destroy_Signal_Struct1(&sig);
 		}
 		fclose(fileIn);

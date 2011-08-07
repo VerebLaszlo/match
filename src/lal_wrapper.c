@@ -21,14 +21,14 @@ int switchMode = LALSQTPN_PRECESSING;
 /** LAL parameters.
  */
 typedef struct LALParameters {
-	LALStatus status;///<a
-	CoherentGW waveform[2];///<a
-	SimInspiralTable injParams[2];///<a
-	PPNParamStruc ppnParams[2];///<a
-	RandomInspiralSignalIn randIn;///<a
-	short shorter;///<a
-	long min_Length;///<a
-	long max_Length;///<a
+	LALStatus status; ///<a
+	CoherentGW waveform[2]; ///<a
+	SimInspiralTable injParams[2]; ///<a
+	PPNParamStruc ppnParams[2]; ///<a
+	RandomInspiralSignalIn randIn; ///<a
+	short shorter; ///<a
+	long min_Length; ///<a
+	long max_Length; ///<a
 	Approximant approx[2];
 } LALParameters;
 
@@ -66,7 +66,7 @@ static void initLALParameters(LALParameters *lalparams, System_Parameters *param
 		lalparams->ppnParams[i].deltaT = 1. / parameters->freq_Sampling;
 		lalparams->injParams[i].amp_order = parameters->amp_Code[i];
 		snprintf(lalparams->injParams[i].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "%s%s%s",
-				parameters->approx[i], parameters->phase[i], parameters->spin[i]);
+			parameters->approx[i], parameters->phase[i], parameters->spin[i]);
 		if (strstr(parameters->approx[i], "SpinQuadTaylor")) {
 			lalparams->approx[i] = SpinQuadTaylor;
 		} else if (strstr(parameters->approx[i], "SpinTaylorFrameless")) {
@@ -120,11 +120,11 @@ static void setSignal_From_A1A2(short i, signalStruct *sig, LALParameters *lal) 
  * @param F
  */
 /*static void setSignal_From_HPHC(short i, signalStruct *sig, LALParameters *lal) {
-	for (long j = 0; j < sig->length[i]; j++) {
-		sig->signal[2 * i][j] = lal->waveform[i].h->data->data[2 * j];
-		sig->signal[2 * i + 1][j] = lal->waveform[i].h->data->data[2 * j + 1];
-	}
-}*/
+ for (long j = 0; j < sig->length[i]; j++) {
+ sig->signal[2 * i][j] = lal->waveform[i].h->data->data[2 * j];
+ sig->signal[2 * i + 1][j] = lal->waveform[i].h->data->data[2 * j + 1];
+ }
+ }*/
 
 /**
  *
@@ -181,7 +181,7 @@ int generateWaveformPair(System_Parameters *parameters, signalStruct *signal) {
 	for (short i = 0; i < 2; i++) {
 		memset(&lalparams.status, 0, sizeof(LALStatus));
 		LALGenerateInspiral(&lalparams.status, &lalparams.waveform[i], &lalparams.injParams[i],
-				&lalparams.ppnParams[i]);
+			&lalparams.ppnParams[i]);
 		if (lalparams.status.statusCode) {
 			fprintf(stderr, "%d: LALSQTPNWaveformTest: error generating waveform\n", i);
 			XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);

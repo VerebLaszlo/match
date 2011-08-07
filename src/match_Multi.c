@@ -18,11 +18,10 @@ double amp = 0.998;
 
 #define PN1 "twoPN"
 
-void multi_Match(program_Params *params, binary_System *act, long num,
-		char dir[50]) {
+void multi_Match(program_Params *params, binary_System *act, long num, char dir[50]) {
 	assert(params);
 	assert(act);
-	assert(num>0);
+	assert(num > 0);
 	// saját
 	signalStruct sig[M_NUM];
 	double *waves[2];
@@ -65,10 +64,10 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 		 sys.bh[0].chi[1] = -(sys.bh[1].chi[1] = 0.);
 		 sys.bh[0].chi[2] = -(sys.bh[1].chi[2] = amp * sin(act[i].incl));
 		 *//*
-		sys.bh[0].chi[0] = -(sys.bh[1].chi[0] = amp * cos(act[i].incl));
-		sys.bh[0].chi[1] = -(sys.bh[1].chi[1] = 0.);
-		sys.bh[0].chi[2] = -(sys.bh[1].chi[2] = amp * sin(act[i].incl));
-		*//*
+		 sys.bh[0].chi[0] = -(sys.bh[1].chi[0] = amp * cos(act[i].incl));
+		 sys.bh[0].chi[1] = -(sys.bh[1].chi[1] = 0.);
+		 sys.bh[0].chi[2] = -(sys.bh[1].chi[2] = amp * sin(act[i].incl));
+		 *//*
 		 sys.bh[0].chi[0] = -(sys.bh[1].chi[0] = -amp * cos(act[i].incl));
 		 sys.bh[0].chi[1] = -(sys.bh[1].chi[1] = 0.);
 		 sys.bh[0].chi[2] = -(sys.bh[1].chi[2] = amp * sin(act[i].incl));
@@ -88,20 +87,20 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 		 sys.bh[1].psi = M_PI;
 		 convert_Spins(&sys, FROM_KAPPA_PSI);*/
 		/*
-		injParams[0].spin1x = sys.bh[0].chi[0];
-		injParams[0].spin1y = sys.bh[0].chi[1];
-		injParams[0].spin1z = sys.bh[0].chi[2];
-		injParams[0].spin2x = sys.bh[1].chi[0];
-		injParams[0].spin2y = sys.bh[1].chi[1];
-		injParams[0].spin2z = sys.bh[1].chi[2];
-		*/
-		 injParams[0].spin1x = act[i].bh[0].chi[0];
-		 injParams[0].spin1y = act[i].bh[0].chi[1];
-		 injParams[0].spin1z = act[i].bh[0].chi[2];
-		 injParams[0].spin2x = act[i].bh[1].chi[0];
-		 injParams[0].spin2y = act[i].bh[1].chi[1];
-		 injParams[0].spin2z = act[i].bh[1].chi[2];
-		 /**/
+		 injParams[0].spin1x = sys.bh[0].chi[0];
+		 injParams[0].spin1y = sys.bh[0].chi[1];
+		 injParams[0].spin1z = sys.bh[0].chi[2];
+		 injParams[0].spin2x = sys.bh[1].chi[0];
+		 injParams[0].spin2y = sys.bh[1].chi[1];
+		 injParams[0].spin2z = sys.bh[1].chi[2];
+		 */
+		injParams[0].spin1x = act[i].bh[0].chi[0];
+		injParams[0].spin1y = act[i].bh[0].chi[1];
+		injParams[0].spin1z = act[i].bh[0].chi[2];
+		injParams[0].spin2x = act[i].bh[1].chi[0];
+		injParams[0].spin2y = act[i].bh[1].chi[1];
+		injParams[0].spin2z = act[i].bh[1].chi[2];
+		/**/
 		injParams[1].spin1x = act[i].bh[0].chi[0];
 		injParams[1].spin1y = act[i].bh[0].chi[1];
 		injParams[1].spin1z = act[i].bh[0].chi[2];
@@ -116,11 +115,9 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 		injParams[1].coa_phase = injParams[0].coa_phase = act[i].coaPhase = 0.;
 		ppnParams.deltaT = 1. / params->freq_Sampling;
 		injParams[1].f_lower = injParams[0].f_lower = params->freq_Initial;
-		snprintf(injParams[0].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
-				"SpinQuadTaylor"PN1"SOSSQM");
-		snprintf(injParams[1].waveform,
-				LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinTaylor"PN1"SS");
+		snprintf(injParams[0].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR),
+			"SpinQuadTaylor"PN1"SOSSQM");
+		snprintf(injParams[1].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "SpinTaylor"PN1"SS");
 		memset(&status, 0, sizeof(LALStatus));
 		memset(&waveform[0], 0, sizeof(CoherentGW));
 		LALGenerateInspiral(&status, &waveform[0], &injParams[0], &ppnParams);
@@ -136,12 +133,10 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 			XLALSQTPNDestroyCoherentGW(&waveform[0]);
 			continue;
 		}
-		long shorter = waveform[0].f->data->length
-				< waveform[1].f->data->length ? 0 : 1;
+		long shorter = waveform[0].f->data->length < waveform[1].f->data->length ? 0 : 1;
 		long min_Length = waveform[shorter].f->data->length;
 		long max_Length = waveform[!shorter].f->data->length;
-		act[i].coaTime = (waveform[0].f->data->length - 1)
-				* params->time_Sampling;
+		act[i].coaTime = (waveform[0].f->data->length - 1) * params->time_Sampling;
 		f0 = waveform[0].f->data->data[waveform[0].f->data->length - 1];
 		f1 = waveform[1].f->data->data[waveform[1].f->data->length - 1];
 		create_Signal_Struct(&sig[0], waveform[!shorter].f->data->length);
@@ -155,8 +150,7 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 		randIn.psd.data = (REAL8*) LALMalloc(sizeof(REAL8) * randIn.psd.length);
 		LALNoiseSpectralDensity(&status, &randIn.psd, &LALLIGOIPsd, df);
 		for (j = 0; j < randIn.psd.length; j++) {
-			sig[0].psd[j] = sig[1].psd[j] = sig[2].psd[j] = sig[3].psd[j]
-					= randIn.psd.data[j];
+			sig[0].psd[j] = sig[1].psd[j] = sig[2].psd[j] = sig[3].psd[j] = randIn.psd.data[j];
 		}
 		for (j = 0; j < 2; j++) {
 			for (k = 0; k < waveform[j].f->data->length; k++) {
@@ -166,32 +160,29 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 				sphi[0] = sin(waveform[j].phi->data->data[k]);
 				cphi[1] = cos(waveform[j].phi->data->data[k] + M_PI / 2.0);
 				sphi[1] = sin(waveform[j].phi->data->data[k] + M_PI / 2.0);
-				waves[j][k] = act[i].F.F[0] * (waveform[j].a->data->data[2 * k]
-						* cshift * cphi[0] - waveform[j].a->data->data[2 * k
-						+ 1] * sshift * sphi[0]) + act[i].F.F[1]
+				waves[j][k] = act[i].F.F[0]
+					* (waveform[j].a->data->data[2 * k] * cshift * cphi[0]
+						- waveform[j].a->data->data[2 * k + 1] * sshift * sphi[0])
+					+ act[i].F.F[1]
 						* (waveform[j].a->data->data[2 * k] * sshift * cphi[0]
-								+ waveform[j].a->data->data[2 * k + 1] * cshift
-										* sphi[0]);
+							+ waveform[j].a->data->data[2 * k + 1] * cshift * sphi[0]);
 				for (l = 0; l < M_NUM; l++) {
 					sig[l].signal[2 * j][k] = act[i].F.F[0] * //
-							(waveform[j].a->data->data[2 * k] * cshift * //
-									cphi[0] - waveform[j].a->data->data[2 * k
-									+ 1] * sshift * sphi[0]) + act[i].F.F[1] * //
+						(waveform[j].a->data->data[2 * k] * cshift * //
+							cphi[0] - waveform[j].a->data->data[2 * k + 1] * sshift * sphi[0])
+						+ act[i].F.F[1] * //
 							(waveform[j].a->data->data[2 * k] * sshift * //
-									cphi[0] + waveform[j].a->data->data[2 * k
-									+ 1] * cshift * sphi[0]);
+								cphi[0] + waveform[j].a->data->data[2 * k + 1] * cshift * sphi[0]);
 					sig[l].signal[2 * j + 1][k] = act[i].F.F[0] * //
-							(waveform[j].a->data->data[2 * k] * cshift * //
-									cphi[1] - waveform[j].a->data->data[2 * k
-									+ 1] * sshift * sphi[1]) + act[i].F.F[1] * //
+						(waveform[j].a->data->data[2 * k] * cshift * //
+							cphi[1] - waveform[j].a->data->data[2 * k + 1] * sshift * sphi[1])
+						+ act[i].F.F[1] * //
 							(waveform[j].a->data->data[2 * k] * sshift * //
-									cphi[1] + waveform[j].a->data->data[2 * k
-									+ 1] * cshift * sphi[1]);
+								cphi[1] + waveform[j].a->data->data[2 * k + 1] * cshift * sphi[1]);
 				}
 			}
 		}
-		params->periodsD = calc_Periods(&params->periods[0],
-				&params->periods[1], &sig[0]);
+		params->periodsD = calc_Periods(&params->periods[0], &params->periods[1], &sig[0]);
 		double freq_Max = (injParams[0].f_final + injParams[1].f_final) / 2.;
 		double freq_Step, fr = 0.;
 		freq_Step = 1. / (ppnParams.deltaT * randIn.psd.length);
@@ -205,7 +196,8 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 			maxfr++;
 		}
 		//		printf("Simp = "PREC"\n", match_Simple(&simp, minfr, maxfr));fflush(stdout);
-		calc_Matches(&sig[0], minfr, maxfr, &params->match_Typ, &params->match_Best, &params->match_Worst);
+		calc_Matches(&sig[0], minfr, maxfr, &params->match_Typ, &params->match_Best,
+			&params->match_Worst);
 		//printf("%ld %d: %lg %lg\n", i, maxTindex, maxT, params->match_TypT);
 		if (params->match_Typ > maxT && params->match_Typ < 1.) {
 			maxT = params->match_Typ;
@@ -217,18 +209,18 @@ void multi_Match(program_Params *params, binary_System *act, long num,
 		print_Binary_System(&act[i], params, file, f0, f1);
 		fprintf(file, "#%s%16s%16s\n", "time", "hSQT", "hST");
 		for (k = 0; k < min_Length; k++) {
-			fprintf(file, PREC" X "PREC" X "PREC"\n", k * ppnParams.deltaT,
-					waves[0][k], waves[1][k]);
-		}
+fprintf		(file, PREC" X "PREC" X "PREC"\n", k * ppnParams.deltaT,
+			waves[0][k], waves[1][k]);
+	}
 		for (; k < max_Length; k++) {
 			if (shorter) {
-				fprintf(file, PREC" X "PREC"\n", k * ppnParams.deltaT,
-						waves[0][k]);
-			} else {
-				fprintf(file, PREC" X ""%-14.8s "" X "PREC"\n", k
-						* ppnParams.deltaT, "", waves[1][k]);
-			}
+fprintf			(file, PREC" X "PREC"\n", k * ppnParams.deltaT,
+				waves[0][k]);
+		} else {
+			fprintf(file, PREC" X ""%-14.8s "" X "PREC"\n", k
+				* ppnParams.deltaT, "", waves[1][k]);
 		}
+	}
 		fclose(file);
 		XLALSQTPNDestroyCoherentGW(&waveform[0]);
 		//XLALSQTPNDestroyCoherentGW(&waveform[1]);

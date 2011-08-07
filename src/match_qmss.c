@@ -8,7 +8,7 @@
 #include "match_qmss.h"
 
 void generate_Same_Parameters(System_Parameters *parameters, binary_System *limits,
-		gen_Mode_Masses mass) {
+	gen_Mode_Masses mass) {
 	assert(parameters);
 	assert(limits);
 	gen_Parameters(&parameters->system[0], &limits[0], &limits[1], mass, KAPPA_PSI);
@@ -57,12 +57,12 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 	}
 	parameters->critical_Match = parameters->match_Minimax;
 	double min_Spin = parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp;
-	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < prog->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp
-			+= prog->spin_Step) {
-		for (; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp < prog->max_Spin; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp
-				+= prog->spin_Step) {
+	for (; parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp < prog->max_Spin;
+		parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp += prog->spin_Step) {
+		for (; parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp < prog->max_Spin;
+			parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp += prog->spin_Step) {
 			if (parameters->system[MOD_SPIN_INDEX].bh[0].chi_Amp == min_Spin
-					&& parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp == min_Spin) {
+				&& parameters->system[MOD_SPIN_INDEX].bh[1].chi_Amp == min_Spin) {
 				continue;
 			}
 			is_Good = calc_Matches_For_ParameterPair(prog, parameters, &second);
@@ -70,12 +70,12 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 				sprintf(file_Name, "%s/first%hd.txt", prog->folder, index);
 				file = safelyOpenForWriting(file_Name);
 				print_Two_Signals(file, &first, parameters->time_Sampling,
-						prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
+					prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
 				fclose(file);
 				sprintf(file_Name, "%s/found%hd.txt", prog->folder, index);
 				file = safelyOpenForWriting(file_Name);
 				print_Two_Signals(file, &first, parameters->time_Sampling,
-						prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
+					prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
 				fclose(file);
 				destroy_Signal_Struct(&first);
 				destroy_Signal_Struct(&second);
@@ -90,14 +90,13 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 }
 
 short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig) {
+	signalStruct *sig) {
 	assert(prog);
 	assert(parameters);
 	generateWaveformPair(parameters, sig);
-	double F[4] = { parameters->system[0].F.antenna_Beam_Pattern[0],
-			parameters->system[0].F.antenna_Beam_Pattern[1],
-			parameters->system[1].F.antenna_Beam_Pattern[0],
-			parameters->system[1].F.antenna_Beam_Pattern[1] };
+	double F[4] = { parameters->system[0].F.antenna_Beam_Pattern[0], parameters->system[0].F
+		.antenna_Beam_Pattern[1], parameters->system[1].F.antenna_Beam_Pattern[0], parameters
+		->system[1].F.antenna_Beam_Pattern[1] };
 	calculate_H_From_HPHC(sig, F);
 	double fr = 0.;
 	long minfr = 0, maxfr = 0;
@@ -111,12 +110,12 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	}
 	if (minfr == maxfr) {
 		fprintf(stderr, "The two frequencies are too close!!! %lg~%lg: %ld %ld\n",
-				parameters->freq_Min, prog->freq_Max, minfr, maxfr);
+			parameters->freq_Min, prog->freq_Max, minfr, maxfr);
 		return NOT_FOUND;
 	}
 	parameters->match_Typ = parameters->match_Best = parameters->match_Minimax = 0.0;
 	calc_Matches(sig, minfr, maxfr, &parameters->match_Typ, &parameters->match_Best,
-			&parameters->match_Minimax);
+		&parameters->match_Minimax);
 	if (parameters->match_Minimax < prog->min_Match) {
 		return NOT_FOUND;
 	}
@@ -124,14 +123,13 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 }
 
 short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
-		signalStruct *sig) {
+	signalStruct *sig) {
 	assert(prog);
 	assert(parameters);
 	generateWaveformPair(parameters, sig);
-	double F[4] = { parameters->system[0].F.antenna_Beam_Pattern[0],
-			parameters->system[0].F.antenna_Beam_Pattern[1],
-			parameters->system[1].F.antenna_Beam_Pattern[0],
-			parameters->system[1].F.antenna_Beam_Pattern[1] };
+	double F[4] = { parameters->system[0].F.antenna_Beam_Pattern[0], parameters->system[0].F
+		.antenna_Beam_Pattern[1], parameters->system[1].F.antenna_Beam_Pattern[0], parameters
+		->system[1].F.antenna_Beam_Pattern[1] };
 	calculate_H_From_HPHC(sig, F);
 	return 0;
 }
@@ -142,7 +140,7 @@ short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Paramet
  * @param parameters
  */
 static void generate_Waveform_For_Testing_Speed(Program_Parameters *prog,
-		System_Parameters *parameters) {
+	System_Parameters *parameters) {
 	assert(prog);
 	assert(parameters);
 	generateWaveformPair(parameters, NULL);
@@ -175,7 +173,7 @@ static void generate_Waveform_For_Testing_Speed(Program_Parameters *prog,
  }
  */
 void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters,
-		short sampling) {
+	short sampling) {
 	assert(program_Parameters);
 	assert(parameters);
 	assert(program_Parameters->number_Of_Runs >= 0);
@@ -186,7 +184,7 @@ void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parame
 	time_t start, end;
 	srand(86);
 	sprintf(temp, "%s/%s%s%d.time", program_Parameters->folder, parameters->approx[0],
-			parameters->spin[0], parameters->amp_Code[0]);
+		parameters->spin[0], parameters->amp_Code[0]);
 	FILE *file = safelyOpenForWriting(temp);
 	time(&start);
 	for (long i = 0; i < program_Parameters->number_Of_Runs; i++) {

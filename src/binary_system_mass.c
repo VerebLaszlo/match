@@ -18,8 +18,8 @@ static void m1m2ToRemainingMass(massParameters *mass) {
 	mass->m1_m2 = mass->mass[0] / mass->mass[1];
 	mass->mu = mass->eta * mass->totalMass;
 	mass->nu =
-			mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] :
-					mass->mass[1] / mass->mass[0];
+		mass->mass[0] < mass->mass[1] ? mass->mass[0] / mass->mass[1] :
+			mass->mass[1] / mass->mass[0];
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
@@ -49,10 +49,9 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 	} else if (limits[MIN].nu > mass->nu || mass->nu > limits[MAX].nu) {
 		between = false;
 	} else if ((limits[MIN].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MAX].m1_m2)
-			&& (limits[MAX].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MIN].m1_m2)) {
+		&& (limits[MAX].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MIN].m1_m2)) {
 		between = false;
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	} SAVE_FUNCTION_FOR_TESTING();
 	return between;
 }
 
@@ -118,8 +117,7 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
 		break;
 	default:
 		break;
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	} SAVE_FUNCTION_FOR_TESTING();
 }
 
 void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
@@ -151,8 +149,7 @@ void generateMass(massParameters *mass, massParameters *limits, generationMode m
 		break;
 	default:
 		break;
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	} SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**
@@ -380,7 +377,7 @@ static bool isOK_generateMass(void) {
 }
 
 static bool isOK_printMassParameters(void) {
-	massParameters mass = { { 30.0, 3.0 }, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0 };
+	massParameters mass = { {30.0, 3.0}, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0};
 	SAVE_FUNCTION_CALLER();
 	printMassParameters(stdout, &mass, defaultFormat);
 	PRINT_OK();

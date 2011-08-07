@@ -19,7 +19,7 @@ void create_Signal_Struct(signalStruct *signal, long size) {
 		signal->csignal[i] = fftw_malloc(signal->size * sizeof(fftw_complex));
 		memset(signal->csignal[i], 0, signal->size * sizeof(fftw_complex));
 		signal->plan[i] = fftw_plan_dft_r2c_1d(signal->size, signal->signal[i], signal->csignal[i],
-				FFTW_ESTIMATE);
+			FFTW_ESTIMATE);
 	}
 	for (; i < NOS_WITH_DETECTOR_RESPONSE; i++) {
 		signal->signal[i] = fftw_malloc(signal->size * sizeof(double));
@@ -131,7 +131,7 @@ void print_Two_Signals(FILE*file, signalStruct *sig, double dt, short width, sho
 }
 
 void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, short width,
-		short precision) {
+	short precision) {
 	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
 	static char temp[FILENAME_MAX];
 	static char format[FILENAME_MAX];
@@ -144,7 +144,7 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
 	for (i = 0; i < sig->length[shorter]; i++) {
 		fprintf(file, temp, (double) i * dt);
 		fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[RESPONSE2][i],
-				sig->signal[RESPONSE1][i] - sig->signal[RESPONSE2][i]);
+			sig->signal[RESPONSE1][i] - sig->signal[RESPONSE2][i]);
 		fprintf(file, "\n");
 	}
 	if (shorter) {
@@ -167,7 +167,7 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
 }
 
 void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short width,
-		short precision) {
+	short precision) {
 	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
 	static char temp[FILENAME_MAX];
 	static char format[FILENAME_MAX];
@@ -188,7 +188,7 @@ void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short 
 		for (; i < sig->size; i++) {
 			fprintf(file, temp, (double) i * dt);
 			fprintf(file, format, sig->signal[RESPONSE1][i], sig->signal[H1P][i],
-					sig->signal[H1C][i]);
+				sig->signal[H1C][i]);
 			fprintf(file, "\n");
 		}
 	} else {
@@ -196,7 +196,7 @@ void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short 
 			fprintf(file, temp, (double) i * dt);
 			fprintf(file, textformat, "", "", "");
 			fprintf(file, format, sig->signal[RESPONSE2][i], sig->signal[H2P][i],
-					sig->signal[H2C][i]);
+				sig->signal[H2C][i]);
 			fprintf(file, "\n");
 		}
 	}
@@ -205,8 +205,9 @@ void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short 
 void calculate_H_From_HPHC(signalStruct *signal, double *antennaFunction) {
 	for (short i = 0; i < 2; i++) {
 		for (long j = 0; j < signal->length[i]; j++) {
-			signal->signal[RESPONSE1 + i][j] = signal->signal[H1P + 2 * i][j] * antennaFunction[H1P
-					+ 2 * i] + signal->signal[H1C + 2 * i][j] * antennaFunction[H1C + 2 * i];
+			signal->signal[RESPONSE1 + i][j] = signal->signal[H1P + 2 * i][j]
+				* antennaFunction[H1P + 2 * i]
+				+ signal->signal[H1C + 2 * i][j] * antennaFunction[H1C + 2 * i];
 		}
 	}
 }

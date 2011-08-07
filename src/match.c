@@ -20,7 +20,7 @@
  * @return
  */
 static double inner_Product(fftw_complex left[], fftw_complex right[], double norm[],
-		long min_Index, long max_Index) {
+	long min_Index, long max_Index) {
 	assert(0<min_Index && min_Index< max_Index);
 	double scalar = 0.;
 	for (long i = min_Index; i < max_Index; i++) {
@@ -47,8 +47,8 @@ static void normalise(signalStruct *in, long min_Index, long max_Index, signalSt
 	assert(0<min_Index && min_Index < max_Index);
 	double normalising_Constant;
 	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
-		normalising_Constant = sqrt(inner_Product(in->csignal[i], in->csignal[i], in->psd,
-				min_Index, max_Index));
+		normalising_Constant = sqrt(
+			inner_Product(in->csignal[i], in->csignal[i], in->psd, min_Index, max_Index));
 		for (long j = 0; j < in->size; j++) {
 			assert(normalising_Constant);
 			out->csignal[i][j][0] /= normalising_Constant;
@@ -75,15 +75,15 @@ static void orthogonise(signalStruct *in, long min_Index, long max_Index, signal
 	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
 		for (short j = 0; j < NUM_OF_SIGNALS; j++) {
 			products[i][j] = inner_Product(in->csignal[i], in->csignal[j], in->psd, min_Index,
-					max_Index);
+				max_Index);
 		}
 	}
 	for (short i = 0; i < 2; i++) {
 		for (long j = 0; j < in->size; j++) {
-			out->csignal[2 * i + 1][j][0] = in->csignal[2 * i + 1][j][0] - in->csignal[2 * i][j][0]
-					* products[2 * i][2 * i + 1] / products[2 * i][2 * i];
-			out->csignal[2 * i + 1][j][1] = in->csignal[2 * i + 1][j][1] - in->csignal[2 * i][j][1]
-					* products[2 * i][2 * i + 1] / products[2 * i][2 * i];
+			out->csignal[2 * i + 1][j][0] = in->csignal[2 * i + 1][j][0]
+				- in->csignal[2 * i][j][0] * products[2 * i][2 * i + 1] / products[2 * i][2 * i];
+			out->csignal[2 * i + 1][j][1] = in->csignal[2 * i + 1][j][1]
+				- in->csignal[2 * i][j][1] * products[2 * i][2 * i + 1] / products[2 * i][2 * i];
 		}
 	}
 }
@@ -114,7 +114,7 @@ static void orthonormalise(signalStruct *in, long min_Index, long max_Index, sig
  * @param out
  */
 static void cross_Product(fftw_complex left[], fftw_complex right[], double norm[], long min_Index,
-		long max_Index, fftw_complex out[]) {
+	long max_Index, fftw_complex out[]) {
 	assert(0<min_Index && min_Index<max_Index);
 	for (long i = min_Index; i < max_Index; i++) {
 		assert(norm[i]);
@@ -140,8 +140,8 @@ static void calc_Timemaximised_Matches(signalStruct *in, double *typ, double *be
 	for (long i = 0; i < in->size; i++) {
 		A = SQR(in->product_Signal[HPP][i]) + SQR(in->product_Signal[HPC][i]);
 		B = SQR(in->product_Signal[HCP][i]) + SQR(in->product_Signal[HCC][i]);
-		C = in->product_Signal[HPP][i] * in->product_Signal[HCP][i] + in->product_Signal[HPC][i]
-				* in->product_Signal[HCC][i];
+		C = in->product_Signal[HPP][i] * in->product_Signal[HCP][i]
+			+ in->product_Signal[HPC][i] * in->product_Signal[HCC][i];
 		match_typ = sqrt(A);
 		max_Typ = max_Typ > match_typ ? max_Typ : match_typ;
 		match_best = sqrt((A + B) / 2. + sqrt(SQR(A - B) / 4. + SQR(C)));
@@ -155,7 +155,7 @@ static void calc_Timemaximised_Matches(signalStruct *in, double *typ, double *be
 }
 
 void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
-		double *minimax) {
+	double *minimax) {
 	assert(in);
 	assert(in->size);
 	assert(0<min_Index && min_Index< max_Index);
@@ -169,7 +169,7 @@ void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ,
 		iplan = fftw_plan_dft_c2r_1d(in->size, product, in->product_Signal[i], FFTW_ESTIMATE);
 		memset(product, 0, in->size * sizeof(fftw_complex));
 		cross_Product(in->csignal[i / 2], in->csignal[i % 2 + 2], in->psd, min_Index, max_Index,
-				product);
+			product);
 		fftw_execute(iplan);
 		fftw_destroy_plan(iplan);
 	}

@@ -31,7 +31,7 @@ typedef struct tagSpinParameters {
  * @param[in]	mode		: generation mode
  */
 void generateSpin(spinParameters *spin, spinParameters limits[], double inclination,
-		conversionMode mode);
+	conversionMode mode);
 /**
  * @param file
  * @param spin

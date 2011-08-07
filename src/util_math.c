@@ -175,10 +175,10 @@ const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT = { 60.0, 1.0 / 60.0, /
 24.0 * 60.0 * 60.0, 1.0 / (24.0 * 60.0 * 60.0), };
 
 const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0, //
-		15.0 * M_PI / 180.0, 1.0 / (15.0 * M_PI / 180.0), //
-		15.0, 1.0 / 15.0, //
-		15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0), //
-		15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
+	15.0 * M_PI / 180.0, 1.0 / (15.0 * M_PI / 180.0), //
+	15.0, 1.0 / 15.0, //
+	15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0), //
+	15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
 
 inline long greatest_Number_That_Less_Than(double number) {
 	assert(number>0.);
@@ -196,8 +196,8 @@ inline double convert_Time_To_Degree(double hour, double minute, double second) 
 
 inline double convert_Time_To_Radian(double hour, double minute, double second) {
 	return (hour * TIME_CONVERSION_CONSTANT.HOUR_TO_SECOND
-			+ minute * TIME_CONVERSION_CONSTANT.MINUTE_TO_SECOND + second)
-			* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+		+ minute * TIME_CONVERSION_CONSTANT.MINUTE_TO_SECOND + second)
+		* CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 }
 
 // trigonometric functions

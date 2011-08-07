@@ -7,7 +7,7 @@
 
 #include "test.h"
 
-struct CONSTANTS STRUCT;
+struct CONSTANTSSTRUCT;
 
 CONSTANTS XX;
 

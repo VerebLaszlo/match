@@ -7,7 +7,6 @@
 
 #include "util_math_tensor.h"
 
-
 inline double angle_Between_Vectors3(double left[], double right[]) {
 	return angle_Between_Vectors(left, right, 3);
 }
@@ -31,7 +30,7 @@ inline void normalize_Vector3(double vector[], double normalizing_Constant, doub
 }
 
 inline void normalize_Vector(double vector[], short size, double normalizing_Constant,
-		double normalized[]) {
+	double normalized[]) {
 	assert(normalizing_Constant);
 	for (short i = 0; i < size; i++) {
 		normalized[i] = vector[i] / normalizing_Constant;
@@ -76,6 +75,5 @@ inline void add_Vectors(double left[], double right[], short size, double result
 
 double triple_Product(double vec1[], double vec2[], double vec3[]) {
 	return vec1[0] * vec2[1] * vec3[2] + vec1[1] * vec2[2] * vec3[0] + vec1[2] * vec2[0] * vec3[1]
-			- vec1[0] * vec2[2] * vec3[1] - vec1[1] * vec2[0] * vec3[2] - vec1[2] * vec2[1]
-			* vec3[0];
+		- vec1[0] * vec2[2] * vec3[1] - vec1[1] * vec2[0] * vec3[2] - vec1[2] * vec2[1] * vec3[0];
 }

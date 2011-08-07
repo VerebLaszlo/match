@@ -26,6 +26,6 @@
  * @param minimax
  */
 void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
-		double *minimax);
+	double *minimax);
 
 #endif

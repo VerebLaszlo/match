@@ -13,7 +13,7 @@
 	double PI;\
 }
 
-typedef struct COnstants STRUCT COnstants;
+typedef struct COnstantsSTRUCT COnstants;
 
 typedef struct CONSTANTS CONSTANTS;
 

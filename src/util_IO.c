@@ -29,16 +29,16 @@ FILE *safelyOpenFile(const char *fileName, const char *mode) {
 	if (stream == NULL) {
 		if (strcmp(mode, "r")) {
 			fprintf(stderr, "%s: Couldn't open file %s for reading; %s\n",
-					program_invocation_short_name, fileName, strerror(errno));
+				program_invocation_short_name, fileName, strerror(errno));
 		} else if (strcmp(mode, "w")) {
 			fprintf(stderr, "%s: Couldn't open file %s for writing; %s\n",
-					program_invocation_short_name, fileName, strerror(errno));
+				program_invocation_short_name, fileName, strerror(errno));
 		} else if (strcmp(mode, "a")) {
 			fprintf(stderr, "%s: Couldn't open file %s for append; %s\n",
-					program_invocation_short_name, fileName, strerror(errno));
+				program_invocation_short_name, fileName, strerror(errno));
 		} else {
 			fprintf(stderr, "%s: Couldn't open file %s; %s\n", program_invocation_short_name,
-					fileName, strerror(errno));
+				fileName, strerror(errno));
 		}
 		exit(EXIT_FAILURE);
 	} else {
@@ -79,12 +79,11 @@ static void setFormatForOneNumber(OutputFormat *format) {
 		sprintf(format->oneNumber, "%%- %d.%dlg", format->width, format->precision);
 	} else {
 		sprintf(format->oneNumber, "%% %d.%dlg", format->width, format->precision);
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	} SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
-		const char separator, bool leftJustified, nameString name, const ushort code) {
+	const char separator, bool leftJustified, nameString name, const ushort code) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(format);
 	assert(width < MAXIMUM_WIDTH);
@@ -93,8 +92,8 @@ void setOutputFormat(OutputFormat *format, const ushort precision, const ushort 
 	assert(name);
 	format->precision = precision;
 	format->width =
-			width > format->precision + SPECIAL_CHARACTER_LENGTH ? width :
-					format->precision + SPECIAL_CHARACTER_LENGTH;
+		width > format->precision + SPECIAL_CHARACTER_LENGTH ? width :
+			format->precision + SPECIAL_CHARACTER_LENGTH;
 	format->widthWithSeparator = format->width + SEPARATOR_LENGTH;
 	format->separator = separator;
 	format->leftJustified = leftJustified;
@@ -121,8 +120,7 @@ static void setFormats(char formatString[], const ushort number, OutputFormat *f
 			sprintf(temp, "%s %c %s", formatString, format->separator, format->oneNumber);
 			strcpy(formatString, temp);
 		}
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	} SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setFormat(char formatString[], const ushort number, OutputFormat *format) {
@@ -137,8 +135,7 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format) {
 		sprintf(formatString, "%s %%%c", temp, format->separator);
 	} else {
 		sprintf(formatString, "%s %c", temp, format->separator);
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	} SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setFormatEnd(char formatString[], const ushort number, OutputFormat *format) {
@@ -173,7 +170,7 @@ static void printFormat(FILE *file, OutputFormat *format) {
 
 static bool isOK_setFormatForOneNumber(void) {
 	OutputFormat format;
-	nameString result[2] = { "%- 10.5lg", "% 10.5lg" };
+	nameString result[2] = {"%- 10.5lg", "% 10.5lg"};
 	format.leftJustified = true;
 	format.precision = 5;
 	format.width = 10;
@@ -205,7 +202,7 @@ static bool isOK_setOutputFormat(void) {
 	OutputFormat format;
 	char separator = '%';
 	ushort code = 0;
-	nameString name[6] = { "ab", "bd", "cf", "dh", "ej", "fl" };
+	nameString name[6] = {"ab", "bd", "cf", "dh", "ej", "fl"};
 	ushort precision = 2 * SPECIAL_CHARACTER_LENGTH;
 	bool leftJusfified = false;
 	ushort width;
@@ -244,15 +241,15 @@ static bool isOK_setFormat(void) {
 		return false;
 	}
 	OutputFormat format;
-	char separator[] = { '%', 'X' };
+	char separator[] = {'%', 'X'};
 	ushort code = 1;
 	nameString name = "multiformat";
 	ushort precision = 5;
 	bool leftJusfified = false;
 	ushort width = 12;
 	nameString output;
-	nameString result[2][2] = { { "% 12.5lg", "% 12.5lg %% % 12.5lg" }, //
-			{ "% 12.5lg", "% 12.5lg X % 12.5lg" } };
+	nameString result[2][2] = { {"% 12.5lg", "% 12.5lg %% % 12.5lg"}, //
+		{	"% 12.5lg", "% 12.5lg X % 12.5lg"}};
 	for (ushort i = 0; i < 2; i++) {
 		setOutputFormat(&format, precision, width, separator[i], leftJusfified, name, code);
 		SAVE_FUNCTION_CALLER();

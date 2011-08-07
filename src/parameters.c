@@ -33,9 +33,9 @@ void readExactParameters(FILE *file, System_Parameters *params) {
 		fscanf(file, "%s ", params->spin[i]);
 		fscanf(file, "%hd ", &params->amp_Code[i]);
 		fscanf(file, "%s\n", params->approx[i]);
-		params->system[i].F.declination = params->system[i].F.gmst
-				= params->system[i].F.greenwich_Hour_Angle = params->system[i].F.polarization
-						= params->system[i].F.right_Ascention = 0.;
+		params->system[i].F.declination = params->system[i].F.gmst = params->system[i].F
+			.greenwich_Hour_Angle = params->system[i].F.polarization = params->system[i].F
+			.right_Ascention = 0.;
 		convert_Masses(&params->system[i], FROM_M1M2);
 		convert_Spins(&params->system[i], FROM_KAPPA_PSI);
 		calc_Antenna_Pattern_For(LH, &params->system[i].F);
@@ -118,5 +118,5 @@ void print_System_Parameters(FILE *file, System_Parameters *params) {
 void print_System_Parameters_For_Plot(FILE *file, System_Parameters *params) {
 	print_Binary_Parameter_For_Plot(file, params->system);
 	fprintf(file, "%-13s %10.4lg %10.4lg %10.4lg\n", "#matches    ", params->match_Typ,
-			params->match_Minimax, params->match_Best);
+		params->match_Minimax, params->match_Best);
 }

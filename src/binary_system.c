@@ -12,7 +12,7 @@
 ///@{
 
 void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
-		generationMode genMass, generationMode genSpin) {
+	generationMode genMass, generationMode genSpin) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(system);
 	assert(limits);
@@ -28,8 +28,7 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 		spin[MIN] = limits[MIN].spin[0];
 		spin[MAX] = limits[MAX].spin[0];
 		generateSpin(&system->spin[i], spin, system->inclination, genSpin);
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	} SAVE_FUNCTION_FOR_TESTING();
 }
 
 ///@}
@@ -47,7 +46,7 @@ void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat 
 	fprintf(file, formatString, system->flatness[0], system->flatness[1], system->inclination);
 	setFormatEnd(formatString, number, format);
 	fprintf(file, formatString, system->distance, system->coalescencePhase,
-			system->coalescenceTime);
+		system->coalescenceTime);
 	SAVE_FUNCTION_FOR_TESTING();
 }
 

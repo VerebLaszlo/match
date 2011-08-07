@@ -41,21 +41,21 @@ void neg(bool *var);
  */
 typedef struct {
 	char function[FILENAME_MAX];	///< name of the called function
-	char file[FILENAME_MAX];	///< file of the called function
-	ushort line;	///< line of the definition of the called function
-	char callerFunction[FILENAME_MAX];	///< name of the caller function
-	char callerFile[FILENAME_MAX];	///< file of the caller function
-	ushort callerLine;	///< line of the calling
-} _sourceLocation;
-extern _sourceLocation sourceLocation;	///< Contains information about the actually tested function.
-extern char previous_function[]; ///< contains the called function's name
-extern char function_file[]; ///< contains the called function's filename
-extern ushort function_line; ///< contains the calling line of the function
-extern char normal[]; ///< color code for normal messages
-extern char err[]; ///< color code for error messages
-extern char errBold[]; ///< bold color code for error messages
-extern char ok[]; ///< color code for ok messages
-extern char okBold[]; ///< bold color code for ok messages
+	char file[FILENAME_MAX];///< file of the called function
+	ushort line;///< line of the definition of the called function
+	char callerFunction[FILENAME_MAX];///< name of the caller function
+	char callerFile[FILENAME_MAX];///< file of the caller function
+	ushort callerLine;///< line of the calling
+}_sourceLocation;
+extern _sourceLocation sourceLocation;///< Contains information about the actually tested function.
+extern char previous_function[];///< contains the called function's name
+extern char function_file[];///< contains the called function's filename
+extern ushort function_line;///< contains the calling line of the function
+extern char normal[];///< color code for normal messages
+extern char err[];///< color code for error messages
+extern char errBold[];///< bold color code for error messages
+extern char ok[];///< color code for ok messages
+extern char okBold[];///< bold color code for ok messages
 
 #define BACKUP_DEFINITION_LINE()\
 	static size_t __line_of_definition__;\

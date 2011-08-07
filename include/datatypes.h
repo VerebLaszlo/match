@@ -42,11 +42,11 @@ typedef enum {
  */
 typedef struct {
 	double *signal[NOS_WITH_DETECTOR_RESPONSE]; ///< the signals in time domain with the following order: \f$h_{1+}\f$, \f$h_{1\times}\f$, \f$h_{2+}\f$, \f$h_{2\times}\f$.
-	double *product_Signal[NUM_OF_SIGNALS];///<a
+	double *product_Signal[NUM_OF_SIGNALS]; ///<a
 	fftw_complex *csignal[NUM_OF_SIGNALS]; ///< the signals in frequency domain with the following order: \f$\tilde h_{1+}\f$, \f$\tilde h_{1\times}\f$, \f$\tilde h_{2+}\f$, \f$\tilde h_{2\times}\f$.
 	fftw_plan plan[NUM_OF_SIGNALS]; ///< FFT plans to calculate \f$\tilde h_{ij}=F\left(h_{ij}\right)\f$
-	double *psd;///<d
-	long length[2];///< lnegth of the signals
+	double *psd; ///<d
+	long length[2]; ///< lnegth of the signals
 	long size; ///< the allocated memory for the signals
 } signalStruct;
 
@@ -91,7 +91,7 @@ void print_Two_Signals(FILE*file, signalStruct *sig, double dt, short width, sho
  * @param precision
  */
 void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, short width,
-		short precision);
+	short precision);
 
 /** Prints the two signal with their \f$+,\times\f$ polarisations.
  * @param file
@@ -101,7 +101,7 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
  * @param precision
  */
 void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short width,
-		short precision);
+	short precision);
 
 void calculate_H_From_HPHC(signalStruct *signal, double *antennaFunction);
 

@@ -31,7 +31,7 @@ typedef struct tagBinarySystem {
  * @param[in]	genSpin	: spin generation mode
  */
 void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
-		generationMode genMass, generationMode genSpin);
+	generationMode genMass, generationMode genSpin);
 
 /**
  * @param file
@@ -45,5 +45,4 @@ void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat 
 bool areBinarySystemFunctionsGood(void);
 
 #endif // TEST
-
 #endif /* BINARY_SYSTEM_H_ */

@@ -9,7 +9,6 @@
 #ifndef BINARY_SYSTEM_UTIL_H_
 #define BINARY_SYSTEM_UTIL_H_
 
-
 /**	Conversion mode codes.
  */
 typedef enum tagConversionMode {

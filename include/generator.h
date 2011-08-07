@@ -50,11 +50,11 @@ typedef struct {
 	double M; ///< the total mass of the system
 	double chirpM; ///< the chirp mass of the system
 	double eta; ///< symmetric mass ratio of the system
-	double mu;///<a
+	double mu; ///<a
 	double incl; ///< inlination of the system
 	double dist; ///< distance of the system
-	double coaPhase;///<a
-	double coaTime;///<a
+	double coaPhase; ///<a
+	double coaTime; ///<a
 	antenna_Func F; ///< antenna functions
 } binary_System;
 
@@ -66,7 +66,7 @@ void convert_Masses(binary_System *sys, conversion_Mode_Masses mode);
 
 ///
 void gen_Parameters(binary_System *sys, binary_System *min, binary_System *max,
-		gen_Mode_Masses mass, gen_Mode_Spin spin);
+	gen_Mode_Masses mass, gen_Mode_Spin spin);
 
 /** Reads the parameter limits of the binary from the file.
  */
