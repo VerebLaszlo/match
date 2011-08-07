@@ -82,8 +82,8 @@ extern char okBold[]; ///< bold color code for ok messages
 			err, errBold, sourceLocation.function, err, errBold, sourceLocation.file, err, errBold,\
 			sourceLocation.line, err, errBold, err); \
 	fprintf(stderr, "The function was called in \"%s%s%s\" at %s%d%s line from the \"%s%s()%s\""\
-			"function.%s\n", errBold, sourceLocation.callerFile, err, errBold,\
-			sourceLocation.callerLine, err, errBold, sourceLocation.callerFunction, err, normal);
+			"function,\ndetected at line %s%d%s.%s\n", errBold, sourceLocation.callerFile, err, errBold,\
+			sourceLocation.callerLine, err, errBold, sourceLocation.callerFunction, err, errBold, __LINE__, err, normal);
 
 /**	Prints that some of the function are wrong.
  */
