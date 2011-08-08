@@ -590,15 +590,44 @@ static bool isOK_convertSpinFromPrecessionFrame(void) {
 	return true;
 }
 
+static bool isOK_convertSpin(void) {
+	if (!isOK_magnitudeOfSpins()) {
+		return false;
+	}
+	if (!isOK_convertSpinFromFixedFrame()) {
+		return false;
+	}
+	if (!isOK_convertSpinFromPrecessionFrame()) {
+		return false;
+	}
+	if (!isOK_convertSpinFromXyzToAngles()) {
+		return false;
+	}
+	if (!isOK_convertSpinFromAnglesToXyz()) {
+		return false;
+	}
+	spinParameters spin;
+	spin.component[FIXED][X] = -1.0;
+	spin.component[FIXED][Y] = +1.0;
+	spin.component[FIXED][Z] = -1.0;
+	double inclination = 0.0;
+	SAVE_FUNCTION_CALLER();
+	convertSpin(&spin, inclination, FROM_FIXED_XYZ);
+	if (memcmp(spin.component[FIXED], spin.component[PRECESSING], sizeof(double) * DIMENSION)) {
+		PRINT_ERROR();
+		return false;
+	}
+	PRINT_OK();
+	return true;
+}
+
 bool areBinarySystemSpinFunctionsGood(void) {
 	bool isOK = true;
 	if (!isOK_magnitudeOfSpins()) {
 		isOK = false;
 	} else if (!isOK_isSpinBetweenLimits()) {
 		isOK = false;
-	} else if (!isOK_convertSpinFromAnglesToXyz()) {
-		isOK = false;
-	} else if (!isOK_convertSpinFromPrecessionFrame()) {
+	} else if (!isOK_convertSpin()) {
 		isOK = false;
 	}
 	if (isOK) {
