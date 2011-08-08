@@ -111,14 +111,34 @@ static void convertSpinFromFixedFrame(spinParameters *spin, const double inclina
 	BACKUP_DEFINITION_LINE();    //
 	assert(spin);
 	double theta[2] = { +0.0, inclination };
-	spin->component[PRECESSING][X] = spin->component[FIXED][X] * cos(theta[0]) * cos(theta[1])
-		+ spin->component[FIXED][Y] * sin(theta[0]) * cos(theta[1])
-		- spin->component[FIXED][Z] * sin(theta[1]);
-	spin->component[PRECESSING][Y] = -spin->component[FIXED][X] * sin(theta[0])
-		+ spin->component[FIXED][Y] * cos(theta[0]);
-	spin->component[PRECESSING][Z] = spin->component[FIXED][X] * cos(theta[0]) * sin(theta[1])
-		+ spin->component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
-		+ spin->component[FIXED][Z] * cos(theta[1]);
+	if (inclination == 0.0) {
+		memcpy(spin->component[PRECESSING], spin->component[FIXED], sizeof(double) * DIMENSION);
+	} else if (inclination == M_PI) {
+		spin->component[PRECESSING][X] = -spin->component[FIXED][X];
+		spin->component[PRECESSING][Y] = spin->component[FIXED][Y];
+		spin->component[PRECESSING][Z] = -spin->component[FIXED][Z];
+	} else if (inclination == M_PI_4) {
+		spin->component[PRECESSING][X] = spin->component[FIXED][Z] * M_SQRT2;
+		spin->component[PRECESSING][Y] = spin->component[FIXED][Y];
+		spin->component[PRECESSING][Z] = spin->component[FIXED][X] * M_SQRT2;
+	} else if (inclination == M_PI_2) {
+		spin->component[PRECESSING][X] = -spin->component[FIXED][Z];
+		spin->component[PRECESSING][Y] = spin->component[FIXED][Y];
+		spin->component[PRECESSING][Z] = spin->component[FIXED][X];
+	} else if (inclination == M_PI_2 + M_PI_4) {
+		spin->component[PRECESSING][X] = -spin->component[FIXED][X] * M_SQRT2;
+		spin->component[PRECESSING][Y] = spin->component[FIXED][Y];
+		spin->component[PRECESSING][Z] = -spin->component[FIXED][Z] * M_SQRT2;
+	} else {
+		spin->component[PRECESSING][X] = spin->component[FIXED][X] * cos(theta[0]) * cos(theta[1])
+			+ spin->component[FIXED][Y] * sin(theta[0]) * cos(theta[1])
+			- spin->component[FIXED][Z] * sin(theta[1]);
+		spin->component[PRECESSING][Y] = -spin->component[FIXED][X] * sin(theta[0])
+			+ spin->component[FIXED][Y] * cos(theta[0]);
+		spin->component[PRECESSING][Z] = spin->component[FIXED][X] * cos(theta[0]) * sin(theta[1])
+			+ spin->component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
+			+ spin->component[FIXED][Z] * cos(theta[1]);
+	}
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
@@ -370,7 +390,7 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 			135.0, -45.0}, {0.0, 90.0, 0.0}, {0.0, 45.0, 45.0}, {45.0, 90.0, 0.0}};
 	memset(&spin, 0, sizeof(spinParameters));
 	ushort testing = 0;
-	ushort convention = 0;
+	ushort convention = FIXED;
 	for (short x = -1; x <= 1; x++) {
 		spin.component[convention][X] = (double) x;
 		for (short y = -1; y <= 1; y++) {
@@ -388,8 +408,8 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 						PRINT_ERROR();
 						return false;
 					}
-				} else if (!isNear(radianFromDegree(result[testing][AZIM]), spin.azimuth[convention],
-						EPSILON)) {
+				} else if (!isNear(radianFromDegree(result[testing][AZIM]),
+						spin.azimuth[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
 				} else if (!isNear(radianFromDegree(result[testing][INCL]),
@@ -450,7 +470,7 @@ static bool isOK_convertSpinFromAnglesToXyz(void) {
 	}
 	spinParameters spin;
 	memset(&spin, 0, sizeof(spinParameters));
-	ushort convention = 0;
+	ushort convention = FIXED;
 	for (short x = -1; x <= 1; x++) {
 		spin.component[convention][X] = (double) x;
 		for (short y = -1; y <= 1; y++) {
@@ -475,6 +495,70 @@ static bool isOK_convertSpinFromAnglesToXyz(void) {
 	return true;
 }
 
+static bool isOK_convertSpinFromFixedFrame(void) {
+	spinParameters spin;
+	ushort convention = FIXED;
+	ushort testing = 0;
+	double incl = 0.0;
+	do {
+		for (short x = -1; x <= 1; x++) {
+			spin.component[convention][X] = (double) x;
+			for (short y = -1; y <= 1; y++) {
+				spin.component[convention][Y] = (double) y;
+				for (short z = -1; z <= 1; z++) {
+					spin.component[convention][Z] = (double) z;
+					magnitudeOfSpin(&spin);
+					SAVE_FUNCTION_CALLER();
+					convertSpinFromFixedFrame(&spin, incl);
+					if (incl == 0.0) {
+						if (spin.component[FIXED][X] != spin.component[PRECESSING][X]
+							&& spin.component[FIXED][Y] != spin.component[PRECESSING][Y]
+							&& spin.component[FIXED][Z] != spin.component[PRECESSING][Z]) {
+							PRINT_ERROR();
+							return false;
+						}
+					} else if (incl == M_PI) {
+						if (spin.component[FIXED][X] != -spin.component[PRECESSING][X]
+							&& spin.component[FIXED][Y] != spin.component[PRECESSING][Y]
+							&& spin.component[FIXED][Z] != -spin.component[PRECESSING][Z]) {
+							PRINT_ERROR();
+							return false;
+						}
+					} else if (incl == M_PI_2) {
+						if (spin.component[FIXED][X] != spin.component[PRECESSING][Z]
+							&& spin.component[FIXED][Y] != spin.component[PRECESSING][Y]
+							&& spin.component[FIXED][Z] != spin.component[PRECESSING][X]) {
+							PRINT_ERROR();
+							return false;
+						}
+					} else if (incl == M_PI_4) {
+						if (spin.component[FIXED][X] != spin.component[PRECESSING][X] * M_SQRT2
+							&& spin.component[FIXED][Y] != spin.component[PRECESSING][Y]
+							&& spin.component[FIXED][Z] != spin.component[PRECESSING][Z] * M_SQRT2) {
+							PRINT_ERROR();
+							return false;
+						}
+					} else if (incl == M_PI_2 + M_PI_4) {
+						if (spin.component[FIXED][X] != -spin.component[PRECESSING][X] * M_SQRT2
+							&& spin.component[FIXED][Y] != spin.component[PRECESSING][Y]
+							&& spin.component[FIXED][Z] != -spin.component[PRECESSING][Z] * M_SQRT2) {
+							PRINT_ERROR();
+							return false;
+						}
+					} else {
+						PRINT_ERROR();
+						return false;
+					}
+					testing++;
+				}
+			}
+		}
+		incl += M_PI_4;
+	}while (incl <= M_PI);
+	PRINT_OK();
+	return true;
+}
+
 bool areBinarySystemSpinFunctionsGood(void) {
 	bool isOK = true;
 	if (!isOK_magnitudeOfSpins()) {
@@ -482,6 +566,8 @@ bool areBinarySystemSpinFunctionsGood(void) {
 	} else if (!isOK_isSpinBetweenLimits()) {
 		isOK = false;
 	} else if (!isOK_convertSpinFromAnglesToXyz()) {
+		isOK = false;
+	} else if (!isOK_convertSpinFromFixedFrame()) {
 		isOK = false;
 	}
 	if (isOK) {
