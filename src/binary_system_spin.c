@@ -72,15 +72,16 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
  * @param[in,out]	spin	: spin parameters
  * @param[in]		index	: frame
  */
-static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort index) {
+static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort convention) {
 	BACKUP_DEFINITION_LINE();
-	if (spin->component[index][X] == 0.0 && spin->component[index][Y] == 0.0) {
-		spin->azimuth[index] = NAN;
+	if (spin->component[convention][X] == 0.0 && spin->component[convention][Y] == 0.0) {
+		spin->azimuth[convention] = NAN;
 	} else {
-		spin->azimuth[index] = atan2(spin->component[index][Y], spin->component[index][X]);
+		spin->azimuth[convention] = atan2(spin->component[convention][Y],
+			spin->component[convention][X]);
 	}
-	spin->inclination[index] = acos(spin->component[index][Z] / spin->magnitude);
-	spin->elevation[index] = M_PI_2 - spin->inclination[index];
+	spin->inclination[convention] = acos(spin->component[convention][Z] / spin->magnitude);
+	spin->elevation[convention] = M_PI_2 - spin->inclination[convention];
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
@@ -88,15 +89,17 @@ static void convertSpinFromXyzToAngles(spinParameters *spin, const ushort index)
  * @param[in,out]	spin	: spin parameters
  * @param[in]		index	: frame
  */
-static void convertSpinFromAnglesToXyz(spinParameters *spin, const ushort index) {
+static void convertSpinFromAnglesToXyz(spinParameters *spin, const ushort convention) {
 	BACKUP_DEFINITION_LINE();
 	double cosAzimuth, cosInclination;
-	cosAzimuth = spin->azimuth[index] == M_PI_2 ? 0.0 : cos(spin->azimuth[index]);
-	cosInclination = spin->inclination[index] == M_PI_2 ? 0.0 : cos(spin->inclination[index]);
-	spin->component[index][X] = spin->magnitude * sin(spin->inclination[index]) * cosAzimuth;
-	spin->component[index][Y] = spin->magnitude * sin(spin->inclination[index])
-		* sin(spin->azimuth[index]);
-	spin->component[index][Z] = spin->magnitude * cosInclination;
+	cosAzimuth = spin->azimuth[convention] == M_PI_2 ? 0.0 : cos(spin->azimuth[convention]);
+	cosInclination =
+		spin->inclination[convention] == M_PI_2 ? 0.0 : cos(spin->inclination[convention]);
+	spin->component[convention][X] = spin->magnitude * sin(spin->inclination[convention])
+		* cosAzimuth;
+	spin->component[convention][Y] = spin->magnitude * sin(spin->inclination[convention])
+		* sin(spin->azimuth[convention]);
+	spin->component[convention][Z] = spin->magnitude * cosInclination;
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
@@ -366,7 +369,7 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 			135.0, -45.0}, {90.0, 90.0, 0.0}, {90.0, 45.0, 45.0}, {-45.0, 90.0, 0.0}, {0.0,
 			135.0, -45.0}, {0.0, 90.0, 0.0}, {0.0, 45.0, 45.0}, {45.0, 90.0, 0.0}};
 	memset(&spin, 0, sizeof(spinParameters));
-	ushort index = 0;
+	ushort testing = 0;
 	ushort convention = 0;
 	for (short x = -1; x <= 1; x++) {
 		spin.component[convention][X] = (double) x;
@@ -380,25 +383,25 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 				magnitudeOfSpin(&spin);
 				SAVE_FUNCTION_CALLER();
 				convertSpinFromXyzToAngles(&spin, convention);
-				if (isnan(result[index][AZIM])) {
+				if (isnan(result[testing][AZIM])) {
 					if (!isnan(spin.azimuth[convention])) {
 						PRINT_ERROR();
 						return false;
 					}
-				} else if (!isNear(radianFromDegree(result[index][AZIM]), spin.azimuth[convention],
+				} else if (!isNear(radianFromDegree(result[testing][AZIM]), spin.azimuth[convention],
 						EPSILON)) {
 					PRINT_ERROR();
 					return false;
-				} else if (!isNear(radianFromDegree(result[index][INCL]),
+				} else if (!isNear(radianFromDegree(result[testing][INCL]),
 						spin.inclination[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
-				} else if (!isNear(radianFromDegree(result[index][ELEV]),
+				} else if (!isNear(radianFromDegree(result[testing][ELEV]),
 						spin.elevation[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
 				}
-				index++;
+				testing++;
 			}
 		}
 	}
@@ -409,7 +412,7 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 	double result2[8][3] = { {-135.0, inc2, ele2}, {-135.0, inc1, ele1}, {135.0, inc2, ele2},
 		{	135.0, inc1, ele1}, {-45.0, inc2, ele2}, {-45.0, inc1, ele1}, {45.0, inc2, ele2}, {
 			45.0, inc1, ele1}};
-	index = 0;
+	testing = 0;
 	for (short x = -1; x <= 1; x++) {
 		spin.component[convention][X] = (double) x;
 		for (short y = -1; y <= 1; y++) {
@@ -422,18 +425,18 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 				magnitudeOfSpin(&spin);
 				SAVE_FUNCTION_CALLER();
 				convertSpinFromXyzToAngles(&spin, convention);
-				if (!isNear(radianFromDegree(result2[index][AZIM]), spin.azimuth[convention],
+				if (!isNear(radianFromDegree(result2[testing][AZIM]), spin.azimuth[convention],
 						EPSILON)) {
 					PRINT_ERROR();
 					return false;
-				} else if (!isNear(result2[index][INCL], spin.inclination[convention], EPSILON)) {
+				} else if (!isNear(result2[testing][INCL], spin.inclination[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
-				} else if (!isNear(result2[index][ELEV], spin.elevation[convention], EPSILON)) {
+				} else if (!isNear(result2[testing][ELEV], spin.elevation[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
 				}
-				index++;
+				testing++;
 			}
 		}
 	}
