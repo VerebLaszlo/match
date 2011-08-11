@@ -8,12 +8,12 @@
 
 #include <time.h>
 #include <stdlib.h>
+#include <math.h>
 #include "util_math.h"
 #include "binary_system.h"
 
 int main(int argc, char *argv[]) {
-	argc = argc;
-	argv = argv;
+	printf("%d: %s\n", argc, argv[0]);
 	srand(time(NULL));
 #ifdef TEST
 	areUtilMathFunctionsOK();

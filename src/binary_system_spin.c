@@ -12,6 +12,7 @@
 
 #include "test.h"
 #include <math.h>
+#include <string.h>
 #include <assert.h>
 #include "util_math.h"
 #include "binary_system.h"
@@ -71,8 +72,7 @@ static bool isSpinBetweenLimits(spinParameters *spin, spinParameters limits[]) {
 				return false;
 			}
 		}
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 	return true;
 }
 
@@ -146,8 +146,7 @@ static void convertSpinFromFixedFrame(spinParameters *spin, const double inclina
 		spin->component[PRECESSING][Z] = spin->component[FIXED][X] * cos(theta[0]) * sin(theta[1])
 			+ spin->component[FIXED][Y] * sin(theta[0]) * sin(theta[1])
 			+ spin->component[FIXED][Z] * cos(theta[1]);
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Converts spin parameters from the precessing frame to the fixed frame.
@@ -262,8 +261,7 @@ void generateSpin(spinParameters *spin, spinParameters limits[], double inclinat
 		break;
 	default:
 		break;
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {
@@ -279,8 +277,7 @@ void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format)
 		fprintf(file, formatString, spin->azimuth[i], spin->inclination[i], spin->elevation[i]);
 		setFormatEnd(formatString, 1, format);
 		fprintf(file, formatString, spin->magnitude);
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 #ifdef TEST

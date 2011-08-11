@@ -55,8 +55,7 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 	} else if ((limits[MIN].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MAX].m1_m2)
 		&& (limits[MAX].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MIN].m1_m2)) {
 		between = false;
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 	return between;
 }
 
@@ -144,8 +143,7 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
 		break;
 	default:
 		break;
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
@@ -177,8 +175,7 @@ void generateMass(massParameters *mass, massParameters *limits, generationMode m
 		break;
 	default:
 		break;
-	}
-	SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**

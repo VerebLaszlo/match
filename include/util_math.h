@@ -13,14 +13,14 @@
 /**	Inserts the square of the number.
  * @param[in] number
  */
-#define square(number) \
-	({ typeof(number) _number = (number); _number*_number; })
+#define square(square_number) \
+	({ typeof(square_number) _square_number = (square_number); _square_number*_square_number; })
 
 /**	Inserts the cube of the number.
  * @param[in] number
  */
-#define cube(number) \
-	({ typeof(number) _number = (number); square(_number)*_number; })
+#define cube(cube_number) \
+	({ typeof(cube_number) _cube_number = (cube_number); square(_cube_number)*_cube_number; })
 
 /// @name Trigonometric functions
 ///@{

@@ -87,7 +87,7 @@ extern OutputFormat *defaultFormat;
  * @param[in]	code			: user defined code of the format
  */
 void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
-	const char separator, bool leftJustified, nameString name, const ushort code);
+	const char separator, bool leftJustified, const nameString name, const ushort code);
 
 /**	Set the format for given number of floating pint data to display.
  * @param[out] formatString	: the generated format string

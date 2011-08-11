@@ -84,7 +84,7 @@ static void setFormatForOneNumber(OutputFormat *format) {
 }
 
 void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
-	const char separator, bool leftJustified, nameString name, const ushort code) {
+	const char separator, bool leftJustified, const nameString name, const ushort code) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(format);
 	assert(width < MAXIMUM_WIDTH);

@@ -54,7 +54,7 @@ typedef enum tagSystemConstants {
 	MAX, ///< MAX
 	FIXED = 0, ///< fixed convention
 	PRECESSING, ///< precessing convention
-	COORDINATE_CONVENTIONS = 2, ///< number of the spin conventions
+	COORDINATE_CONVENTIONS, ///< number of the spin conventions
 	NUMBER_OF_BLACKHOLES = 2,
 ///< number of the blackholes
 ///< NUMBER_OF_BLACKHOLES
