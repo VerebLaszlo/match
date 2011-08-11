@@ -85,20 +85,20 @@ double randomBetweenZeroAndOne(void) {
 }
 
 double randomBetweenZeroAnd(double top) {
-	BACKUP_DEFINITION_LINE();
+	BACKUP_DEFINITION_LINE(); //
 	SAVE_FUNCTION_FOR_TESTING();
 	return top * randomBetweenZeroAndOne();
 }
 
 double randomBetween(double bottom, double top) {
-	BACKUP_DEFINITION_LINE();
+	BACKUP_DEFINITION_LINE(); //
 	SAVE_FUNCTION_FOR_TESTING();
 	return (top - bottom) * randomBetweenZeroAndOne() + bottom;
 }
 
 ///@}
 
-const double EPSILON = 1.110223024625157e-16;
+const double EPSILON = 1.776356839400251e-15;
 
 bool isNear(const double first, const double second, const double epsilon) {
 	return fabs(first - second) < epsilon;

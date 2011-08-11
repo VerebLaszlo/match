@@ -186,8 +186,9 @@ void generateMass(massParameters *mass, massParameters *limits, generationMode m
 void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
 	BACKUP_DEFINITION_LINE();
 	ushort number = 4;
-	char formatString[number * format->widthWithSeparator];setFormat
-	(formatString, number, format);
+	ushort length = number * format->widthWithSeparator;
+	char formatString[length];
+	setFormat(formatString, number, format);
 	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);
 	setFormatEnd(formatString, number, format);
 	fprintf(file, formatString, mass->chirpMass, mass->mu, mass->nu, mass->m1_m2);
@@ -320,10 +321,12 @@ static bool isOK_convertMassesEtaM(void) {
 	m1m2ToRemainingMass(&result);
 	SAVE_FUNCTION_CALLER();
 	convertMassesFromEtaM(&mass);
-	if (areMassParametersNear(&mass, &result)) {
+	if (!areMassParametersNear(&mass, &result)) {
+		convertMassesFromEtaM(&mass);
 		PRINT_ERROR();
 		return false;
 	}
+	convertMassesFromEtaM(&mass);
 	PRINT_OK();
 	return true;
 }
@@ -342,7 +345,7 @@ static bool isOK_convertMassesEtaChirp(void) {
 	m1m2ToRemainingMass(&result);
 	SAVE_FUNCTION_CALLER();
 	convertMassesFromEtaChirp(&mass);
-	if (areMassParametersNear(&mass, &result)) {
+	if (!areMassParametersNear(&mass, &result)) {
 		PRINT_ERROR();
 		return false;
 	}
@@ -373,7 +376,7 @@ static bool isOK_convertMasses(void) {
 	m1m2ToRemainingMass(&result);
 	SAVE_FUNCTION_CALLER();
 	convertMasses(&mass, FROM_ETAM);
-	if (areMassParametersNear(&mass, &result)) {
+	if (!areMassParametersNear(&mass, &result)) {
 		PRINT_ERROR();
 		return false;
 	}
@@ -417,19 +420,20 @@ static bool isOK_printMassParameters(void) {
 }
 
 bool areBinarySystemMassFunctionsGood(void) {
+	bool isOK = true;
 	if (!isOK_m1m2ToRemainingMass()) {
-		PRINT_ERROR_FILE();
-		return false;
+		isOK = false;
 	} else if (!isOK_isMassBetweenLimits()) {
-		PRINT_ERROR_FILE();
-		return false;
+		isOK = false;
 	} else if (!isOK_generateMass()) {
-		PRINT_ERROR_FILE();
-		return false;
-	} else {
-		PRINT_OK_FILE();
-		return true;
+		isOK = false;
 	}
+	if (isOK) {
+		PRINT_OK_FILE();
+	} else {
+		PRINT_ERROR_FILE();
+	}
+	return isOK;
 }
 
 #endif	// TEST

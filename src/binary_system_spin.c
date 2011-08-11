@@ -214,50 +214,42 @@ void generateSpin(spinParameters *spin, spinParameters limits[], double inclinat
 	assert(limits);
 	switch (mode) {
 	case GEN_FIXED_XYZ:
-		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-			do {
-				for (short j = 0; j < DIMENSION; j++) {
-					spin[i].component[FIXED][j] = randomBetween(limits[MIN].component[FIXED][j],
-						limits[MAX].component[FIXED][j]);
-				}
-				convertSpin(&spin[i], inclination, mode);
-			} while (!isSpinBetweenLimits(&spin[i], limits));
-		}
+		do {
+			for (short j = 0; j < DIMENSION; j++) {
+				spin->component[FIXED][j] = randomBetween(limits[MIN].component[FIXED][j],
+					limits[MAX].component[FIXED][j]);
+			}
+			convertSpin(spin, inclination, mode);
+		} while (!isSpinBetweenLimits(spin, limits));
 		break;
 	case GEN_FIXED_ANGLES:
-		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-			do {
-				spin[i].magnitude = randomBetween(limits[MIN].magnitude, limits[MAX].magnitude);
-				spin[i].azimuth[FIXED] = randomBetween(limits[MIN].azimuth[FIXED],
-					limits[MAX].azimuth[FIXED]);
-				spin[i].inclination[FIXED] = randomBetween(limits[MIN].inclination[FIXED],
-					limits[MAX].inclination[FIXED]);
-				convertSpin(&spin[i], inclination, mode);
-			} while (!isSpinBetweenLimits(&spin[i], limits));
-		}
+		do {
+			spin->magnitude = randomBetween(limits[MIN].magnitude, limits[MAX].magnitude);
+			spin->azimuth[FIXED] = randomBetween(limits[MIN].azimuth[FIXED],
+				limits[MAX].azimuth[FIXED]);
+			spin->inclination[FIXED] = randomBetween(limits[MIN].inclination[FIXED],
+				limits[MAX].inclination[FIXED]);
+			convertSpin(spin, inclination, mode);
+		} while (!isSpinBetweenLimits(spin, limits));
 		break;
 	case GEN_PRECESSING_XYZ:
-		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-			do {
-				for (short j = 0; j < DIMENSION; j++) {
-					spin[i].component[FIXED][j] = randomBetween(limits[MIN].component[FIXED][j],
-						limits[MAX].component[FIXED][j]);
-				}
-				convertSpin(&spin[i], inclination, mode);
-			} while (!isSpinBetweenLimits(&spin[i], limits));
-		}
+		do {
+			for (short j = 0; j < DIMENSION; j++) {
+				spin->component[FIXED][j] = randomBetween(limits[MIN].component[FIXED][j],
+					limits[MAX].component[FIXED][j]);
+			}
+			convertSpin(spin, inclination, mode);
+		} while (!isSpinBetweenLimits(spin, limits));
 		break;
 	case GEN_PRECESSING_ANGLES:
-		for (short i = 0; i < NUMBER_OF_BLACKHOLES; i++) {
-			do {
-				spin[i].magnitude = randomBetween(limits[MIN].magnitude, limits[MAX].magnitude);
-				spin[i].azimuth[PRECESSING] = randomBetween(limits[MIN].azimuth[PRECESSING],
-					limits[MAX].azimuth[PRECESSING]);
-				spin[i].inclination[PRECESSING] = randomBetween(limits[MIN].inclination[PRECESSING],
-					limits[MAX].inclination[PRECESSING]);
-				convertSpin(&spin[i], inclination, mode);
-			} while (!isSpinBetweenLimits(&spin[i], limits));
-		}
+		do {
+			spin->magnitude = randomBetween(limits[MIN].magnitude, limits[MAX].magnitude);
+			spin->azimuth[PRECESSING] = randomBetween(limits[MIN].azimuth[PRECESSING],
+				limits[MAX].azimuth[PRECESSING]);
+			spin->inclination[PRECESSING] = randomBetween(limits[MIN].inclination[PRECESSING],
+				limits[MAX].inclination[PRECESSING]);
+			convertSpin(spin, inclination, mode);
+		} while (!isSpinBetweenLimits(spin, limits));
 		break;
 	default:
 		break;
@@ -653,16 +645,14 @@ static bool isOK_generateSpin(void) {
 	limits[MAX].component[PRECESSING][X] = 40.0 + (limits[MIN].component[PRECESSING][X] = -20.0);
 	limits[MAX].component[PRECESSING][Y] = 40.0 + (limits[MIN].component[PRECESSING][Y] = -20.0);
 	limits[MAX].component[PRECESSING][Z] = 40.0 + (limits[MIN].component[PRECESSING][Z] = -20.0);
-	printSpinParameters(stdout, &limits[MIN], defaultFormat);
-	printSpinParameters(stdout, &limits[MAX], defaultFormat);
 	SAVE_FUNCTION_CALLER();
 	generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
 	if (!isSpinBetweenLimits(&spin, limits)) {
-		//generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
+		generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
 		PRINT_ERROR();
 		return false;
 	}
-	//generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
+	generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
 	PRINT_OK();
 	return true;
 }
