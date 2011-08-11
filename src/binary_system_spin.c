@@ -630,13 +630,51 @@ static bool isOK_convertSpin(void) {
 	return true;
 }
 
+static bool isOK_generateSpin(void) {
+	if (!isOK_randomBetween()) {
+		return false;
+	}
+	if (!isOK_convertSpin()) {
+		return false;
+	}
+	if (!isOK_isSpinBetweenLimits()) {
+		return false;
+	}
+	double inclination = 0.0;
+	spinParameters spin, limits[2];
+	memset(limits, 0, 2 * sizeof(spinParameters));
+	limits[MAX].magnitude = 100.0 * (limits[MIN].magnitude = 1.0);
+	limits[MAX].azimuth[FIXED] = 10000.0 * (limits[MIN].azimuth[FIXED] = 0.000314);
+	limits[MAX].azimuth[PRECESSING] = 10000.0 * (limits[MIN].azimuth[PRECESSING] = 0.000314);
+	limits[MAX].inclination[FIXED] = 10000.0 * (limits[MIN].inclination[FIXED] = 0.000314);
+	limits[MAX].inclination[PRECESSING] = 10000.0 * (limits[MIN].inclination[PRECESSING] = 0.000314);
+	limits[MAX].elevation[FIXED] = M_PI + (limits[MIN].elevation[FIXED] = -M_PI_2);
+	limits[MAX].elevation[PRECESSING] = M_PI + (limits[MIN].elevation[PRECESSING] = -M_PI_4);
+	limits[MAX].component[FIXED][X] = 10.0 * (limits[MIN].component[FIXED][X] = 1.0);
+	limits[MAX].component[FIXED][Y] = 10.0 * (limits[MIN].component[FIXED][Y] = 1.0);
+	limits[MAX].component[FIXED][Z] = 10.0 * (limits[MIN].component[FIXED][Z] = 1.0);
+	limits[MAX].component[PRECESSING][X] = 40.0 + (limits[MIN].component[PRECESSING][X] = -20.0);
+	limits[MAX].component[PRECESSING][Y] = 40.0 + (limits[MIN].component[PRECESSING][Y] = -20.0);
+	limits[MAX].component[PRECESSING][Z] = 40.0 + (limits[MIN].component[PRECESSING][Z] = -20.0);
+	printSpinParameters(stdout, &limits[MIN], defaultFormat);
+	printSpinParameters(stdout, &limits[MAX], defaultFormat);
+	SAVE_FUNCTION_CALLER();
+	generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
+	if (!isSpinBetweenLimits(&spin, limits)) {
+		//generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
+		PRINT_ERROR();
+		return false;
+	}
+	//generateSpin(&spin, limits, inclination, GEN_FIXED_XYZ);
+	PRINT_OK();
+	return true;
+}
+
 bool areBinarySystemSpinFunctionsGood(void) {
 	bool isOK = true;
-	if (!isOK_magnitudeOfSpins()) {
+	if (!isOK_isSpinBetweenLimits()) {
 		isOK = false;
-	} else if (!isOK_isSpinBetweenLimits()) {
-		isOK = false;
-	} else if (!isOK_convertSpin()) {
+	} else if (!isOK_generateSpin()) {
 		isOK = false;
 	}
 	if (isOK) {
