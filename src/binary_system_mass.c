@@ -58,8 +58,31 @@ static bool isMassBetweenLimits(massParameters *mass, massParameters limits[]) {
 	} else if ((limits[MIN].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MAX].m1_m2)
 		&& (limits[MAX].m1_m2 < mass->m1_m2 || mass->m1_m2 < limits[MIN].m1_m2)) {
 		between = false;
-	}SAVE_FUNCTION_FOR_TESTING();
+	}
+	SAVE_FUNCTION_FOR_TESTING();
 	return between;
+}
+
+static bool areMassParametersNear(massParameters *left, massParameters *right) {
+	bool areEqual = true;
+	if (!isNear(left->mass[0], right->mass[0], EPSILON)) {
+		areEqual = false;
+	} else if (!isNear(left->mass[0], right->mass[0], EPSILON)) {
+		areEqual = false;
+	} else if (!isNear(left->totalMass, right->totalMass, EPSILON)) {
+		areEqual = false;
+	} else if (!isNear(left->eta, right->eta, EPSILON)) {
+		areEqual = false;
+	} else if (!isNear(left->chirpMass, right->chirpMass, EPSILON)) {
+		areEqual = false;
+	} else if (!isNear(left->m1_m2, right->m1_m2, EPSILON)) {
+		areEqual = false;
+	} else if (!isNear(left->mu, right->mu, EPSILON)) {
+		areEqual = false;
+	} else if (!isNear(left->nu, right->nu, EPSILON)) {
+		areEqual = false;
+	}
+	return areEqual;
 }
 
 static double calcChirpMass(double totalMass, double eta) {
@@ -124,7 +147,8 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
 		break;
 	default:
 		break;
-	}SAVE_FUNCTION_FOR_TESTING();
+	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
@@ -156,7 +180,8 @@ void generateMass(massParameters *mass, massParameters *limits, generationMode m
 		break;
 	default:
 		break;
-	}SAVE_FUNCTION_FOR_TESTING();
+	}
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**
@@ -301,7 +326,7 @@ static bool isOK_convertMassesEtaM(void) {
 	m1m2ToRemainingMass(&result);
 	SAVE_FUNCTION_CALLER();
 	convertMassesFromEtaM(&mass);
-	if (memcmp(&mass, &result, sizeof(massParameters))) {
+	if (areMassParametersNear(&mass, &result)) {
 		PRINT_ERROR();
 		return false;
 	}
@@ -323,7 +348,7 @@ static bool isOK_convertMassesEtaChirp(void) {
 	m1m2ToRemainingMass(&result);
 	SAVE_FUNCTION_CALLER();
 	convertMassesFromEtaChirp(&mass);
-	if (memcmp(&mass, &result, sizeof(massParameters))) {
+	if (areMassParametersNear(&mass, &result)) {
 		PRINT_ERROR();
 		return false;
 	}
@@ -354,7 +379,7 @@ static bool isOK_convertMasses(void) {
 	m1m2ToRemainingMass(&result);
 	SAVE_FUNCTION_CALLER();
 	convertMasses(&mass, FROM_ETAM);
-	if (memcmp(&mass, &result, sizeof(massParameters))) {
+	if (areMassParametersNear(&mass, &result)) {
 		PRINT_ERROR();
 		return false;
 	}
@@ -363,7 +388,13 @@ static bool isOK_convertMasses(void) {
 }
 
 static bool isOK_generateMass(void) {
-	if (!isOK_isMassBetweenLimits() || !isOK_convertMasses() || !isOK_randomBetween()) {
+	if (!isOK_randomBetween()) {
+		return false;
+	}
+	if (!isOK_isMassBetweenLimits()) {
+		return false;
+	}
+	if (!isOK_convertMasses()) {
 		return false;
 	}
 	massParameters mass, limits[2];
@@ -392,7 +423,13 @@ static bool isOK_printMassParameters(void) {
 }
 
 bool areBinarySystemMassFunctionsGood(void) {
-	if (!isOK_generateMass()) {
+	if (!isOK_m1m2ToRemainingMass()) {
+		PRINT_ERROR_FILE();
+		return false;
+	} else if (!isOK_isMassBetweenLimits()) {
+		PRINT_ERROR_FILE();
+		return false;
+	} else if (!isOK_generateMass()) {
 		PRINT_ERROR_FILE();
 		return false;
 	} else {
