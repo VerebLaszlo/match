@@ -6,10 +6,7 @@
  * @brief
  */
 
-#ifdef TEST
 #include "test.h"
-#endif
-
 #include <math.h>
 #include <assert.h>
 #include "util_math.h"

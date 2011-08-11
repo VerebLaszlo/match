@@ -15,23 +15,12 @@ int main(int argc, char *argv[]) {
 	argc = argc;
 	argv = argv;
 	srand(time(NULL));
+#ifdef TEST
 	areUtilMathFunctionsOK();
 	areIOFunctionsGood();
 	areBinarySystemMassFunctionsGood();
 	areBinarySystemSpinFunctionsGood();
-	/*OutputFormat format;
-	 setOutputFormat(&format, 5, 5, '%', true, "plot", 0);
-	 binarySystem system, limits[2];
-	 for (ushort i = 0; i < 2; i++) {
-	 double j = i + 1;
-	 limits[i].mass.mass[0] = j * 30.0;
-	 limits[i].mass.mass[1] = j * 3.0;
-	 limits[i].spin[0].magnitude = j * 0.5;
-	 limits[i].spin[0].azimuth[FIXED] = j * M_PI / 3.0;
-	 limits[i].spin[0].inclination[FIXED] = j * M_PI / 4.0;
-	 }
-	 generateBinarySystemParameters(&system, limits, FROM_M1M2, FROM_FIXED_ANGLES);
-	 printBinarySystemParameters(stdout, &system, &format);*/
+#endif // TEST
 	puts("\nOK");
 	return 0;
 }

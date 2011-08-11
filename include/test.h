@@ -95,12 +95,15 @@ extern char okBold[];///< bold color code for ok messages
 			okBold, ok, normal)
 
 #else
+
+#define BACKUP_DEFINITION_LINE()
 #define SAVE_FUNCTION_FOR_TESTING()
 #define SAVE_FUNCTION_CALLER()
 #define PRINT_ERROR()
 #define PRINT_ERROR_FILE()
 #define PRINT_OK()
 #define PRINT_OK_FILE()
+
 #endif
 
 #endif /* TEST_H_ */

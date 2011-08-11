@@ -5,13 +5,10 @@
  * @brief Various utilities for math.
  */
 
-#ifdef TEST
-#include "test.h"
-#endif
-
 #include <math.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "test.h"
 #include "util_math.h"
 
 static const double RADIAN_PER_DEGREE = M_PI / 180.0; ///< degree to radian conversion constant

@@ -6,10 +6,7 @@
  * @brief Handles input-output specific events.
  */
 
-#ifdef TEST
 #include "test.h"
-#endif
-
 #include <errno.h>
 #include <stdlib.h>
 #include "util_IO.h"
@@ -83,7 +80,7 @@ static void setFormatForOneNumber(OutputFormat *format) {
 		sprintf(format->oneNumber, "%%- %d.%dlg", format->width, format->precision);
 	} else {
 		sprintf(format->oneNumber, "%% %d.%dlg", format->width, format->precision);
-	} SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
@@ -124,7 +121,7 @@ static void setFormats(char formatString[], const ushort number, OutputFormat *f
 			sprintf(temp, "%s %c %s", formatString, format->separator, format->oneNumber);
 			strcpy(formatString, temp);
 		}
-	} SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setFormat(char formatString[], const ushort number, OutputFormat *format) {
@@ -139,7 +136,7 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format) {
 		sprintf(formatString, "%s %%%c", temp, format->separator);
 	} else {
 		sprintf(formatString, "%s %c", temp, format->separator);
-	} SAVE_FUNCTION_FOR_TESTING();
+	}SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setFormatEnd(char formatString[], const ushort number, OutputFormat *format) {

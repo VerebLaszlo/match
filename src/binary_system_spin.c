@@ -7,10 +7,10 @@
  */
 
 #ifdef TEST
-#include "test.h"
 #include <stdlib.h>
 #endif
 
+#include "test.h"
 #include <math.h>
 #include <assert.h>
 #include "util_math.h"

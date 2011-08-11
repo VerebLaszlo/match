@@ -18,6 +18,10 @@ CC := gcc
 CFLAGS := -std=gnu99 -O3 -ggdb3
 include config.mk
 
+ifneq (,$(findstring TEST, $(macros)))
+	TEST := Test
+endif
+
 errorFlags := -Wall -Wextra -Wformat-security -Wmissing-include-dirs -Wswitch-default
 errorFlags += -Wstrict-prototypes -Wold-style-definition
 
@@ -56,7 +60,7 @@ proba :
 	@echo ''
 	@echo "$(makes)"
 
-all : release
+all : test
 
 release :
 	@echo "$(CFLAGS)"
@@ -65,8 +69,6 @@ debug : CFLAGS += $(errorExtraFlags)
 
 debug :
 	@echo "$(CFLAGS)"
-
-test : macros := -DTEST
 
 test : CFLAGS += $(errorExtraFlags)
 
@@ -109,10 +111,7 @@ release : CFLAGS += -O3
 .PHONY : doxy cleandoxy clean cleanobj cleanall all # csak utasítás név, nem cél
 
 doxy : doxyutil
-	doxygen Doxyfile
-
-doxytest : doxyutil
-	doxygen DoxyfileTest
+	doxygen Doxyfile$(TEST)
 
 doxyutil :
 	-mkdir doc
