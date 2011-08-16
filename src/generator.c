@@ -304,8 +304,9 @@ static void gen_Sys(binary_System *sys, binary_System *min, binary_System *max) 
 	sys->incl = randomBetween(min->incl, max->incl);
 	sys->F.declination = randomBetween(min->F.declination, max->F.declination);
 	sys->F.polarization = randomBetween(min->F.polarization, max->F.polarization);
-	sys->F.right_Ascention = randomBetween(min->F.right_Ascention, max->F.right_Ascention);
-	sys->F.gmst = randomBetween(min->F.gmst, max->F.gmst);
+	sys->F.rightAscention = randomBetween(min->F.rightAscention, max->F.rightAscention);
+	sys->F.greenwichMeanSiderealTime = randomBetween(min->F.greenwichMeanSiderealTime,
+		max->F.greenwichMeanSiderealTime);
 	calc_Antenna_Pattern_For(LH, &(sys->F));
 }
 
@@ -370,15 +371,16 @@ void read_Binary_Parameter_Limits(FILE*file, binary_System *sys) {
 	sys[0].F.polarization *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
 	sys[1].F.polarization *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
 	fgets(line, length, file);
-	sscanf(line, "%lg %lg %*s\n", &sys[0].F.right_Ascention, &sys[1].F.right_Ascention);
-	sys[0].F.right_Ascention *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
-	sys[1].F.right_Ascention *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+	sscanf(line, "%lg %lg %*s\n", &sys[0].F.rightAscention, &sys[1].F.rightAscention);
+	sys[0].F.rightAscention *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
+	sys[1].F.rightAscention *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 	fgets(line, length, file);
 	sscanf(line, "%lg %lg %*s\n", &sys[0].F.declination, &sys[1].F.declination);
 	sys[0].F.declination *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
 	sys[1].F.declination *= CONVERSION_CONSTANT.DEGREE_TO_RADIAN;
 	fgets(line, length, file);
-	sscanf(line, "%lg %lg %*s\n", &sys[0].F.gmst, &sys[1].F.gmst);
+	sscanf(line, "%lg %lg %*s\n", &sys[0].F.greenwichMeanSiderealTime,
+		&sys[1].F.greenwichMeanSiderealTime);
 	sys[0].F.declination *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 	sys[1].F.declination *= CONVERSION_CONSTANT.SECOND_TO_RADIAN;
 }
@@ -397,10 +399,10 @@ void print_Binary_Parameter_Limits(FILE* file, binary_System*sys) {
 	fprintf(file, "%10s %10.4lg %10.4lg\n", "incl", sys[0].incl, sys[1].incl);
 	fprintf(file, "%10s %10.4lg %10.4lg\n", "dist", sys[0].dist, sys[1].dist);
 	fprintf(file, "%10s %10.4lg %10.4lg\n", "pol", sys[0].F.polarization, sys[1].F.polarization);
-	fprintf(file, "%10s %10.4lg %10.4lg\n", "ra", sys[0].F.right_Ascention,
-		sys[1].F.right_Ascention);
+	fprintf(file, "%10s %10.4lg %10.4lg\n", "ra", sys[0].F.rightAscention,
+		sys[1].F.rightAscention);
 	fprintf(file, "%10s %10.4lg %10.4lg\n", "dec", sys[0].F.declination, sys[1].F.declination);
-	fprintf(file, "%10s %10.4lg %10.4lg\n", "gmst", sys[0].F.gmst, sys[1].F.gmst);
+	fprintf(file, "%10s %10.4lg %10.4lg\n", "gmst", sys[0].F.greenwichMeanSiderealTime, sys[1].F.greenwichMeanSiderealTime);
 }
 
 void print_Binary_Parameter_For_Plot(FILE* file, binary_System*sys) {

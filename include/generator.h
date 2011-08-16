@@ -55,7 +55,7 @@ typedef struct {
 	double dist; ///< distance of the system
 	double coaPhase; ///<a
 	double coaTime; ///<a
-	antenna_Func F; ///< antenna functions
+	DetectorParamters F; ///< antenna functions
 } binary_System;
 
 ///
