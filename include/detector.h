@@ -10,6 +10,7 @@
 #define DETECTOR_H_
 
 #include "util.h"
+#include "util_IO.h"
 
 typedef enum {
 	X, Y, Z, DIMENSION,
@@ -56,6 +57,13 @@ void calcAntennaPatternFor(DetectorID id, DetectorParamters *parameter);
  * @param[in]  limits	: the limits of the parameters
  */
 void generateDetectorParameters(DetectorParamters *detector, DetectorParamters limits[]);
+
+/**	Prints detector parameters.
+ * @param[in] file		:
+ * @param[in] detector	:
+ * @param[in] format	:
+ */
+void printDetectorParameters(FILE *file, DetectorParamters *detector, OutputFormat *format);
 
 #ifdef TEST
 

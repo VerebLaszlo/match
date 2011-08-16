@@ -5,7 +5,6 @@
  */
 
 #include <assert.h>
-#include <string.h>
 #include <stdlib.h>
 #include "detector.h"
 #include "test.h"
@@ -187,6 +186,22 @@ void generateDetectorParameters(DetectorParamters *detector, DetectorParamters l
 		limits[MAX].rightAscention);
 	detector->greenwichMeanSiderealTime = randomBetween(limits[MIN].greenwichMeanSiderealTime,
 		limits[MAX].greenwichMeanSiderealTime);
+	SAVE_FUNCTION_FOR_TESTING();
+}
+
+void printDetectorParameters(FILE *file, DetectorParamters *detector, OutputFormat *format) {
+	BACKUP_DEFINITION_LINE();
+	ushort number = 4;
+	ushort length = number * format->widthWithSeparator;
+	char formatString[length];
+	setFormat(formatString, number, format);
+	fprintf(file, formatString, detector->declination, detector->polarization,
+		detector->rightAscention, detector->greenwichMeanSiderealTime);
+	number = 3;
+	length = number * format->widthWithSeparator;
+	setFormatEnd(formatString, number, format);
+	fprintf(file, formatString, detector->greenwichHourAngle, detector->antennaBeamPattern[0],
+		detector->antennaBeamPattern[1]);
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
