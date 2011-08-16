@@ -193,10 +193,10 @@ void generateDetectorParameters(DetectorParamters *detector, DetectorParamters l
 #ifdef TEST
 
 static bool isOK_getDetectorIDOf(void) {
-	DetectorID id[] = { LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
-						NUMBER_OF_DETECTORS, };
-	const char *name[] = { "LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
-							"MPQ", "CIT", };
+	DetectorID id[] = {LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
+		NUMBER_OF_DETECTORS,};
+	const char *name[] = {"LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
+		"MPQ", "CIT",};
 	ushort detector = 0;
 	while (id[detector] != NUMBER_OF_DETECTORS) {
 		SAVE_FUNCTION_CALLER();
@@ -220,10 +220,10 @@ static bool isOK_getDetectorIDOf(void) {
 }
 
 static bool isOK_getDetectorTable(void) {
-	DetectorID id[] = { LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
-						NUMBER_OF_DETECTORS, };
-	const char *name[] = { "LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
-							"MPQ", "CIT", };
+	DetectorID id[] = {LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
+		NUMBER_OF_DETECTORS,};
+	const char *name[] = {"LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
+		"MPQ", "CIT",};
 	ushort detector = 0;
 	DetectorTable table;
 	while (id[detector] != NUMBER_OF_DETECTORS) {
@@ -249,11 +249,118 @@ static bool isOK_getDetectorTable(void) {
 	return true;
 }
 
+static bool isOK_calcResponseMatrix(void) {
+	ushort detector = LL;
+	double matrix[DIMENSION][DIMENSION];
+	double result[GEO600][DIMENSION][DIMENSION] = { //
+		{ //
+			{	+0.4113180, +0.1402100, +0.2472790}, //
+			{	+0.1402100, -0.1089980, -0.1815970}, //
+			{	+0.2472790, -0.1815970, -0.3022360}, //
+		},
+		{ //
+			{	-0.3926320, -0.0776099, -0.2473840}, //
+			{	-0.0776099, +0.3194990, +0.2279880}, //
+			{	-0.2473840, +0.2279880, +0.0730968}, //
+		},
+		{ //
+			{	+0.2439030, -0.0990959, -0.2326030}, //
+			{	-0.0990959, -0.4478410, +0.1878410}, //
+			{	-0.2326030, +0.1878410, +0.2039790}, //
+		}, //
+	};
+	while (detector < GEO600) {
+		SAVE_FUNCTION_CALLER();
+		calcResponseMatrix(matrix, detectors[detector]);
+		for (ushort dim1 = X; dim1 < DIMENSION; dim1++) {
+			for (ushort dim2 = X; dim2 < DIMENSION; dim2++) {
+				if (!isNear(matrix[dim1][dim2], result[detector][dim1][dim2], 4.849999999946e-07)) {
+					PRINT_ERROR();
+					return false;
+				}
+			}
+		}
+		detector++;
+	} //
+	PRINT_OK();
+	return true;
+}
+
+static bool isOK_calcAntennaPatternFromResponseMatrix(void) {
+	if (!isOK_calcResponseMatrix()) {
+		return false;
+	}
+	double matrix[DIMENSION][DIMENSION];
+	DetectorParamters antenna;
+	antenna.declination = antenna.polarization = antenna.greenwichHourAngle = 1.0;
+	calcResponseMatrix(matrix, detectors[LL]);
+	double epsilon = 3.406948470563443e-07;
+	SAVE_FUNCTION_CALLER();
+	calcAntennaPatternFromResponseMatrix(&antenna, matrix);
+	if (!isNear(antenna.antennaBeamPattern[0], -0.1663658543172435722, epsilon)
+		|| !isNear(antenna.antennaBeamPattern[1], -0.79869393295667401311, epsilon)) {
+		PRINT_ERROR();
+		return false;
+	} //
+	PRINT_OK();
+	return true;
+}
+
+static bool isOK_calcAntennaPatternFor(void) {
+	DetectorParamters params;
+	params.greenwichMeanSiderealTime = 2.0;
+	params.rightAscention = 1.0;
+	params.declination = 1.0;
+	params.polarization = 1.0;
+	double epsilon = 3.406948470563443e-07;
+	SAVE_FUNCTION_CALLER();
+	calcAntennaPatternFor(LL, &params);
+	if (!isNear(params.antennaBeamPattern[0], -0.1663658543172435722, epsilon)
+		|| !isNear(params.antennaBeamPattern[1], -0.79869393295667401311, epsilon)) {
+		PRINT_ERROR();
+		return false;
+	} //
+	PRINT_OK();
+	return true;
+}
+
+static bool isOK_generateDetectorParameters(void) {
+	if (!areUtilMathFunctionsOK()) {
+		return false;
+	}
+	DetectorParamters params, limits[2];
+	limits[MAX].polarization = 10.0 + (limits[MIN].polarization = 0.0);
+	limits[MAX].declination = 10.0 + (limits[MIN].declination = 0.0);
+	limits[MAX].rightAscention = 10.0 + (limits[MIN].rightAscention = 0.0);
+	limits[MAX].greenwichMeanSiderealTime = 10.0 + (limits[MIN].greenwichMeanSiderealTime = 0.0);
+	SAVE_FUNCTION_CALLER();
+	generateDetectorParameters(&params, limits);
+	if (limits[MIN].polarization > params.polarization
+		|| params.polarization > limits[MAX].polarization
+		|| limits[MIN].declination > params.declination
+		|| params.declination > limits[MAX].declination
+		|| limits[MIN].rightAscention > params.rightAscention
+		|| params.rightAscention > limits[MAX].rightAscention
+		|| limits[MIN].greenwichMeanSiderealTime > params.greenwichMeanSiderealTime
+		|| params.greenwichMeanSiderealTime > limits[MAX].greenwichMeanSiderealTime) {
+		PRINT_ERROR();
+		return false;
+	} //
+	PRINT_OK();
+	return true;
+}
+
 bool areDetectorFunctionsGood(void) {
 	bool isOK = true;
 	if (!isOK_getDetectorIDOf()) {
 		isOK = false;
 	} else if (!isOK_getDetectorTable()) {
+		isOK = false;
+	} else if (!isOK_calcAntennaPatternFromResponseMatrix()) {
+		isOK = false;
+	} else if (!isOK_calcAntennaPatternFor()) {
+		isOK = false;
+	} else if (!isOK_generateDetectorParameters()) {
 		isOK = false;
 	}
 	if (isOK) {

@@ -15,8 +15,8 @@
 
 int main(int argc, char *argv[]) {
 	printf("%d: %s\n", argc, argv[0]);
-	srand(time(NULL));
 #ifdef TEST
+	srand(86);
 	areUtilMathFunctionsOK();
 	areIOFunctionsGood();
 	areBinarySystemMassFunctionsGood();
@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
 	areBinarySystemFunctionsGood();
 	areDetectorFunctionsGood();
 #else
+	srand(time(NULL));
 	bool boolean = true;
 	printf("%d - ", boolean);
 	neg(&boolean);
