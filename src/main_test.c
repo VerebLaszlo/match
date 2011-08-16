@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
 	areIOFunctionsGood();
 	areBinarySystemMassFunctionsGood();
 	areBinarySystemSpinFunctionsGood();
+	areBinarySystemFunctionsGood();
 #else
 	bool boolean = true;
 	printf("%d - ", boolean);
