@@ -46,12 +46,6 @@ typedef enum tagGenerationMode {
 /**	Various constants for the binary system.
  */
 typedef enum tagSystemConstants {
-	X = 0, ///< x component
-	Y, ///< y component
-	Z, ///< z component
-	DIMENSION, ///< number of the dimensions
-	MIN = 0, ///< MIN
-	MAX, ///< MAX
 	FIXED = 0, ///< fixed convention
 	PRECESSING, ///< precessing convention
 	COORDINATE_CONVENTIONS, ///< number of the spin conventions

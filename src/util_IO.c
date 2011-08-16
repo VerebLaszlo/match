@@ -12,7 +12,6 @@
 #include "util_IO.h"
 #ifndef NDEBUG
 #include <assert.h>
-#include <string.h>
 #endif
 
 extern char * program_invocation_short_name; ///< short name of the program

@@ -10,6 +10,18 @@
 
 #include "util.h"
 
+typedef enum {
+	X, ///< x componen
+	Y, ///< y component
+	Z, ///< z component
+	DIMENSION,
+///< number of the dimensions
+} Coordinates;
+
+typedef enum {
+	MIN, MAX,
+} Codes;
+
 /**	Inserts the square of the number.
  * @param[in] number
  */

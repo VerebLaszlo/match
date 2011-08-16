@@ -18,5 +18,4 @@ typedef unsigned short ushort; ///< shorthand for unsigned short int type
  */
 void neg(bool *var);
 
-
 #endif // UTIL_H

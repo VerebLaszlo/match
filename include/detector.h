@@ -9,16 +9,8 @@
 #ifndef DETECTOR_H_
 #define DETECTOR_H_
 
-#include "util.h"
 #include "util_IO.h"
-
-typedef enum {
-	X, Y, Z, DIMENSION,
-} Coordinates;
-
-typedef enum {
-	MIN, MAX,
-} Codes;
+#include "util_math.h"
 
 /** Detector codes
  */

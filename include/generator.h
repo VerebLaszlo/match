@@ -8,7 +8,6 @@
 #define GENERATOR_H
 
 #include "binary_system.h"
-#include "util_math.h"
 
 typedef conversionMode conversion_Mode_Spins;
 typedef conversionMode conversion_Mode_Masses;
