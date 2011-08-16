@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "detector.h"
+#include "test.h"
 #include "util_math.h"
 
 const DetectorTable detectors[] = { //
@@ -88,10 +89,10 @@ const DetectorTable detectors[] = { //
  * @return the id of the detector
  */
 static DetectorID getDetectorIDOf(const char *name) {
-
+	BACKUP_DEFINITION_LINE();
 	for (short i = 0; i < NUMBER_OF_DETECTORS; i++) {
-		if (strcmp(name, detectors[i].name)) {
-
+		if (!strcmp(name, detectors[i].name)) {
+			SAVE_FUNCTION_FOR_TESTING();
 			return detectors[i].id;
 		}
 	}
@@ -104,11 +105,14 @@ static DetectorID getDetectorIDOf(const char *name) {
  * @return	the parameters of the detector
  */
 static DetectorTable getDetectorTable(DetectorID id) {
+	BACKUP_DEFINITION_LINE();
 	for (short i = 0; i < NUMBER_OF_DETECTORS; i++) {
 		if (detectors[i].id == id) {
+			SAVE_FUNCTION_FOR_TESTING();
 			return detectors[i];
 		}
-	}
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 	return detectors[0];
 }
 
@@ -117,6 +121,7 @@ static DetectorTable getDetectorTable(DetectorID id) {
  * @param[in]  detector		  : the detectors parameters
  */
 static void calcResponseMatrix(double responseMatrix[DIMENSION][DIMENSION], DetectorTable detector) {
+	BACKUP_DEFINITION_LINE();
 	for (short i = 0; i < DIMENSION; i++) {
 		responseMatrix[i][i] = (detector.arm[X][i] * detector.arm[X][i]
 			- detector.arm[Y][i] * detector.arm[Y][i]) / 2.0;
@@ -124,7 +129,8 @@ static void calcResponseMatrix(double responseMatrix[DIMENSION][DIMENSION], Dete
 			responseMatrix[i][j] = responseMatrix[j][i] = (detector.arm[X][i] * detector.arm[X][j]
 				- detector.arm[Y][i] * detector.arm[Y][j]) / 2.0;
 		}
-	}
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**	Calculates the antenna pattern for a response matrix. Equations [1] (B1-5) (B7-8)
@@ -133,6 +139,7 @@ static void calcResponseMatrix(double responseMatrix[DIMENSION][DIMENSION], Dete
  */
 static void calcAntennaPatternFromResponseMatrix(DetectorParamters *antenna,
 	double responseMatrix[DIMENSION][DIMENSION]) {
+	BACKUP_DEFINITION_LINE();
 	double VEC1[DIMENSION];
 	double VEC2[DIMENSION];
 	const double cosGHA = cosGood(antenna->greenwichHourAngle);
@@ -155,20 +162,23 @@ static void calcAntennaPatternFromResponseMatrix(DetectorParamters *antenna,
 			+ responseMatrix[dim][Z] * VEC2[Z];
 		antenna->antennaBeamPattern[0] += VEC1[dim] * DX - VEC2[dim] * DY;
 		antenna->antennaBeamPattern[1] += VEC1[dim] * DY + VEC2[dim] * DX;
-	}
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void calcAntennaPatternFor(DetectorID id, DetectorParamters *parameter) {
+	BACKUP_DEFINITION_LINE();
 	double response_Matrix[3][3];
 	parameter->greenwichHourAngle = parameter->greenwichMeanSiderealTime
 		- parameter->rightAscention;
 	DetectorTable detector = getDetectorTable(id);
 	calcResponseMatrix(response_Matrix, detector);
 	calcAntennaPatternFromResponseMatrix(parameter, response_Matrix);
-
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void generateDetectorParameters(DetectorParamters *detector, DetectorParamters limits[]) {
+	BACKUP_DEFINITION_LINE(); //
 	assert(detector);
 	assert(limits);
 	detector->declination = randomBetween(limits[MIN].declination, limits[MAX].declination);
@@ -177,8 +187,84 @@ void generateDetectorParameters(DetectorParamters *detector, DetectorParamters l
 		limits[MAX].rightAscention);
 	detector->greenwichMeanSiderealTime = randomBetween(limits[MIN].greenwichMeanSiderealTime,
 		limits[MAX].greenwichMeanSiderealTime);
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
+#ifdef TEST
+
+static bool isOK_getDetectorIDOf(void) {
+	DetectorID id[] = { LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
+						NUMBER_OF_DETECTORS, };
+	const char *name[] = { "LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
+							"MPQ", "CIT", };
+	ushort detector = 0;
+	while (id[detector] != NUMBER_OF_DETECTORS) {
+		SAVE_FUNCTION_CALLER();
+		if (id[detector] != getDetectorIDOf(name[detector])) {
+			PRINT_ERROR();
+			return false;
+		}
+		detector++;
+	}
+	detector = 0;
+	while (id[detector] != NUMBER_OF_DETECTORS) {
+		SAVE_FUNCTION_CALLER();
+		if (id[detector + 1] == getDetectorIDOf(name[detector])) {
+			PRINT_ERROR();
+			return false;
+		}
+		detector++;
+	} //
+	PRINT_OK();
+	return true;
+}
+
+static bool isOK_getDetectorTable(void) {
+	DetectorID id[] = { LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
+						NUMBER_OF_DETECTORS, };
+	const char *name[] = { "LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
+							"MPQ", "CIT", };
+	ushort detector = 0;
+	DetectorTable table;
+	while (id[detector] != NUMBER_OF_DETECTORS) {
+		SAVE_FUNCTION_CALLER();
+		table = getDetectorTable(id[detector]);
+		if (strcmp(table.name, name[detector])) {
+			PRINT_ERROR();
+			return false;
+		}
+		detector++;
+	}
+	detector = 0;
+	while (id[detector] != NUMBER_OF_DETECTORS) {
+		SAVE_FUNCTION_CALLER();
+		table = getDetectorTable(id[detector + 1]);
+		if (!strcmp(table.name, name[detector])) {
+			PRINT_ERROR();
+			return false;
+		}
+		detector++;
+	} //
+	PRINT_OK();
+	return true;
+}
+
+bool areDetectorFunctionsGood(void) {
+	bool isOK = true;
+	if (!isOK_getDetectorIDOf()) {
+		isOK = false;
+	} else if (!isOK_getDetectorTable()) {
+		isOK = false;
+	}
+	if (isOK) {
+		PRINT_OK_FILE();
+	} else {
+		PRINT_ERROR_FILE();
+	}
+	return isOK;
+}
+
+#endif	// TEST
 /*
  const DETECTOR_CONSTANTS DETECTOR_CONSTANT = { 630720013.0, 32.0, 189388800.0, 284083201.0, 36525.0,
  1.0 / 36525.0, 24110.54841, 8640184.812866,

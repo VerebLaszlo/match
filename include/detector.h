@@ -57,6 +57,11 @@ void calcAntennaPatternFor(DetectorID id, DetectorParamters *parameter);
  */
 void generateDetectorParameters(DetectorParamters *detector, DetectorParamters limits[]);
 
+#ifdef TEST
+
+bool areDetectorFunctionsGood(void);
+
+#endif // TEST
 /** Egyéb
  */
 /*typedef struct DETECTOR_CONSTANTS {

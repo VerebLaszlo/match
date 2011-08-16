@@ -11,6 +11,7 @@
 #include <math.h>
 #include "util_math.h"
 #include "binary_system.h"
+#include "detector.h"
 
 int main(int argc, char *argv[]) {
 	printf("%d: %s\n", argc, argv[0]);
@@ -21,6 +22,7 @@ int main(int argc, char *argv[]) {
 	areBinarySystemMassFunctionsGood();
 	areBinarySystemSpinFunctionsGood();
 	areBinarySystemFunctionsGood();
+	areDetectorFunctionsGood();
 #else
 	bool boolean = true;
 	printf("%d - ", boolean);
