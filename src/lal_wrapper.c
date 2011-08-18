@@ -84,12 +84,12 @@ static void initLALParameters(LALParameters *lalparams, System_Parameters *param
  */
 static void createPSD(LALParameters *lalparams, double *psd) {
 	assert(lalparams);
-	lalparams->randIn.psd.length = lalparams->max_Length;
-	double df = 1. / lalparams->ppnParams[0].deltaT / lalparams->randIn.psd.length;
-	lalparams->randIn.psd.data = (REAL8*) LALMalloc(sizeof(REAL8) * lalparams->randIn.psd.length);
-	LALNoiseSpectralDensity(&lalparams->status, &lalparams->randIn.psd, &LALLIGOIPsd, df);
-	for (unsigned long j = 0; j < lalparams->randIn.psd.length; j++) {
-		psd[j] = lalparams->randIn.psd.data[j];
+	lalparams->randIn.powerSpectrumDensity.length = lalparams->max_Length;
+	double df = 1. / lalparams->ppnParams[0].deltaT / lalparams->randIn.powerSpectrumDensity.length;
+	lalparams->randIn.powerSpectrumDensity.data = (REAL8*) LALMalloc(sizeof(REAL8) * lalparams->randIn.powerSpectrumDensity.length);
+	LALNoiseSpectralDensity(&lalparams->status, &lalparams->randIn.powerSpectrumDensity, &LALLIGOIPsd, df);
+	for (unsigned long j = 0; j < lalparams->randIn.powerSpectrumDensity.length; j++) {
+		psd[j] = lalparams->randIn.powerSpectrumDensity.data[j];
 	}
 }
 
@@ -197,7 +197,7 @@ int generateWaveformPair(System_Parameters *parameters, signalStruct *signal) {
 	}
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
-	XLALFree(lalparams.randIn.psd.data);
+	XLALFree(lalparams.randIn.powerSpectrumDensity.data);
 	LALCheckMemoryLeaks();
 	return FOUND;
 }

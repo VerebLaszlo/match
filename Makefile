@@ -23,7 +23,7 @@ ifneq (,$(findstring TEST, $(macros)))
 endif
 
 errorFlags := -Wall -Wextra -Wformat-security -Wmissing-include-dirs -Wswitch-default
-errorFlags += -Wstrict-prototypes -Wold-style-definition
+errorFlags += -Wstrict-prototypes -Wold-style-definition -Wno-aggregate-return
 
 errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wcast-qual
 errorExtraFlags += -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return -Wredundant-decls
@@ -42,6 +42,9 @@ objects += $(patsubst $(testdir)/%.c,$(objdir)/%.o,$(wildcard $(testdir)/*.c))
 makes += $(patsubst $(testdir)/%.c,$(objdir)/%.d,$(wildcard $(testdir)/*.c))
 includes := -I$(incdir) #-I/usr/include
 
+objs_test := main_test.o signals.o detector.o binary_system.o binary_system_mass.o
+objs_test += binary_system_spin.o util_math.o util_IO.o util.o test.o
+
 vpath
 vpath %.c $(srcdir)
 vpath %.c $(testdir)
@@ -55,11 +58,6 @@ vpath lib%.a $(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L l
 LAL_INC := $(shell pkg-config --cflags lalinspiral)
 LAL_LIB := $(shell pkg-config --libs lalinspiral)
 
-proba :
-	@echo "$(objects)"
-	@echo ''
-	@echo "$(makes)"
-
 all : test
 
 release :
@@ -72,7 +70,7 @@ debug :
 
 test : CFLAGS += $(errorExtraFlags)
 
-test : main_test.o detector.o binary_system.o binary_system_mass.o binary_system_spin.o util_math.o util_IO.o util.o test.o -lm
+test : $(objs_test) -lfftw3 -lm
 	@echo -e '\e[36mLinking: $@ from $^\e[0m'
 	$(CC) $(CFLAGS) $(macros) -o test $^
 	@echo -e '\e[35mFinished linking: $@\e[0m'

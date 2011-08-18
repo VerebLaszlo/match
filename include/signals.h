@@ -1,14 +1,32 @@
 /**
  * @file datatypes.h
  *
- *  Created on: Jul 16, 2011
- *      Author: vereb
+ * @date 2011.08.18.
+ * @author László Veréb
  */
 
 #ifndef DATATYPES_H_
 #define DATATYPES_H_
 
 #include <fftw3.h>
+
+typedef enum {
+	H1P, H1C, H2P, H2C, NUMBER_OF_SIGNALS_COMPONENTS, NUMBER_OF_SIGNALS = 2, H1 = 0, H2,
+} SignalComponentCodes;
+
+/**	Structure containing the signals.
+ */
+typedef struct {
+	double *inTime[NUMBER_OF_SIGNALS]; ///< the two signals in time domain: \f$h_i=h_{i+}F_++h_{i\times}F_\times\f$
+	double *componentsInTime[NUMBER_OF_SIGNALS_COMPONENTS]; ///< the components of the signals in time domain with the following order: \f$h_{1+}, h_{1\times}, h_{2+}, h_{2\times}\f$.
+	double *product[NUMBER_OF_SIGNALS_COMPONENTS];
+	fftw_complex *componentsInFrequency[NUMBER_OF_SIGNALS_COMPONENTS]; ///< the signals in frequency domain with the following order: \f$\tilde h_{1+}, \tilde h_{1\times}, \tilde h_{2+}, \tilde h_{2\times}\f$.
+	fftw_plan plan[NUMBER_OF_SIGNALS_COMPONENTS]; ///< FFT plans to calculate \f$\tilde h_{ij}=F\left(h_{ij}\right)\f$
+	double *powerSpectrumDensity; ///< the used power spectrum density
+	long length[2]; ///< length of the signals
+	long size; ///< the allocated memory for the signals
+} SignalStruct;
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,12 +40,6 @@ typedef enum CONSTANTS {
 /**	An enum to contains the integer type constatns.
  */
 typedef enum {
-	H1 = 0,
-	H1P = 0,
-	H1C = 1,
-	H2 = 2,
-	H2P = 2,
-	H2C = 3,
 	HPP = 0,
 	HPC = 1,
 	HCP = 2,
@@ -38,41 +50,29 @@ typedef enum {
 	NOS_WITH_DETECTOR_RESPONSE = 6,
 } constantValues;
 
-/**	Structure containing the signals.
+/**	Allocates memory for the signals.
+ * @param[in] s		: pointer to the structure containing the signals
+ * @param[in] size	: the size of the allocated memory
+ * @return : the succes of the memory allocation
  */
-typedef struct {
-	double *signal[NOS_WITH_DETECTOR_RESPONSE]; ///< the signals in time domain with the following order: \f$h_{1+}\f$, \f$h_{1\times}\f$, \f$h_{2+}\f$, \f$h_{2\times}\f$.
-	double *product_Signal[NUM_OF_SIGNALS]; ///<a
-	fftw_complex *csignal[NUM_OF_SIGNALS]; ///< the signals in frequency domain with the following order: \f$\tilde h_{1+}\f$, \f$\tilde h_{1\times}\f$, \f$\tilde h_{2+}\f$, \f$\tilde h_{2\times}\f$.
-	fftw_plan plan[NUM_OF_SIGNALS]; ///< FFT plans to calculate \f$\tilde h_{ij}=F\left(h_{ij}\right)\f$
-	double *psd; ///<d
-	long length[2]; ///< lnegth of the signals
-	long size; ///< the allocated memory for the signals
-} signalStruct;
+void create_Signal_Struct(SignalStruct *s, long size);
 
 /**	Allocates memory for the signals.
  * @param[in] s		: pointer to the structure containing the signals
  * @param[in] size	: the size of the allocated memory
  * @return : the succes of the memory allocation
  */
-void create_Signal_Struct(signalStruct *s, long size);
-
-/**	Allocates memory for the signals.
- * @param[in] s		: pointer to the structure containing the signals
- * @param[in] size	: the size of the allocated memory
- * @return : the succes of the memory allocation
- */
-void create_Signal_Struct1(signalStruct *s, long size);
+void create_Signal_Struct1(SignalStruct *s, long size);
 
 /**	Deallocates the memory of the signals.
  * @param[in] s	: pointer to the structure containing the signals
  */
-void destroy_Signal_Struct(signalStruct *s);
+void destroy_Signal_Struct(SignalStruct *s);
 
 /**	Deallocates the memory of the signals.
  * @param[in] s	: pointer to the structure containing the signals
  */
-void destroy_Signal_Struct1(signalStruct *s);
+void destroy_Signal_Struct1(SignalStruct *s);
 
 /** Prints the two signal
  * @param file
@@ -81,7 +81,7 @@ void destroy_Signal_Struct1(signalStruct *s);
  * @param width
  * @param precision
  */
-void print_Two_Signals(FILE*file, signalStruct *sig, double dt, short width, short precision);
+void print_Two_Signals(FILE*file, SignalStruct *sig, double dt, short width, short precision);
 
 /** Prints the two signal and there difference.
  * @param file
@@ -90,7 +90,7 @@ void print_Two_Signals(FILE*file, signalStruct *sig, double dt, short width, sho
  * @param width
  * @param precision
  */
-void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, short width,
+void print_Two_Signals_And_Difference(FILE*file, SignalStruct *sig, double dt, short width,
 	short precision);
 
 /** Prints the two signal with their \f$+,\times\f$ polarisations.
@@ -100,9 +100,9 @@ void print_Two_Signals_And_Difference(FILE*file, signalStruct *sig, double dt, s
  * @param width
  * @param precision
  */
-void print_Two_Signals_With_HPHC(FILE*file, signalStruct *sig, double dt, short width,
+void print_Two_Signals_With_HPHC(FILE*file, SignalStruct *sig, double dt, short width,
 	short precision);
 
-void calculate_H_From_HPHC(signalStruct *signal, double *antennaFunction);
+void calculate_H_From_HPHC(SignalStruct *signal, double *antennaFunction);
 
 #endif /* DATATYPES_H_ */

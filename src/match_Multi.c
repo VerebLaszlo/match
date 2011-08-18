@@ -1,7 +1,7 @@
 #include "match_Multi.h"
 
 #define M_NUM 4
-double calc_Periods(double *per1, double *per2, signalStruct *signal);
+double calc_Periods(double *per1, double *per2, SignalStruct *signal);
 
 void destroySTWave(CoherentGW waveform);
 
@@ -23,7 +23,7 @@ void multi_Match(program_Params *params, binary_System *act, long num, char dir[
 	assert(act);
 	assert(num > 0);
 	// saját
-	signalStruct sig[M_NUM];
+	SignalStruct sig[M_NUM];
 	double *waves[2];
 	char file_Name[50];
 	FILE *file;
@@ -145,12 +145,12 @@ void multi_Match(program_Params *params, binary_System *act, long num, char dir[
 		create_Signal_Struct(&sig[3], waveform[!shorter].f->data->length);
 		waves[0] = malloc(max_Length * sizeof(double));
 		waves[1] = malloc(max_Length * sizeof(double));
-		randIn.psd.length = waveform[!shorter].f->data->length;
-		double df = 1. / ppnParams.deltaT / randIn.psd.length;
-		randIn.psd.data = (REAL8*) LALMalloc(sizeof(REAL8) * randIn.psd.length);
-		LALNoiseSpectralDensity(&status, &randIn.psd, &LALLIGOIPsd, df);
-		for (j = 0; j < randIn.psd.length; j++) {
-			sig[0].psd[j] = sig[1].psd[j] = sig[2].psd[j] = sig[3].psd[j] = randIn.psd.data[j];
+		randIn.powerSpectrumDensity.length = waveform[!shorter].f->data->length;
+		double df = 1. / ppnParams.deltaT / randIn.powerSpectrumDensity.length;
+		randIn.powerSpectrumDensity.data = (REAL8*) LALMalloc(sizeof(REAL8) * randIn.powerSpectrumDensity.length);
+		LALNoiseSpectralDensity(&status, &randIn.powerSpectrumDensity, &LALLIGOIPsd, df);
+		for (j = 0; j < randIn.powerSpectrumDensity.length; j++) {
+			sig[0].psd[j] = sig[1].psd[j] = sig[2].psd[j] = sig[3].psd[j] = randIn.powerSpectrumDensity.data[j];
 		}
 		for (j = 0; j < 2; j++) {
 			for (k = 0; k < waveform[j].f->data->length; k++) {
@@ -185,7 +185,7 @@ void multi_Match(program_Params *params, binary_System *act, long num, char dir[
 		params->periodsD = calc_Periods(&params->periods[0], &params->periods[1], &sig[0]);
 		double freq_Max = (injParams[0].f_final + injParams[1].f_final) / 2.;
 		double freq_Step, fr = 0.;
-		freq_Step = 1. / (ppnParams.deltaT * randIn.psd.length);
+		freq_Step = 1. / (ppnParams.deltaT * randIn.powerSpectrumDensity.length);
 		long minfr = 0, maxfr = 0;
 		while (fr < freq_Min) {
 			fr += freq_Step;
@@ -231,7 +231,7 @@ fprintf			(file, PREC" X "PREC"\n", k * ppnParams.deltaT,
 		destroy_Signal_Struct(&sig[3]);
 		free(waves[0]);
 		free(waves[1]);
-		XLALFree(randIn.psd.data);
+		XLALFree(randIn.powerSpectrumDensity.data);
 	}
 	hp = params->freq_Sampling;
 	memset(params, 0, sizeof(program_Params));
@@ -262,7 +262,7 @@ void destroySTWave(CoherentGW waveform) {
 		XLALFree(waveform.a);
 }
 
-double calc_Periods(double *per1, double *per2, signalStruct *signal) {
+double calc_Periods(double *per1, double *per2, SignalStruct *signal) {
 	assert(signal);
 	double prev, act;
 	*per1 = *per2 = 0;
