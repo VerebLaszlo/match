@@ -1,5 +1,5 @@
 /**
- * @file datatypes.h
+ * @file signals.h
  *
  * @date 2011.08.18.
  * @author László Veréb
@@ -26,6 +26,17 @@ typedef struct {
 	long length[2]; ///< length of the signals
 	long size; ///< the allocated memory for the signals
 } SignalStruct;
+
+/**	Creates the signal structure.
+ * @param[out] signal : the allocated memory for the signals
+ * @param[in]  size	  : the size of the allocated memories
+ */
+void createSignal(SignalStruct *signal, size_t size);
+
+/**	Destroys the signal structure.
+ * @param[in] signal :
+ */
+void destroySignal(SignalStruct *signal);
 
 #include <assert.h>
 #include <string.h>

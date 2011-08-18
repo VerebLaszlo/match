@@ -1,11 +1,39 @@
-/*
- * datatypes.c
+/**
+ * @file signals.c
  *
- *  Created on: Jul 16, 2011
- *      Author: vereb
+ * @date 2011.08.18.
+ * @author László Veréb
  */
 
 #include "signals.h"
+
+void createSignal(SignalStruct *signal, size_t size) {
+	assert(signal);
+	assert(size);
+	memset(signal, 0, sizeof(SignalStruct));
+	signal->size = size;
+	for (ushort i = 0; i < NUMBER_OF_SIGNALS; i++) {
+		signal->inTime[i] = malloc(signal->size * sizeof(double));
+		memset(signal->inTime[i], 0, signal->size * sizeof(double));
+	}
+	for (ushort i = 0; i < NUMBER_OF_SIGNALS_COMPONENTS; i++) {
+		signal->componentsInTime[i] = malloc(signal->size * sizeof(double));
+		memset(signal->componentsInTime[i], 0, signal->size * sizeof(double));
+	}
+}
+
+void destroySignal(SignalStruct *signal) {
+	assert(signal);
+	signal->size = 0;
+	for (ushort i = 0; i < NUMBER_OF_SIGNALS; i++) {
+		if (signal->inTime[i]) {
+			free(signal->inTime[i]);
+		}
+	}
+	for (ushort i = 0; i < NUMBER_OF_SIGNALS_COMPONENTS; i++) {
+		free(signal->componentsInTime[i]);
+	}
+}
 
 void create_Signal_Struct(SignalStruct *signal, long size) {
 	assert(size>0);
