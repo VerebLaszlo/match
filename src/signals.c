@@ -35,6 +35,108 @@ void destroySignal(SignalStruct *signal) {
 	}
 }
 
+void printTwoSignals(FILE *file, SignalStruct *signal, OutputFormat *format) {
+	assert(file);
+	assert(signal);
+	assert(format);
+	ushort firstShorter = signal->length[0] < signal->length[1] ? 1 : 0;
+	ushort number = 3;
+	ushort length = number * format->widthWithSeparator;
+	char formatString[length];
+	setFormatEnd(formatString, number, format);
+	size_t i;
+	for (i = 0; i < signal->length[firstShorter]; i++) {
+		fprintf(file, formatString, (double) i * signal->samplingTime, signal->inTime[H1][i],
+			signal->inTime[H2][i]);
+	}
+	if (firstShorter) {
+		sprintf(formatString, "%s %%%c %s %%%c %s\n", format->oneNumber, format->separator,
+			format->empty, format->separator, format->oneNumber);
+		for (; i < signal->size; i++) {
+			fprintf(file, formatString, (double) i * signal->samplingTime, "",
+				signal->inTime[H2][i]);
+		}
+	} else {
+		sprintf(formatString, "%s %%%c %s %%%c %s\n", format->oneNumber, format->separator,
+			format->oneNumber, format->separator, format->empty);
+		for (; i < signal->size; i++) {
+			fprintf(file, formatString, (double) i * signal->samplingTime, signal->inTime[H1][i],
+				"");
+		}
+	}
+}
+
+void printTwoSignalsAndDifference(FILE *file, SignalStruct *signal, OutputFormat *format) {
+	assert(file);
+	assert(signal);
+	assert(format);
+	ushort firstShorter = signal->length[0] < signal->length[1] ? 1 : 0;
+	ushort number = 4;
+	ushort length = number * format->widthWithSeparator;
+	char formatString[length];
+	setFormatEnd(formatString, number, format);
+	size_t i;
+	for (i = 0; i < signal->length[firstShorter]; i++) {
+		fprintf(file, formatString, (double) i * signal->samplingTime, signal->inTime[H1][i],
+			signal->inTime[H2][i], signal->inTime[H1][i] - signal->inTime[H2][i]);
+	}
+	if (firstShorter) {
+		sprintf(formatString, "%s %%%c %s %%%c %s %%%c %s\n", format->oneNumber, format->separator,
+			format->empty, format->separator, format->oneNumber, format->separator,
+			format->oneNumber);
+		for (; i < signal->size; i++) {
+			fprintf(file, formatString, (double) i * signal->samplingTime, "",
+				signal->inTime[H2][i], -signal->inTime[H2][i]);
+		}
+	} else {
+		sprintf(formatString, "%s %%%c %s %%%c %s %%%c %s\n", format->oneNumber, format->separator,
+			format->oneNumber, format->separator, format->empty, format->separator,
+			format->oneNumber);
+		for (; i < signal->size; i++) {
+			fprintf(file, formatString, (double) i * signal->samplingTime, signal->inTime[H1][i],
+				"", signal->inTime[H1][i]);
+		}
+	}
+}
+
+void printTwoSignalsWithHPHC(FILE* file, SignalStruct *signal, OutputFormat *format) {
+	assert(file);
+	assert(signal);
+	assert(format);
+	short firstShorter = signal->length[0] < signal->length[1] ? 1 : 0;
+	ushort number = 7;
+	ushort length = number * format->widthWithSeparator;
+	char formatString[length];
+	setFormatEnd(formatString, number, format);
+	size_t i;
+	for (i = 0; i < signal->length[firstShorter]; i++) {
+		fprintf(file, formatString, (double) i * signal->samplingTime, signal->inTime[H1][i],
+			signal->inTime[H2][i], signal->componentsInTime[H1P][i],
+			signal->componentsInTime[H1C][i], signal->componentsInTime[H2P][i],
+			signal->componentsInTime[H2C][i]);
+	}
+	if (firstShorter) {
+		sprintf(formatString, "%s %%%c %s %%%c %s %%%c %s %%%c %s %%%c %s %%%c %s\n",
+			format->oneNumber, format->separator, format->empty, format->separator,
+			format->oneNumber, format->separator, format->empty, format->separator, format->empty,
+			format->separator, format->oneNumber, format->separator, format->oneNumber);
+		for (; i < signal->size; i++) {
+			fprintf(file, formatString, (double) i * signal->samplingTime, "",
+				signal->inTime[H2][i], "", "", signal->componentsInTime[H2P][i],
+				signal->componentsInTime[H2C][i]);
+		}
+	} else {
+		sprintf(formatString, "%s %%%c %s %%%c %s %%%c %s %%%c %s %%%c %s %%%c %s\n",
+			format->oneNumber, format->separator, format->oneNumber, format->separator,
+			format->empty, format->separator, format->oneNumber, format->separator,
+			format->oneNumber, format->separator, format->empty, format->separator, format->empty);
+		for (; i < signal->size; i++) {
+			fprintf(file, formatString, (double) i * signal->samplingTime, signal->inTime[H1][i],
+				"", signal->componentsInTime[H1P][i], signal->componentsInTime[H1C][i], "", "");
+		}
+	}
+}
+
 void create_Signal_Struct(SignalStruct *signal, long size) {
 	assert(size>0);
 	signal->size = size;
@@ -119,116 +221,6 @@ void destroy_Signal_Struct1(SignalStruct *signal) {
 	}
 	if (signal->powerSpectrumDensity) {
 		free(signal->powerSpectrumDensity);
-	}
-}
-
-void print_Two_Signals(FILE*file, SignalStruct *sig, double dt, short width, short precision) {
-	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
-	static char temp[FILENAME_MAX];
-	static char format[FILENAME_MAX];
-	static char text[FILENAME_MAX];
-	static char text1[FILENAME_MAX];
-	static char textformat[FILENAME_MAX];
-	sprintf(temp, "%%%d.%dlg %%%% ", width, precision);
-	sprintf(text, "%%%ds %%%% ", width);
-	sprintf(format, "%s %s", temp, temp);
-	sprintf(text1, "%%-%ds ", width);
-	sprintf(textformat, "%s %s %s", text1, text1, text1);
-	fprintf(file, textformat, "#time", " h1", "  h2");
-	fprintf(file, "\n");
-	long i;
-	for (i = 0; i < sig->length[shorter]; i++) {
-		fprintf(file, temp, (double) i * dt);
-		fprintf(file, format, sig->inTime[H1][i], sig->inTime[H2][i]);
-		fprintf(file, "\n");
-	}
-	if (shorter) {
-		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double) i * dt);
-			fprintf(file, temp, sig->inTime[H1][i]);
-			fprintf(file, "\n");
-		}
-	} else {
-		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double) i * dt);
-			fprintf(file, text, "");
-			fprintf(file, temp, sig->inTime[H2][i]);
-			fprintf(file, "\n");
-		}
-	}
-}
-
-void print_Two_Signals_And_Difference(FILE*file, SignalStruct *sig, double dt, short width,
-	short precision) {
-	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
-	static char temp[FILENAME_MAX];
-	static char format[FILENAME_MAX];
-	static char text[FILENAME_MAX];
-	sprintf(temp, "%%%d.%dlg %%%% ", width, precision);
-	sprintf(text, "%%%ds %%", width);
-	sprintf(format, "%s%s%s", temp, temp, temp);
-	puts(format);
-	long i;
-	for (i = 0; i < sig->length[shorter]; i++) {
-		fprintf(file, temp, (double) i * dt);
-		fprintf(file, format, sig->inTime[H1][i], sig->inTime[H2][i],
-			sig->inTime[H1][i] - sig->inTime[H2][i]);
-		fprintf(file, "\n");
-	}
-	if (shorter) {
-		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double) i * dt);
-			fprintf(file, temp, sig->inTime[H1][i]);
-			fprintf(file, text, "");
-			fprintf(file, temp, sig->inTime[H1][i]);
-			fprintf(file, "\n");
-		}
-	} else {
-		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double) i * dt);
-			fprintf(file, text, width, "");
-			fprintf(file, temp, sig->inTime[H2][i]);
-			fprintf(file, temp, -sig->inTime[H2][i]);
-			fprintf(file, "\n");
-		}
-	}
-}
-
-void print_Two_Signals_With_HPHC(FILE*file, SignalStruct *sig, double dt, short width,
-	short precision) {
-	short shorter = sig->length[0] < sig->length[1] ? 0 : 1;
-	static char temp[FILENAME_MAX];
-	static char format[FILENAME_MAX];
-	static char text[FILENAME_MAX];
-	static char textformat[FILENAME_MAX];
-	sprintf(temp, "%%%d.%dlg %%%%", width, precision);
-	sprintf(text, "%%%ds %%%%", width);
-	sprintf(format, " %s %s %s", temp, temp, temp);
-	sprintf(textformat, " %s %s %s", text, text, text);
-	long i;
-	for (i = 0; i < sig->length[shorter]; i++) {
-		fprintf(file, temp, (double) i * dt);
-		fprintf(file, format, sig->inTime[H1][i], sig->componentsInTime[H1P][i],
-			sig->componentsInTime[H1C][i]);
-		fprintf(file, format, sig->inTime[H2][i], sig->componentsInTime[H2P][i],
-			sig->componentsInTime[H2C][i]);
-		fprintf(file, "\n");
-	}
-	if (shorter) {
-		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double) i * dt);
-			fprintf(file, format, sig->inTime[H1][i], sig->componentsInTime[H1P][i],
-				sig->componentsInTime[H1C][i]);
-			fprintf(file, "\n");
-		}
-	} else {
-		for (; i < sig->size; i++) {
-			fprintf(file, temp, (double) i * dt);
-			fprintf(file, textformat, "", "", "");
-			fprintf(file, format, sig->inTime[H2][i], sig->componentsInTime[H2P][i],
-				sig->componentsInTime[H2C][i]);
-			fprintf(file, "\n");
-		}
 	}
 }
 

@@ -65,7 +65,7 @@ FILE *safelyOpenForAppend(const char *fileName) {
 /// @name Output formatting functions and types
 ///@{
 
-OutputFormat _defaultFormat = { 3, 6, 9, ' ', true, "%- 6.3lg", "default", 0 };
+OutputFormat _defaultFormat = { 3, 6, 9, ' ', true, "%- 6.3lg", "%6s", "default", 0 };
 OutputFormat *defaultFormat = &_defaultFormat;
 
 /**	Sets the format string for one number.
@@ -75,11 +75,13 @@ static void setFormatForOneNumber(OutputFormat *format) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(format);
 	assert(format->width > 0);
+	sprintf(format->empty, "%%%ds", format->width);
 	if (format->leftJustified) {
 		sprintf(format->oneNumber, "%%- %d.%dlg", format->width, format->precision);
 	} else {
 		sprintf(format->oneNumber, "%% %d.%dlg", format->width, format->precision);
-	}SAVE_FUNCTION_FOR_TESTING();
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setOutputFormat(OutputFormat *format, const ushort precision, const ushort width,
@@ -108,8 +110,9 @@ static void setFormats(char formatString[], const ushort number, OutputFormat *f
 	assert(formatString);
 	assert(number);
 	assert(format);
-	char temp[number * format->widthWithSeparator];strcpy
-	(formatString, format->oneNumber);
+	ushort length = number * format->widthWithSeparator;
+	char temp[length];
+	strcpy(formatString, format->oneNumber);
 	if (format->separator == '%') {
 		for (ushort i = 1; i < number; i++) {
 			sprintf(temp, "%s %%%c %s", formatString, format->separator, format->oneNumber);
@@ -120,7 +123,8 @@ static void setFormats(char formatString[], const ushort number, OutputFormat *f
 			sprintf(temp, "%s %c %s", formatString, format->separator, format->oneNumber);
 			strcpy(formatString, temp);
 		}
-	}SAVE_FUNCTION_FOR_TESTING();
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setFormat(char formatString[], const ushort number, OutputFormat *format) {
@@ -135,7 +139,8 @@ void setFormat(char formatString[], const ushort number, OutputFormat *format) {
 		sprintf(formatString, "%s %%%c", temp, format->separator);
 	} else {
 		sprintf(formatString, "%s %c", temp, format->separator);
-	}SAVE_FUNCTION_FOR_TESTING();
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void setFormatEnd(char formatString[], const ushort number, OutputFormat *format) {
@@ -144,8 +149,9 @@ void setFormatEnd(char formatString[], const ushort number, OutputFormat *format
 	assert(number);
 	assert(format);
 	setFormats(formatString, number, format);
-	char temp[number * format->widthWithSeparator]; //
-strcpy	(temp, formatString);
+	ushort length = number * format->widthWithSeparator;
+	char temp[length];
+	strcpy(temp, formatString);
 	sprintf(formatString, "%s\n", temp);
 	SAVE_FUNCTION_FOR_TESTING();
 }

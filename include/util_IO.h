@@ -10,7 +10,7 @@
 #define UTIL_IO_H_
 
 #include <stdio.h>
-#include <stdbool.h>
+#include "util.h"
 
 /// @name File handling functions
 ///@{
@@ -71,6 +71,7 @@ typedef struct tagOutputFormat {
 	char separator; ///< column separator for gnuplot
 	bool leftJustified; ///< it's true if the format is left justified, otherwise false
 	char oneNumber[FORMAT_LENGTH]; ///< format string form one number
+	char empty[FORMAT_LENGTH];
 	nameString name; ///< string representation of the format, e.g.: plot, data
 	ushort code; ///< numerical representation of the format
 } OutputFormat;

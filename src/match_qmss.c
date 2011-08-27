@@ -69,12 +69,12 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 			if (is_Good && parameters->match_Minimax > parameters->critical_Match) {
 				sprintf(file_Name, "%s/first%hd.txt", prog->folder, index);
 				file = safelyOpenForWriting(file_Name);
-				print_Two_Signals(file, &first, parameters->time_Sampling,
+				printTwoSignals(file, &first, parameters->time_Sampling,
 					prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
 				fclose(file);
 				sprintf(file_Name, "%s/found%hd.txt", prog->folder, index);
 				file = safelyOpenForWriting(file_Name);
-				print_Two_Signals(file, &first, parameters->time_Sampling,
+				printTwoSignals(file, &first, parameters->time_Sampling,
 					prog->width_Of_Number_To_Plot, prog->precision_To_Plot);
 				fclose(file);
 				destroy_Signal_Struct(&first);
