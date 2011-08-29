@@ -85,10 +85,10 @@ int main(int argc, char *argv[]) {
 		puts(help);
 		exit(EXIT_FAILURE);
 	}
-	Program_Parameters program_Parameters;
+	ProgramParameters program_Parameters;
 	System_Parameters parameters;
 	FILE *file = safelyOpenForReading(argv[arg++]);
-	read_Program_Parameters(file, &program_Parameters);
+	readProgramParameters(file, &program_Parameters);
 	fclose(file);
 	strcpy(apr[0], parameters.approx[0]);
 	strcpy(apr[1], parameters.approx[1]);
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 	case 't':
 	case 's':
 		file = safelyOpenForReading(argv[arg++]);
-		read_System_Parameters(file, &parameters);
+		readSystemParameters(file, &parameters);
 		fclose(file);
 		//print_System_Parameters(stdout, &parameters);
 		print_Program_Parameters(stdout, &program_Parameters);

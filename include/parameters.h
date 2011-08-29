@@ -8,6 +8,32 @@
 #ifndef PARAMETERS_H_
 #define PARAMETERS_H_
 
+#include "binary_system.h"
+
+typedef enum ParameterConstants_ {
+	TO_PLOT, TO_BACKUP, NUMBER_OF_FORMATS, NUMBER_OF_SYSTEMS = 2, LENGTH_OF_STRING = 100,
+} ParameterConstants;
+
+typedef struct SystemParameter_ {
+	BinarySystem system[NUMBER_OF_SYSTEMS];
+	DetectorParameters detector[NUMBER_OF_SYSTEMS];
+	double samplingFrequency;
+	double samplingTime;
+	double initialFrequency;
+	char name[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];
+	char approximant[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];
+	char phase[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];
+	char spin[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];
+	char amplitude[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];
+} SystemParameter;
+
+typedef struct ProgramParameter_ {
+	char outputDirectory[FILENAME_MAX];
+	ulong numberOfRuns;
+	ushort precision[NUMBER_OF_FORMATS];
+	ushort width[NUMBER_OF_FORMATS];
+} ProgramParameter;
+
 #include "generator.h"
 
 /** System aprameters.
@@ -48,7 +74,7 @@ typedef struct Program_Parameters {
 	double freq_Max; ///<a
 	double delta_Length; ///<a
 	double min_Match; ///<a
-} Program_Parameters;
+} ProgramParameters;
 
 /** Reads the exact system parameters.
  * @param file
@@ -60,19 +86,19 @@ void readExactParameters(FILE *file, System_Parameters *params);
  * @param file
  * @param params
  */
-void read_Program_Parameters(FILE*file, Program_Parameters *params);
+void readProgramParameters(FILE*file, ProgramParameters *params);
 
 /** Prints program parameters.
  * @param file
  * @param params
  */
-void print_Program_Parameters(FILE*file, Program_Parameters *params);
+void print_Program_Parameters(FILE*file, ProgramParameters *params);
 
 /** Reads system parameters.
  * @param file
  * @param params
  */
-void read_System_Parameters(FILE *file, System_Parameters *params);
+void readSystemParameters(FILE *file, System_Parameters *params);
 
 /** Prints system parameters.
  * @param file

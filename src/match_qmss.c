@@ -22,7 +22,7 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits) {
 	gen_Parameters(&parameters->system[1], &limits[0], &limits[1], ETAM, KAPPA_PSI);
 }
 
-void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters) {
+void find_Spin_Greater_Than1(ProgramParameters *program_Parameters, System_Parameters *parameters) {
 	assert(program_Parameters);
 	assert(parameters);
 	assert(program_Parameters->number_Of_Runs > 0);
@@ -43,7 +43,7 @@ void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Para
 	}
 }
 
-short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index) {
+short incrementing_Spins(ProgramParameters *prog, System_Parameters* parameters, short index) {
 	assert(prog);
 	assert(parameters);
 	FILE*file;
@@ -89,7 +89,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
 	return NOT_FOUND;
 }
 
-short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
+short calc_Matches_For_ParameterPair(ProgramParameters *prog, System_Parameters *parameters,
 	signalStruct *sig) {
 	assert(prog);
 	assert(parameters);
@@ -122,7 +122,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
 	return FOUND;
 }
 
-short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
+short generate_Waveforms_For_Difference(ProgramParameters *prog, System_Parameters *parameters,
 	signalStruct *sig) {
 	assert(prog);
 	assert(parameters);
@@ -139,7 +139,7 @@ short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Paramet
  * @param prog
  * @param parameters
  */
-static void generate_Waveform_For_Testing_Speed(Program_Parameters *prog,
+static void generate_Waveform_For_Testing_Speed(ProgramParameters *prog,
 	System_Parameters *parameters) {
 	assert(prog);
 	assert(parameters);
@@ -172,7 +172,7 @@ static void generate_Waveform_For_Testing_Speed(Program_Parameters *prog,
  XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);
  }
  */
-void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters,
+void calc_Time(ProgramParameters *program_Parameters, System_Parameters *parameters,
 	short sampling) {
 	assert(program_Parameters);
 	assert(parameters);

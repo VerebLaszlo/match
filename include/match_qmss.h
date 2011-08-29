@@ -28,7 +28,7 @@ typedef enum {
  * @param parameters
  * @param limits
  */
-void find_Spin_Greater_Than1(Program_Parameters *program_Parameters, System_Parameters *parameters);
+void find_Spin_Greater_Than1(ProgramParameters *program_Parameters, System_Parameters *parameters);
 
 /**
  * Done
@@ -52,7 +52,7 @@ void generate_Parameters(System_Parameters *parameters, binary_System *limits);
  * @param index
  * @return
  */
-short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters, short index);
+short incrementing_Spins(ProgramParameters *prog, System_Parameters* parameters, short index);
 
 /**
  * Done.
@@ -61,7 +61,7 @@ short incrementing_Spins(Program_Parameters *prog, System_Parameters* parameters
  * @param sig
  * @return
  */
-short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters *parameters,
+short calc_Matches_For_ParameterPair(ProgramParameters *prog, System_Parameters *parameters,
 	signalStruct *sig);
 
 /**
@@ -71,7 +71,7 @@ short calc_Matches_For_ParameterPair(Program_Parameters *prog, System_Parameters
  * @param sig
  * @return
  */
-short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Parameters *parameters,
+short generate_Waveforms_For_Difference(ProgramParameters *prog, System_Parameters *parameters,
 	signalStruct *sig);
 
 //void find_Waveform_Errors_At_Parameter(Program_Parameters *prog, System_Parameters *parameters,
@@ -81,7 +81,7 @@ short generate_Waveforms_For_Difference(Program_Parameters *prog, System_Paramet
  * @param program_Parameters
  * @param parameters
  */
-void calc_Time(Program_Parameters *program_Parameters, System_Parameters *parameters,
+void calc_Time(ProgramParameters *program_Parameters, System_Parameters *parameters,
 	short sampling);
 
 #endif /* MATCH_QMSS_H_ */
