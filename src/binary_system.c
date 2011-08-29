@@ -14,7 +14,7 @@
 /// @name Generation functions
 ///@{
 
-void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
+void generateBinarySystemParameters(BinarySystem *system, BinarySystem limits[],
 	generationMode genMass, generationMode genSpin) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(system);
@@ -39,7 +39,7 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
 /// @name Printing functions
 ///@{
 
-void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format) {
+void printBinarySystemParameters(FILE *file, BinarySystem *system, OutputFormat *format) {
 	BACKUP_DEFINITION_LINE();
 	printMassParameters(file, &system->mass, format);
 	printSpinParameters(file, &system->spin[0], format);
@@ -70,7 +70,7 @@ static bool isOK_generateBinarySystemParameters(void) {
 	} else if (!areBinarySystemSpinFunctionsGood()) {
 		isOK = false;
 	}
-	binarySystem system, limits[2];
+	BinarySystem system, limits[2];
 	SAVE_FUNCTION_CALLER();
 	limits[MAX].mass.mass[0] = 100.0 * (limits[MIN].mass.mass[0] = 1.0);
 	limits[MAX].mass.mass[1] = 100.0 * (limits[MIN].mass.mass[1] = 1.0);

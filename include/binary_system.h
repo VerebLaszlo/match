@@ -87,7 +87,7 @@ typedef struct tagBinarySystem {
 	double distance; ///< distance of the binary system from the detector in \f$Mpc\f$
 	double coalescencePhase; ///< phase at the coalescence
 	double coalescenceTime; ///< the length of the gravitational wave at the coalescence in \f$s\f$
-} binarySystem;
+} BinarySystem;
 
 /**	Generates the mass parameters according the generation mode.
  * @param[out]	mass	: generated mass parameters
@@ -124,7 +124,7 @@ void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format)
  * @param[in]	genMass	: mass generation mode
  * @param[in]	genSpin	: spin generation mode
  */
-void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
+void generateBinarySystemParameters(BinarySystem *system, BinarySystem limits[],
 	generationMode genMass, generationMode genSpin);
 
 /**
@@ -132,7 +132,7 @@ void generateBinarySystemParameters(binarySystem *system, binarySystem limits[],
  * @param system
  * @param format
  */
-void printBinarySystemParameters(FILE *file, binarySystem *system, OutputFormat *format);
+void printBinarySystemParameters(FILE *file, BinarySystem *system, OutputFormat *format);
 
 #ifdef TEST
 

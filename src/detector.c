@@ -136,7 +136,7 @@ static void calcResponseMatrix(double responseMatrix[DIMENSION][DIMENSION], Dete
  * @param[out] antenna		   :
  * @param[in]  responseMatrix :
  */
-static void calcAntennaPatternFromResponseMatrix(DetectorParamters *antenna,
+static void calcAntennaPatternFromResponseMatrix(DetectorParameters *antenna,
 	double responseMatrix[DIMENSION][DIMENSION]) {
 	BACKUP_DEFINITION_LINE();
 	double VEC1[DIMENSION];
@@ -165,7 +165,7 @@ static void calcAntennaPatternFromResponseMatrix(DetectorParamters *antenna,
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
-void calcAntennaPatternFor(DetectorID id, DetectorParamters *parameter) {
+void calcAntennaPatternFor(DetectorID id, DetectorParameters *parameter) {
 	BACKUP_DEFINITION_LINE();
 	double response_Matrix[3][3];
 	parameter->greenwichHourAngle = parameter->greenwichMeanSiderealTime
@@ -176,7 +176,7 @@ void calcAntennaPatternFor(DetectorID id, DetectorParamters *parameter) {
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
-void generateDetectorParameters(DetectorParamters *detector, DetectorParamters limits[]) {
+void generateDetectorParameters(DetectorParameters *detector, DetectorParameters limits[]) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(detector);
 	assert(limits);
@@ -189,7 +189,7 @@ void generateDetectorParameters(DetectorParamters *detector, DetectorParamters l
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
-void printDetectorParameters(FILE *file, DetectorParamters *detector, OutputFormat *format) {
+void printDetectorParameters(FILE *file, DetectorParameters *detector, OutputFormat *format) {
 	BACKUP_DEFINITION_LINE();
 	ushort number = 4;
 	ushort length = number * format->widthWithSeparator;
@@ -306,7 +306,7 @@ static bool isOK_calcAntennaPatternFromResponseMatrix(void) {
 		return false;
 	}
 	double matrix[DIMENSION][DIMENSION];
-	DetectorParamters antenna;
+	DetectorParameters antenna;
 	antenna.declination = antenna.polarization = antenna.greenwichHourAngle = 1.0;
 	calcResponseMatrix(matrix, detectors[LL]);
 	double epsilon = 3.406948470563443e-07;
@@ -322,7 +322,7 @@ static bool isOK_calcAntennaPatternFromResponseMatrix(void) {
 }
 
 static bool isOK_calcAntennaPatternFor(void) {
-	DetectorParamters params;
+	DetectorParameters params;
 	params.greenwichMeanSiderealTime = 2.0;
 	params.rightAscention = 1.0;
 	params.declination = 1.0;
@@ -343,7 +343,7 @@ static bool isOK_generateDetectorParameters(void) {
 	if (!areUtilMathFunctionsOK()) {
 		return false;
 	}
-	DetectorParamters params, limits[2];
+	DetectorParameters params, limits[2];
 	limits[MAX].polarization = 10.0 + (limits[MIN].polarization = 0.0);
 	limits[MAX].declination = 10.0 + (limits[MIN].declination = 0.0);
 	limits[MAX].rightAscention = 10.0 + (limits[MIN].rightAscention = 0.0);

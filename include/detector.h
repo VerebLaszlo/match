@@ -36,26 +36,26 @@ typedef struct DetectorParameters_ {
 	double greenwichMeanSiderealTime; ///< in radians
 	double greenwichHourAngle; ///< in radians
 	double antennaBeamPattern[2]; ///< \f$F_+, F_\times\f$
-} DetectorParamters;
+} DetectorParameters;
 
 /**	Calculates the antenna pattern for the given detector.
  * @param[out] parameter : antenna function struct containing the antenna pattern
  * @param[in]  id		 : the detector
  */
-void calcAntennaPatternFor(DetectorID id, DetectorParamters *parameter);
+void calcAntennaPatternFor(DetectorID id, DetectorParameters *parameter);
 
 /**	Generates the detector parameters.
  * @param[out] detector : the generated parameters
  * @param[in]  limits	: the limits of the parameters
  */
-void generateDetectorParameters(DetectorParamters *detector, DetectorParamters limits[]);
+void generateDetectorParameters(DetectorParameters *detector, DetectorParameters limits[]);
 
 /**	Prints detector parameters.
  * @param[in] file		:
  * @param[in] detector	:
  * @param[in] format	:
  */
-void printDetectorParameters(FILE *file, DetectorParamters *detector, OutputFormat *format);
+void printDetectorParameters(FILE *file, DetectorParameters *detector, OutputFormat *format);
 
 #ifdef TEST
 
