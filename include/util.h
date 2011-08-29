@@ -12,6 +12,7 @@
 
 typedef char *string; ///< shorthand for dynamic string type
 typedef unsigned short ushort; ///< shorthand for unsigned short int type
+typedef unsigned long ulong;
 
 /**	Negates the boolean variable.
  * @param[in,out] var	: boolean variable to be negated.

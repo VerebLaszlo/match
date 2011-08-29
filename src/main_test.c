@@ -10,8 +10,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "util_math.h"
-#include "binary_system.h"
-#include "detector.h"
+#include "parameters.h"
 
 int main(int argc, char *argv[]) {
 	printf("%d: %s\n", argc, argv[0]);
@@ -76,6 +75,16 @@ int main(int argc, char *argv[]) {
 	printSpinParameters(stdout, &spin[0], &format);
 	printSpinParameters(stdout, &spin[1], &format);
 #endif // TEST
+	FILE *file = safelyOpenForReading(argv[1]);
+	ProgramParameter prog;
+	readProgramParameters(file, &prog);
+	fclose(file);
+	printProgramParameters(stdout, &prog);
+	file = safelyOpenForReading(argv[2]);
+	SystemParameter system;
+	readExactParameters(file, &system);
+	fclose(file);
+	printSystemParameters(stdout, &system, defaultFormat);
 	puts("\nOK");
 	return 0;
 }

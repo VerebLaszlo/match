@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
 		readSystemParameters(file, &parameters);
 		fclose(file);
 		//print_System_Parameters(stdout, &parameters);
-		print_Program_Parameters(stdout, &program_Parameters);
+		printProgramParameters(stdout, &program_Parameters);
 		break;
 	default:
 		break;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 		srand(86);
 		for (int i = 0; i < program_Parameters.number_Of_Runs; i++) {
 			generate_Same_Parameters(&parameters, limits, M1M2);
-			print_System_Parameters(stdout, &parameters);
+			printSystemParameters(stdout, &parameters);
 			signalStruct sig;
 			puts("Starting difference ...");
 			generate_Waveforms_For_Difference(&program_Parameters, &parameters, &sig);

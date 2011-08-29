@@ -10,6 +10,7 @@
 #define BINARY_SYSTEM_H_
 
 #include "util_IO.h"
+#include "util_math.h"
 
 /**	Conversion mode codes.
  */
