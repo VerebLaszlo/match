@@ -156,19 +156,19 @@ void setFormatEnd(char formatString[], const ushort number, OutputFormat *format
 	SAVE_FUNCTION_FOR_TESTING();
 }
 
-static void printFormat(FILE *file, OutputFormat *format) {
-	fprintf(file, "prefision:             %u\n", format->precision);
-	fprintf(file, "width:                 %u\n", format->width);
-	fprintf(file, "width with separator:  %u\n", format->widthWithSeparator);
-	fprintf(file, "separator:             %c\n", format->separator);
-	fprintf(file, "left jusfified:        %d\n", format->leftJustified);
-	fprintf(file, "format for one number: %s\n", format->oneNumber);
-	fprintf(file, "name of the format:    %s\n", format->name);
-	fprintf(file, "code of the format:    %d\n", format->code);
-}
-
+/*
+ static void printFormat(FILE *file, OutputFormat *format) {
+ fprintf(file, "prefision:             %u\n", format->precision);
+ fprintf(file, "width:                 %u\n", format->width);
+ fprintf(file, "width with separator:  %u\n", format->widthWithSeparator);
+ fprintf(file, "separator:             %c\n", format->separator);
+ fprintf(file, "left jusfified:        %d\n", format->leftJustified);
+ fprintf(file, "format for one number: %s\n", format->oneNumber);
+ fprintf(file, "name of the format:    %s\n", format->name);
+ fprintf(file, "code of the format:    %d\n", format->code);
+ }
+ */
 ///@}
-
 #ifdef TEST
 
 /// @name Test functions

@@ -74,8 +74,8 @@ debug :
 test : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)
 
 test : $(objs_test) -lfftw3 -lm
-	@echo -e '\e[36mLinking: $@ from $^\e[0m'
-	$(CC) $(CFLAGS) $(macros) $(lal_libraries) -o test $^
+	@echo -e '\e[36mLinking: $@\e[0m'
+	$(hide_echo)$(CC) $(CFLAGS) $(macros) $(lal_libraries) -o test $^
 	@echo -e '\e[35mFinished linking: $@\e[0m'
 	@echo ' '
 
@@ -86,7 +86,7 @@ $(objdir)/%.o : %.h
 
 $(objdir)/%.o : %.c | $(objdir)
 	@echo -e '\e[36mBuilding file: $<\e[0m'
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(includes) $(macros) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
+	$(hide_echo)$(CC) $(CFLAGS) $(CPPFLAGS) $(includes) $(macros) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
 	@echo -e '\e[35mFinished building: $<\e[0m'
 	@echo ' '
 

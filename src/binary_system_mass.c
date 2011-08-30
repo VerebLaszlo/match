@@ -411,13 +411,15 @@ static bool isOK_generateMass(void) {
 	return true;
 }
 
-static bool isOK_printMassParameters(void) {
-	massParameters mass = { {30.0, 3.0}, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0};
-	SAVE_FUNCTION_CALLER();
-	printMassParameters(stdout, &mass, defaultFormat);
-	PRINT_OK();
-	return true;
-}
+/*
+ static bool isOK_printMassParameters(void) {
+ massParameters mass = { {30.0, 3.0}, 33.0, 0.23, 0.3, 1.4, 0.1, 10.0};
+ SAVE_FUNCTION_CALLER();
+ printMassParameters(stdout, &mass, defaultFormat);
+ PRINT_OK();
+ return true;
+ }
+ */
 
 bool areBinarySystemMassFunctionsGood(void) {
 	bool isOK = true;

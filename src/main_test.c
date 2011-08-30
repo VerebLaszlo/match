@@ -81,10 +81,10 @@ int main(int argc, char *argv[]) {
 	fclose(file);
 	printProgramParameters(stdout, &prog);
 	file = safelyOpenForReading(argv[2]);
-	SystemParameter system;
-	readExactParameters(file, &system);
+	SystemParameter params;
+	readExactParameters(file, &params);
 	fclose(file);
-	printSystemParameters(stdout, &system, defaultFormat);
+	printSystemParameters(stdout, &params, defaultFormat);
 	puts("\nOK");
 	return 0;
 }

@@ -225,8 +225,8 @@ void destroy_Signal_Struct1(SignalStruct *signal) {
 }
 
 void calculate_H_From_HPHC(SignalStruct *signal, double *antennaFunction) {
-	for (short i = 0; i < 2; i++) {
-		for (long j = 0; j < signal->length[i]; j++) {
+	for (ushort i = 0; i < 2; i++) {
+		for (ulong j = 0; j < signal->length[i]; j++) {
 			signal->inTime[H1 + i][j] = signal->inTime[H1P + 2 * i][j]
 				* antennaFunction[H1P + 2 * i]
 				+ signal->inTime[H1C + 2 * i][j] * antennaFunction[H1C + 2 * i];

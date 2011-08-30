@@ -57,7 +57,7 @@ void printBinarySystemParameters(FILE *file, BinarySystem *system, OutputFormat 
 
 ///@}
 
-#ifdef TEST
+//#ifdef TEST
 #include <math.h>
 /// @name Testing functions
 ///@{
@@ -81,26 +81,26 @@ static bool isOK_generateBinarySystemParameters(void) {
 	limits[MAX].mass.mu = 100.0 + (limits[MIN].mass.mu = 0.0);
 	limits[MAX].mass.nu = 100.0 + (limits[MIN].mass.nu = 0.0);
 	limits[MAX].mass.m1_m2 = 100.0 + (limits[MIN].mass.m1_m2 = 0.0);
-	for (ushort index = 0; index < DIMENSION; index++) {
-		limits[MAX].spin[0].component[FIXED][index] = 100.0
-		* (limits[MIN].spin[0].component[FIXED][index] = 1.0);
-		limits[MAX].spin[1].component[FIXED][index] = 100.0
-		* (limits[MIN].spin[1].component[FIXED][index] = 1.0);
+	for (ushort dim = 0; dim < DIMENSION; dim++) {
+		limits[MAX].spin[0].component[FIXED][dim] = 100.0
+			* (limits[MIN].spin[0].component[FIXED][dim] = 1.0);
+		limits[MAX].spin[1].component[FIXED][dim] = 100.0
+			* (limits[MIN].spin[1].component[FIXED][dim] = 1.0);
 	}
 	for (ushort i = 0; i < 2; i++) {
 		limits[MAX].spin[i].magnitude = 100.0 * (limits[MIN].spin[i].magnitude = 1.0);
 		limits[MAX].spin[i].azimuth[FIXED] = 10000.0 * (limits[MIN].spin[i].azimuth[FIXED] =
 			0.000314);
 		limits[MAX].spin[i].azimuth[PRECESSING] = 10000.0
-		* (limits[MIN].spin[i].azimuth[PRECESSING] = 0.000314);
+			* (limits[MIN].spin[i].azimuth[PRECESSING] = 0.000314);
 		limits[MAX].spin[i].inclination[FIXED] = 10000.0 * (limits[MIN].spin[i].inclination[FIXED] =
 			0.000314);
 		limits[MAX].spin[i].inclination[PRECESSING] = 10000.0
-		* (limits[MIN].spin[i].inclination[PRECESSING] = 0.000314);
+			* (limits[MIN].spin[i].inclination[PRECESSING] = 0.000314);
 		limits[MAX].spin[i].elevation[FIXED] = M_PI + (limits[MIN].spin[i].elevation[FIXED] =
 			-M_PI_2);
 		limits[MAX].spin[i].elevation[PRECESSING] = M_PI
-		+ (limits[MIN].spin[i].elevation[PRECESSING] = -M_PI_4);
+			+ (limits[MIN].spin[i].elevation[PRECESSING] = -M_PI_4);
 		limits[MAX].spin[i].component[FIXED][X] = 10.0 * (limits[MIN].spin[i].component[FIXED][X] =
 			1.0);
 		limits[MAX].spin[i].component[FIXED][Y] = 10.0 * (limits[MIN].spin[i].component[FIXED][Y] =
@@ -108,11 +108,11 @@ static bool isOK_generateBinarySystemParameters(void) {
 		limits[MAX].spin[i].component[FIXED][Z] = 10.0 * (limits[MIN].spin[i].component[FIXED][Z] =
 			1.0);
 		limits[MAX].spin[i].component[PRECESSING][X] = 40.0
-		+ (limits[MIN].spin[i].component[PRECESSING][X] = -20.0);
+			+ (limits[MIN].spin[i].component[PRECESSING][X] = -20.0);
 		limits[MAX].spin[i].component[PRECESSING][Y] = 40.0
-		+ (limits[MIN].spin[i].component[PRECESSING][Y] = -20.0);
+			+ (limits[MIN].spin[i].component[PRECESSING][Y] = -20.0);
 		limits[MAX].spin[i].component[PRECESSING][Z] = 40.0
-		+ (limits[MIN].spin[i].component[PRECESSING][Z] = -20.0);
+			+ (limits[MIN].spin[i].component[PRECESSING][Z] = -20.0);
 	}
 	generateBinarySystemParameters(&system, limits, GEN_M1M2, GEN_FIXED_XYZ);
 	if (!isOK) {
@@ -135,4 +135,4 @@ bool areBinarySystemFunctionsGood(void) {
 }
 
 ///@}
-#endif	// TEST
+//#endif	// TEST
