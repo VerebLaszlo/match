@@ -128,7 +128,7 @@ bool isOK_randomBetween(void) {
 	double one[] = {+0.0, +0.0, -1.0, +1.0};
 	double two[] = {-1.0, +1.0, +0.0, +0.0};
 	double x;
-	for (ushort i = 0; i < number; i += 2) {
+	for (ushort i = ZERO; i < number; i = (ushort)(i+2)) {
 		SAVE_FUNCTION_CALLER();
 		x = randomBetween(one[i], two[i]);
 		if (x > 0) {
@@ -167,17 +167,23 @@ bool areUtilMathFunctionsOK(void) {
 ///@{
 
 const TIME_CONVERSION_CONSTANTS TIME_CONVERSION_CONSTANT = { 60.0, 1.0 / 60.0, //
-60.0, 1.0 / 60.0, //
-60.0 * 60.0, 1.0 / (60.0 * 60.0), //
-24.0, 1.0 / 24.0, //
-24.0 * 60.0, 1.0 / (24.0 * 60.0), //
-24.0 * 60.0 * 60.0, 1.0 / (24.0 * 60.0 * 60.0), };
+																60.0, 1.0 / 60.0, //
+																60.0 * 60.0, 1.0 / (60.0 * 60.0), //
+																24.0, 1.0 / 24.0, //
+																24.0 * 60.0, 1.0 / (24.0 * 60.0), //
+																24.0 * 60.0 * 60.0, 1.0
+																	/ (24.0 * 60.0 * 60.0), };
 
-const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0, //
-	15.0 * M_PI / 180.0, 1.0 / (15.0 * M_PI / 180.0), //
-	15.0, 1.0 / 15.0, //
-	15.0 * M_PI / 180.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0), //
-	15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0 / (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
+const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0
+													, //
+													15.0 * M_PI / 180.0, 1.0 / (15.0 * M_PI / 180.0)
+													, //
+													15.0, 1.0 / 15.0, //
+													15.0 * M_PI / 180.0 / 60.0, 1.0
+														/ (15.0 * M_PI / 180.0 / 60.0)
+													, //
+													15.0 * M_PI / 180.0 / 60.0 / 60.0, 1.0
+														/ (15.0 * M_PI / 180.0 / 60.0 / 60.0), };
 
 inline long greatest_Number_That_Less_Than(double number) {
 	assert(number>0.);

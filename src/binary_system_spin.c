@@ -259,7 +259,7 @@ void generateSpin(spinParameters *spin, spinParameters limits[], double inclinat
 void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {
 	BACKUP_DEFINITION_LINE();
 	ushort number = 3;
-	ushort formatLength = number * format->widthWithSeparator;
+	ushort formatLength = (ushort) (number * format->widthWithSeparator);
 	char formatString[formatLength];
 	for (ushort i = FIXED; i < COORDINATE_CONVENTIONS; i++) {
 		setFormat(formatString, number, format);

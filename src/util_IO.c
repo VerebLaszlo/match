@@ -93,10 +93,10 @@ void setOutputFormat(OutputFormat *format, const ushort precision, const ushort 
 	assert(separator);
 	assert(name);
 	format->precision = precision;
-	format->width =
+	format->width = (ushort) (
 		width > format->precision + SPECIAL_CHARACTER_LENGTH ? width :
-			format->precision + SPECIAL_CHARACTER_LENGTH;
-	format->widthWithSeparator = format->width + SEPARATOR_LENGTH;
+			format->precision + SPECIAL_CHARACTER_LENGTH);
+	format->widthWithSeparator = (ushort) (format->width + SEPARATOR_LENGTH);
 	format->separator = separator;
 	format->leftJustified = leftJustified;
 	strcpy(format->name, name);
@@ -110,7 +110,7 @@ static void setFormats(char formatString[], const ushort number, OutputFormat *f
 	assert(formatString);
 	assert(number);
 	assert(format);
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char temp[length];
 	strcpy(formatString, format->oneNumber);
 	if (format->separator == '%') {
@@ -149,7 +149,7 @@ void setFormatEnd(char formatString[], const ushort number, OutputFormat *format
 	assert(number);
 	assert(format);
 	setFormats(formatString, number, format);
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char temp[length];
 	strcpy(temp, formatString);
 	sprintf(formatString, "%s\n", temp);
@@ -212,10 +212,10 @@ static bool isOK_setOutputFormat(void) {
 	ushort precision = 2 * SPECIAL_CHARACTER_LENGTH;
 	bool leftJusfified = false;
 	ushort width;
-	for (short i = 0; i < 2; i++, neg(&leftJusfified)) {
-		width = precision - 2 * SPECIAL_CHARACTER_LENGTH;
-		for (short j = 0; j < 3; j++, code++) {
-			short k = 3 * i + j;
+	for (ushort i = 0; i < 2; i++, neg(&leftJusfified)) {
+		width = (ushort)(precision - 2 * SPECIAL_CHARACTER_LENGTH);
+		for (ushort j = 0; j < 3; j++, code++) {
+			ushort k = (ushort)(3 * i + j);
 			SAVE_FUNCTION_CALLER();
 			setOutputFormat(&format, precision, width, separator, leftJusfified, name[k], code);
 			if (format.precision != precision) {
@@ -234,7 +234,7 @@ static bool isOK_setOutputFormat(void) {
 				PRINT_ERROR();
 				return false;
 			}
-			width += 2 * SPECIAL_CHARACTER_LENGTH;
+			width = (ushort)(width + 2 * SPECIAL_CHARACTER_LENGTH);
 		}
 	}
 	/// @todo a hibás bemenet nincs leellenőrizve!!!

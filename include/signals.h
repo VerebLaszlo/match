@@ -89,14 +89,14 @@ typedef enum {
  * @param[in] size	: the size of the allocated memory
  * @return : the succes of the memory allocation
  */
-void create_Signal_Struct(SignalStruct *s, long size);
+void create_Signal_Struct(SignalStruct *s, size_t size);
 
 /**	Allocates memory for the signals.
  * @param[in] s		: pointer to the structure containing the signals
  * @param[in] size	: the size of the allocated memory
  * @return : the succes of the memory allocation
  */
-void create_Signal_Struct1(SignalStruct *s, long size);
+void create_Signal_Struct1(SignalStruct *s, size_t size);
 
 /**	Deallocates the memory of the signals.
  * @param[in] s	: pointer to the structure containing the signals

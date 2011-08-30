@@ -64,17 +64,17 @@ static void initLALParameters(LALParameters *lalparams, SystemParameter *paramet
 	LALStatus status;
 	memset(&status, 1, sizeof(LALStatus));
 	for (short i = 0; i < 2; i++) {
-		lalparams->injParams[i].mass1 = parameters->system[i].mass.mass[0];
-		lalparams->injParams[i].mass2 = parameters->system[i].mass.mass[0];
-		lalparams->injParams[i].spin1x = parameters->system[i].spin[0].component[FIXED][X];
-		lalparams->injParams[i].spin1y = parameters->system[i].spin[0].component[FIXED][Y];
-		lalparams->injParams[i].spin1z = parameters->system[i].spin[0].component[FIXED][Z];
-		lalparams->injParams[i].spin2x = parameters->system[i].spin[1].component[FIXED][X];
-		lalparams->injParams[i].spin2y = parameters->system[i].spin[1].component[FIXED][Y];
-		lalparams->injParams[i].spin2z = parameters->system[i].spin[1].component[FIXED][Z];
-		lalparams->injParams[i].inclination = parameters->system[i].inclination;
-		lalparams->injParams[i].f_lower = parameters->initialFrequency;
-		lalparams->injParams[i].distance = parameters->system[i].distance;
+		lalparams->injParams[i].mass1 = (REAL4) parameters->system[i].mass.mass[0];
+		lalparams->injParams[i].mass2 = (REAL4) parameters->system[i].mass.mass[0];
+		lalparams->injParams[i].spin1x = (REAL4) parameters->system[i].spin[0].component[FIXED][X];
+		lalparams->injParams[i].spin1y = (REAL4) parameters->system[i].spin[0].component[FIXED][Y];
+		lalparams->injParams[i].spin1z = (REAL4) parameters->system[i].spin[0].component[FIXED][Z];
+		lalparams->injParams[i].spin2x = (REAL4) parameters->system[i].spin[1].component[FIXED][X];
+		lalparams->injParams[i].spin2y = (REAL4) parameters->system[i].spin[1].component[FIXED][Y];
+		lalparams->injParams[i].spin2z = (REAL4) parameters->system[i].spin[1].component[FIXED][Z];
+		lalparams->injParams[i].inclination = (REAL4) parameters->system[i].inclination;
+		lalparams->injParams[i].f_lower = (REAL4) parameters->initialFrequency;
+		lalparams->injParams[i].distance = (REAL4) parameters->system[i].distance;
 		//lalparams->injParams[i].coa_phase = parameters->system[i].coaPhase = 0.;
 		lalparams->ppnParams[i].deltaT = 1. / parameters->samplingFrequency;
 		lalparams->injParams[i].amp_order = convertAmplitudeOrderFromString(
@@ -98,7 +98,7 @@ static void initLALParameters(LALParameters *lalparams, SystemParameter *paramet
  */
 static void createPSD(LALParameters *lalparams, double *psd) {
 	assert(lalparams);
-	lalparams->psd.length = lalparams->max_Length;
+	lalparams->psd.length = (UINT4) lalparams->max_Length;
 	double df = 1. / lalparams->ppnParams[0].deltaT / lalparams->psd.length;
 	lalparams->psd.data = (REAL8*) XLALCalloc(sizeof(REAL8), lalparams->psd.length);
 	LALNoiseSpectralDensity(&lalparams->status, &lalparams->psd, &LALLIGOIPsd, df);
@@ -172,7 +172,7 @@ static void create_Signal_Struct_From_LAL(SignalStruct *signal, LALParameters *l
 			break;
 		}
 	}
-	signal->size = fmax(signal->length[0], signal->length[1]);
+	signal->size = (size_t) fmax(signal->length[0], signal->length[1]);
 	create_Signal_Struct(signal, signal->size);
 	for (short i = 0; i < 2; i++) {
 		switch (lal->approx[i]) {

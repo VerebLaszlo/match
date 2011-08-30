@@ -121,10 +121,10 @@ static DetectorTable getDetectorTable(DetectorID id) {
  */
 static void calcResponseMatrix(double responseMatrix[DIMENSION][DIMENSION], DetectorTable detector) {
 	BACKUP_DEFINITION_LINE();
-	for (short i = 0; i < DIMENSION; i++) {
+	for (ushort i = ZERO; i < DIMENSION; i++) {
 		responseMatrix[i][i] = (detector.arm[X][i] * detector.arm[X][i]
 			- detector.arm[Y][i] * detector.arm[Y][i]) / 2.0;
-		for (short j = i + 1; j < DIMENSION; j++) {
+		for (ushort j = (ushort) (i + 1);j < DIMENSION; j++) {
 			responseMatrix[i][j] = responseMatrix[j][i] = (detector.arm[X][i] * detector.arm[X][j]
 				- detector.arm[Y][i] * detector.arm[Y][j]) / 2.0;
 		}
@@ -192,13 +192,13 @@ void generateDetectorParameters(DetectorParameters *detector, DetectorParameters
 void printDetectorParameters(FILE *file, DetectorParameters *detector, OutputFormat *format) {
 	BACKUP_DEFINITION_LINE();
 	ushort number = 4;
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char formatString[length];
 	setFormat(formatString, number, format);
 	fprintf(file, formatString, detector->declination, detector->polarization,
 		detector->rightAscention, detector->greenwichMeanSiderealTime);
 	number = 3;
-	length = number * format->widthWithSeparator;
+	length = (ushort) (number * format->widthWithSeparator);
 	setFormatEnd(formatString, number, format);
 	fprintf(file, formatString, detector->greenwichHourAngle, detector->antennaBeamPattern[0],
 		detector->antennaBeamPattern[1]);

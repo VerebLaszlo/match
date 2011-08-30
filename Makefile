@@ -71,7 +71,7 @@ debug : CFLAGS += $(errorExtraFlags)
 debug :
 	@echo "$(CFLAGS)"
 
-test : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)
+test : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)  -Wconversion
 
 test : $(objs_test) -lfftw3 -lm
 	@echo -e '\e[36mLinking: $@\e[0m'

@@ -186,7 +186,7 @@ void generateMass(massParameters *mass, massParameters *limits, generationMode m
 void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format) {
 	BACKUP_DEFINITION_LINE();
 	ushort number = 4;
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char formatString[length];
 	setFormat(formatString, number, format);
 	fprintf(file, formatString, mass->mass[0], mass->mass[1], mass->eta, mass->totalMass);

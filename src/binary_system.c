@@ -45,7 +45,7 @@ void printBinarySystemParameters(FILE *file, BinarySystem *system, OutputFormat 
 	printSpinParameters(file, &system->spin[0], format);
 	printSpinParameters(file, &system->spin[1], format);
 	ushort number = 3;
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char formatString[length];
 	setFormat(formatString, number, format);
 	fprintf(file, formatString, system->flatness[0], system->flatness[1], system->inclination);

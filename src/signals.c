@@ -6,6 +6,7 @@
  */
 
 #include "signals.h"
+#include <limits.h>
 
 void createSignal(SignalStruct *signal, size_t size) {
 	assert(signal);
@@ -41,7 +42,7 @@ void printTwoSignals(FILE *file, SignalStruct *signal, OutputFormat *format) {
 	assert(format);
 	ushort firstShorter = signal->length[0] < signal->length[1] ? 1 : 0;
 	ushort number = 3;
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char formatString[length];
 	setFormatEnd(formatString, number, format);
 	size_t i;
@@ -72,7 +73,7 @@ void printTwoSignalsAndDifference(FILE *file, SignalStruct *signal, OutputFormat
 	assert(format);
 	ushort firstShorter = signal->length[0] < signal->length[1] ? 1 : 0;
 	ushort number = 4;
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char formatString[length];
 	setFormatEnd(formatString, number, format);
 	size_t i;
@@ -105,7 +106,7 @@ void printTwoSignalsWithHPHC(FILE* file, SignalStruct *signal, OutputFormat *for
 	assert(format);
 	short firstShorter = signal->length[0] < signal->length[1] ? 1 : 0;
 	ushort number = 7;
-	ushort length = number * format->widthWithSeparator;
+	ushort length = (ushort) (number * format->widthWithSeparator);
 	char formatString[length];
 	setFormatEnd(formatString, number, format);
 	size_t i;
@@ -137,29 +138,35 @@ void printTwoSignalsWithHPHC(FILE* file, SignalStruct *signal, OutputFormat *for
 	}
 }
 
-void create_Signal_Struct(SignalStruct *signal, long size) {
-	assert(size>0);
-	signal->size = size;
+void create_Signal_Struct(SignalStruct *signal, size_t length) {
+	assert(length>0);
+	size_t size;
+	if (length < INT_MAX) {
+		signal->size = length;
+		size = signal->size * sizeof(double);
+	} else {
+		exit(EXIT_FAILURE);
+	}
 	short i;
 	for (i = 0; i < NUMBER_OF_SIGNALS_COMPONENTS; i++) {
-		signal->componentsInTime[i] = fftw_malloc(signal->size * sizeof(double));
-		memset(signal->componentsInTime[i], 0, signal->size * sizeof(double));
-		signal->product[i] = fftw_malloc(signal->size * sizeof(double));
-		memset(signal->product[i], 0, signal->size * sizeof(double));
+		signal->componentsInTime[i] = fftw_malloc(size);
+		memset(signal->componentsInTime[i], 0, size);
+		signal->product[i] = fftw_malloc(size);
+		memset(signal->product[i], 0, size);
 		signal->componentsInFrequency[i] = fftw_malloc(signal->size * sizeof(fftw_complex));
 		memset(signal->componentsInFrequency[i], 0, signal->size * sizeof(fftw_complex));
-		signal->plan[i] = fftw_plan_dft_r2c_1d(signal->size, signal->componentsInTime[i],
+		signal->plan[i] = fftw_plan_dft_r2c_1d((int) signal->size, signal->componentsInTime[i],
 			signal->componentsInFrequency[i], FFTW_ESTIMATE);
 	}
 	for (; i < NUMBER_OF_SIGNALS; i++) {
-		signal->inTime[i] = fftw_malloc(signal->size * sizeof(double));
-		memset(signal->inTime[i], 0, signal->size * sizeof(double));
+		signal->inTime[i] = fftw_malloc(size);
+		memset(signal->inTime[i], 0, size);
 	}
-	signal->powerSpectrumDensity = fftw_malloc(signal->size * sizeof(double));
-	memset(signal->powerSpectrumDensity, 0, signal->size * sizeof(double));
+	signal->powerSpectrumDensity = fftw_malloc(size);
+	memset(signal->powerSpectrumDensity, 0, size);
 }
 
-void create_Signal_Struct1(SignalStruct *signal, long size) {
+void create_Signal_Struct1(SignalStruct *signal, size_t size) {
 	assert(size>0);
 	signal->size = size;
 	short i;

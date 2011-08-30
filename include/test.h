@@ -32,10 +32,10 @@
 typedef struct {
 	char function[FILENAME_MAX];	///< name of the called function
 	char file[FILENAME_MAX];///< file of the called function
-	ushort line;///< line of the definition of the called function
+	size_t line;///< line of the definition of the called function
 	char callerFunction[FILENAME_MAX];///< name of the caller function
 	char callerFile[FILENAME_MAX];///< file of the caller function
-	ushort callerLine;///< line of the calling
+	size_t callerLine;///< line of the calling
 }_sourceLocation;
 
 extern _sourceLocation sourceLocation;///< Contains information about the actually tested function.
