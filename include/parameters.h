@@ -18,6 +18,8 @@ typedef enum ParameterConstants_ {
 typedef struct SystemParameter_ {
 	BinarySystem system[NUMBER_OF_SYSTEMS];
 	DetectorParameters detector[NUMBER_OF_SYSTEMS];
+	double coalescencePhase[NUMBER_OF_SYSTEMS];
+	double coalescenceTime[NUMBER_OF_SYSTEMS];
 	double samplingFrequency;
 	double samplingTime;
 	double initialFrequency;

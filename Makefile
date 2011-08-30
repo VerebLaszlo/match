@@ -26,10 +26,11 @@ errorFlags := -Wall -Wextra -Wformat-security -Wmissing-include-dirs -Wswitch-de
 errorFlags += -Wstrict-prototypes -Wold-style-definition -Wno-aggregate-return
 
 errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wcast-qual
-errorExtraFlags += -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return -Wredundant-decls
+errorExtraFlags += -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return
 errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wdisabled-optimization
 
 errorOptionalFlags := -Wformat-nonliteral -Wconversion -Wswitch-enum -Wbad-function-cast
+errorOptionalFlags += -Wredundant-decls
 
 CFLAGS += -march=$(shell arch) $(errorFlags)
 srcdir := src
@@ -43,7 +44,7 @@ makes += $(patsubst $(testdir)/%.c,$(objdir)/%.d,$(wildcard $(testdir)/*.c))
 includes := -I$(incdir) #-I/usr/include
 
 objs_test := main_test.o signals.o detector.o binary_system.o binary_system_mass.o
-objs_test += binary_system_spin.o util_math.o util_IO.o util.o test.o parameters.o
+objs_test += binary_system_spin.o util_math.o util_IO.o util.o test.o parameters.o lal_wrapper.o
 
 vpath
 vpath %.c $(srcdir)
@@ -52,11 +53,13 @@ vpath %.h $(incdir)
 vpath %.o $(objdir)
 vpath %.d $(objdir)
 # EZT MÉG LE KELL ELLENŐRIZNI
-vpath lib%.so $(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L lalinspiral)))
-vpath lib%.a $(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L lalinspiral)))
+#vpath lib%.so $(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L lalinspiral)))
+#vpath lib%.a $(subst -L,,$(subst lib\ -L,lib:,$(shell pkg-config --libs-only-L lalinspiral)))
 
-LAL_INC := $(shell pkg-config --cflags lalinspiral)
-LAL_LIB := $(shell pkg-config --libs lalinspiral)
+lal_includes := $(shell pkg-config --cflags lalinspiral)
+includes += $(lal_includes)
+lal_libraries := $(shell pkg-config --libs-only-l lalinspiral)
+lal_libraries_path := $(shell pkg-config --libs-only-L lalinspiral)
 
 all : test
 
@@ -68,11 +71,11 @@ debug : CFLAGS += $(errorExtraFlags)
 debug :
 	@echo "$(CFLAGS)"
 
-test : CFLAGS += $(errorExtraFlags)
+test : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)
 
 test : $(objs_test) -lfftw3 -lm
 	@echo -e '\e[36mLinking: $@ from $^\e[0m'
-	$(CC) $(CFLAGS) $(macros) -o test $^
+	$(CC) $(CFLAGS) $(macros) $(lal_libraries) -o test $^
 	@echo -e '\e[35mFinished linking: $@\e[0m'
 	@echo ' '
 
