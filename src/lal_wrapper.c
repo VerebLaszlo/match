@@ -168,6 +168,38 @@ static void create_Signal_Struct_From_LAL(SignalStruct *signal, LALParameters *l
 		case SpinTaylor:
 			signal->length[i] = lal->ppnParams[i].length;
 			break;
+		case TaylorT1:
+		case TaylorT2:
+		case TaylorT3:
+		case TaylorF1:
+		case TaylorF2:
+		case PadeT1:
+		case PadeF1:
+		case EOB:
+		case BCV:
+		case BCVSpin:
+		case SpinTaylorT3:
+		case PhenSpinTaylorRD:
+		case PhenSpinTaylorRDF:
+		case FindChirpSP:
+		case FindChirpPTF:
+		case GeneratePPN:
+		case BCVC:
+		case FrameFile:
+		case AmpCorPPN:
+		case NumRel:
+		case Eccentricity:
+		case EOBNR:
+		case EOBNRv2:
+		case EOBNRv2HM:
+		case IMRPhenomA:
+		case IMRPhenomB:
+		case IMRPhenomFA:
+		case IMRPhenomFB:
+		case TaylorEt:
+		case TaylorT4:
+		case TaylorN:
+		case NumApproximants:
 		default:
 			break;
 		}
@@ -185,6 +217,38 @@ static void create_Signal_Struct_From_LAL(SignalStruct *signal, LALParameters *l
 		case SpinTaylor:
 			setSignal_From_A1A2(i, signal, lal);
 			break;
+		case TaylorT1:
+		case TaylorT2:
+		case TaylorT3:
+		case TaylorF1:
+		case TaylorF2:
+		case PadeT1:
+		case PadeF1:
+		case EOB:
+		case BCV:
+		case BCVSpin:
+		case SpinTaylorT3:
+		case PhenSpinTaylorRD:
+		case PhenSpinTaylorRDF:
+		case FindChirpSP:
+		case FindChirpPTF:
+		case GeneratePPN:
+		case BCVC:
+		case FrameFile:
+		case AmpCorPPN:
+		case NumRel:
+		case Eccentricity:
+		case EOBNR:
+		case EOBNRv2:
+		case EOBNRv2HM:
+		case IMRPhenomA:
+		case IMRPhenomB:
+		case IMRPhenomFA:
+		case IMRPhenomFB:
+		case TaylorEt:
+		case TaylorT4:
+		case TaylorN:
+		case NumApproximants:
 		default:
 			break;
 		}

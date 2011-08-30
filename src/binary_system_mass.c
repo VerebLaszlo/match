@@ -128,7 +128,7 @@ static void convertMassesFromEtaChirp(massParameters *mass) {
  * @param[in,out] mass		: initial and calculated mass parameters
  * @param[in]	  convert	: specifies the initial parameters
  */
-static void convertMasses(massParameters *mass, conversionMode convert) {
+static void convertMasses(massParameters *mass, massConversionMode convert) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(mass);
 	switch (convert) {
@@ -141,12 +141,14 @@ static void convertMasses(massParameters *mass, conversionMode convert) {
 	case FROM_ETACHIRP:
 		convertMassesFromEtaChirp(mass);
 		break;
+	case MASS_CONVERSIONS:
 	default:
 		break;
-	}SAVE_FUNCTION_FOR_TESTING();
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
-void generateMass(massParameters *mass, massParameters *limits, generationMode mode) {
+void generateMass(massParameters *mass, massParameters *limits, massGenerationMode mode) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(mass);
 	assert(limits);
@@ -173,9 +175,11 @@ void generateMass(massParameters *mass, massParameters *limits, generationMode m
 			convertMasses(mass, FROM_ETACHIRP);
 		} while (!isMassBetweenLimits(mass, limits));
 		break;
+	case MASS_GENERATIONS:
 	default:
 		break;
-	}SAVE_FUNCTION_FOR_TESTING();
+	} //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 /**

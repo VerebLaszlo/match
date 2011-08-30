@@ -15,7 +15,7 @@
 ///@{
 
 void generateBinarySystemParameters(BinarySystem *system, BinarySystem limits[],
-	generationMode genMass, generationMode genSpin) {
+	massGenerationMode genMass, spinGenerationMode genSpin) {
 	BACKUP_DEFINITION_LINE(); //
 	assert(system);
 	assert(limits);

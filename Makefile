@@ -28,6 +28,7 @@ errorFlags += -Wstrict-prototypes -Wold-style-definition -Wno-aggregate-return
 errorExtraFlags := -Wshadow -Winit-self -Wunsafe-loop-optimizations -Wcast-qual
 errorExtraFlags += -Wcast-align -Wwrite-strings -Wlogical-op -Waggregate-return
 errorExtraFlags += -Wmissing-prototypes -Wmissing-declarations -Wdisabled-optimization
+errorExtraFlags += -Wconversion -Wswitch-enum
 
 errorOptionalFlags := -Wformat-nonliteral -Wconversion -Wswitch-enum -Wbad-function-cast
 errorOptionalFlags += -Wredundant-decls
@@ -71,7 +72,7 @@ debug : CFLAGS += $(errorExtraFlags)
 debug :
 	@echo "$(CFLAGS)"
 
-test : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)  -Wconversion
+test : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)
 
 test : $(objs_test) -lfftw3 -lm
 	@echo -e '\e[36mLinking: $@\e[0m'

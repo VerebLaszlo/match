@@ -14,35 +14,45 @@
 
 /**	Conversion mode codes.
  */
-typedef enum tagConversionMode {
+typedef enum massConversionModes {
 	FROM_M1M2 = 0, ///< convert from \f$m_1, m_2\f$
 	FROM_ETAM, ///< convert from \f$\eta, M\f$
 	FROM_ETACHIRP, ///< convert from \f$\eta, \mathcal{M}\f$
-	MASS_CONVERSIONS, ///< number of mass conversion modes
+	MASS_CONVERSIONS,
+///< number of mass conversion modes
+} massConversionMode;
+
+/**	Conversion mode codes.
+ */
+typedef enum spinConversionModes {
 	FROM_FIXED_XYZ = 0, ///< convert from \f$x, y, z\f$ in fixed convention
 	FROM_FIXED_ANGLES, ///< convert from inclination and azimuth in fixed convention
 	FROM_PRECESSION_XZY, ///< convert from \f$x, y, z\f$ in precessing convention
 	FROM_PRECESSION_ANGLES, ///< convert from inclination and azimuth in precessing convention
-	SPIN_CONVERSIONS, ///< number of spin conversion modes
-	FROM_OTHER = 100,
-///< ???
-} conversionMode;
+	SPIN_CONVERSIONS,
+///< number of spin conversion modes
+} spinConversionMode;
 
 /** Generation mode codes.
  */
-typedef enum tagGenerationMode {
+typedef enum massGenerationMode {
 	GEN_M1M2 = FROM_M1M2, ///< generate in \f$m_1, m_2\f$
 	GEN_ETAM = FROM_ETAM, ///< generate in \f$\eta, M\f$
 	GEN_ETACHIRP = FROM_ETACHIRP, ///< generate in \f$\eta, \mathcal{M}\f$
-	MASS_GENERATIONS = MASS_CONVERSIONS, ///< number of mass generation modes
+	MASS_GENERATIONS = MASS_CONVERSIONS,
+///< number of mass generation modes
+} massGenerationMode;
+
+/** Generation mode codes.
+ */
+typedef enum spinGenerationMode {
 	GEN_FIXED_XYZ = FROM_FIXED_XYZ, ///< generate in \f$x, y, z\f$ in fixed convention
 	GEN_FIXED_ANGLES = FROM_FIXED_ANGLES, ///< generate in inclination and azimuth in fixed convention
 	GEN_PRECESSING_XYZ = FROM_PRECESSION_XZY, ///< generate in \f$x, y, z\f$ in precessing convention
 	GEN_PRECESSING_ANGLES = FROM_PRECESSION_ANGLES, ///< generate in inclination and azimuth in precessing convention
-	SPIN_GENERATIONS = SPIN_CONVERSIONS, ///< number of spin generation modes
-	GEN_OTHER = FROM_OTHER,
-///< ???
-} generationMode;
+	SPIN_GENERATIONS = SPIN_CONVERSIONS,
+///< number of spin generation modes
+} spinGenerationMode;
 
 /**	Various constants for the binary system.
  */
@@ -95,7 +105,7 @@ typedef struct tagBinarySystem {
  * @param[in]	limits	: limits of the mass parameters
  * @param[in]	mode	: generation mode
  */
-void generateMass(massParameters *mass, massParameters *limits, generationMode mode);
+void generateMass(massParameters *mass, massParameters *limits, massGenerationMode mode);
 
 /**
  * @param file
@@ -111,7 +121,7 @@ void printMassParameters(FILE *file, massParameters *mass, OutputFormat *format)
  * @param[in]	mode		: generation mode
  */
 void generateSpin(spinParameters *spin, spinParameters limits[], double inclination,
-	conversionMode mode);
+	spinGenerationMode mode);
 /**
  * @param file
  * @param spin
@@ -126,7 +136,7 @@ void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format)
  * @param[in]	genSpin	: spin generation mode
  */
 void generateBinarySystemParameters(BinarySystem *system, BinarySystem limits[],
-	generationMode genMass, generationMode genSpin);
+	massGenerationMode genMass, spinGenerationMode genSpin);
 
 /**
  * @param file

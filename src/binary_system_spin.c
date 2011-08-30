@@ -174,7 +174,7 @@ static void convertSpinFromPrecessingFrame(spinParameters *spin, const double in
  * @param[in]		convert		: conversion mode
  */
 static void convertSpin(spinParameters spin[NUMBER_OF_BLACKHOLES], const double inclination,
-	conversionMode convert) {
+	spinConversionMode convert) {
 	BACKUP_DEFINITION_LINE();    //
 	assert(spin);
 	switch (convert) {
@@ -200,6 +200,7 @@ static void convertSpin(spinParameters spin[NUMBER_OF_BLACKHOLES], const double 
 		convertSpinFromPrecessingFrame(spin, inclination);
 		convertSpinFromXyzToAngles(spin, FIXED);
 		break;
+	case SPIN_CONVERSIONS:
 	default:
 		break;
 	}
@@ -208,7 +209,7 @@ static void convertSpin(spinParameters spin[NUMBER_OF_BLACKHOLES], const double 
 }
 
 void generateSpin(spinParameters *spin, spinParameters limits[], double inclination,
-	conversionMode mode) {
+	spinGenerationMode mode) {
 	BACKUP_DEFINITION_LINE();    //
 	assert(spin);
 	assert(limits);
@@ -251,9 +252,11 @@ void generateSpin(spinParameters *spin, spinParameters limits[], double inclinat
 			convertSpin(spin, inclination, mode);
 		} while (!isSpinBetweenLimits(spin, limits));
 		break;
+	case SPIN_GENERATIONS:
 	default:
 		break;
-	}SAVE_FUNCTION_FOR_TESTING();
+	}    //
+	SAVE_FUNCTION_FOR_TESTING();
 }
 
 void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format) {

@@ -81,7 +81,8 @@ double degreeFromTurn(double turn) {
 ///@{
 
 double randomBetweenZeroAndOne(void) {
-	return (double) rand() / ((double) RAND_MAX + 1.0);
+	int number = rand();
+	return (double) number / ((double) RAND_MAX + 1.0);
 }
 
 double randomBetweenZeroAnd(double top) {
@@ -187,12 +188,14 @@ const CONVERSION_CONSTANTS CONVERSION_CONSTANT = { 180.0 / M_PI, M_PI / 180.0
 
 inline long greatest_Number_That_Less_Than(double number) {
 	assert(number>0.);
-	return (long) exp2(ceil(log(number) / M_LN2));
+	double result = exp2(ceil(log(number) / M_LN2));
+	return (long) result;
 }
 
 inline long least_Number_That_Greater_Than(double number) {
 	assert(number>0.);
-	return (long) exp2(floor(log(number) / M_LN2));
+	double result = exp2(floor(log(number) / M_LN2));
+	return (long) result;
 }
 
 inline double convert_Time_To_Degree(double hour, double minute, double second) {
