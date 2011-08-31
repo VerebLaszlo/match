@@ -18,10 +18,6 @@ CC := gcc
 CFLAGS := -std=gnu99 -O3 -ggdb3
 include config.mk
 
-ifneq (,$(findstring TEST, $(macros)))
-	TEST := Test
-endif
-
 errorFlags := -Wall -Wextra -Wformat-security -Wmissing-include-dirs -Wswitch-default
 errorFlags += -Wstrict-prototypes -Wold-style-definition -Wno-aggregate-return
 
@@ -64,24 +60,14 @@ lal_libraries_path := $(shell pkg-config --libs-only-L lalinspiral)
 
 all : test
 
-release :
-	@echo "$(CFLAGS)"
+test main : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)
+test : macros += -DTEST
 
-debug : CFLAGS += $(errorExtraFlags)
-
-debug :
-	@echo "$(CFLAGS)"
-
-test : CFLAGS += $(errorExtraFlags) $(lal_libraries_path)
-
-test : $(objs_test) -lfftw3 -lm
+test main : $(objects) -lfftw3 -lm
 	@echo -e '\e[36mLinking: $@\e[0m'
-	$(hide_echo)$(CC) $(CFLAGS) $(macros) $(lal_libraries) -o test $^
+	$(hide_echo)$(CC) $(CFLAGS) $(macros) $(lal_libraries) -o $@ $^
 	@echo -e '\e[35mFinished linking: $@\e[0m'
 	@echo ' '
-
-main : $(objects)
-	$(CC) -o main $(objects)
 
 $(objdir)/%.o : %.h
 
@@ -137,4 +123,3 @@ cleanall : cleanobj
 cleanobj :
 	-rm $(objdir)/*.o
 	clear
-

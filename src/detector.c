@@ -6,9 +6,9 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 #include "detector.h"
 #include "test.h"
-#include "util_math.h"
 
 const DetectorTable detectors[] = { //
 	{ LL, "LL", //
@@ -208,10 +208,10 @@ void printDetectorParameters(FILE *file, DetectorParameters *detector, OutputFor
 #ifdef TEST
 
 static bool isOK_getDetectorIDOf(void) {
-	DetectorID id[] = {LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
-		NUMBER_OF_DETECTORS,};
-	const char *name[] = {"LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
-		"MPQ", "CIT",};
+	DetectorID id[] = { LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
+						NUMBER_OF_DETECTORS, };
+	const char *name[] = { "LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
+							"MPQ", "CIT", };
 	ushort detector = 0;
 	while (id[detector] != NUMBER_OF_DETECTORS) {
 		SAVE_FUNCTION_CALLER();
@@ -235,10 +235,10 @@ static bool isOK_getDetectorIDOf(void) {
 }
 
 static bool isOK_getDetectorTable(void) {
-	DetectorID id[] = {LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
-		NUMBER_OF_DETECTORS,};
-	const char *name[] = {"LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
-		"MPQ", "CIT",};
+	DetectorID id[] = { LL, LH, VIRGO, GEO600, TAMA20, TAMA300, GLASGOW, ISAS100, MPQ, CIT,
+						NUMBER_OF_DETECTORS, };
+	const char *name[] = { "LL", "LH", "VIRGO", "GEO600", "TAMA20", "TAMA300", "GLASGOW", "ISAS100",
+							"MPQ", "CIT", };
 	ushort detector = 0;
 	DetectorTable table;
 	while (id[detector] != NUMBER_OF_DETECTORS) {
@@ -269,21 +269,21 @@ static bool isOK_calcResponseMatrix(void) {
 	double matrix[DIMENSION][DIMENSION];
 	double result[GEO600][DIMENSION][DIMENSION] = { //
 		{ //
-			{	+0.4113180, +0.1402100, +0.2472790}, //
-			{	+0.1402100, -0.1089980, -0.1815970}, //
-			{	+0.2472790, -0.1815970, -0.3022360}, //
+		{ +0.4113180, +0.1402100, +0.2472790 }, //
+		{ +0.1402100, -0.1089980, -0.1815970 }, //
+		{ +0.2472790, -0.1815970, -0.3022360 }, //
 		},
 		{ //
-			{	-0.3926320, -0.0776099, -0.2473840}, //
-			{	-0.0776099, +0.3194990, +0.2279880}, //
-			{	-0.2473840, +0.2279880, +0.0730968}, //
+		{ -0.3926320, -0.0776099, -0.2473840 }, //
+		{ -0.0776099, +0.3194990, +0.2279880 }, //
+		{ -0.2473840, +0.2279880, +0.0730968 }, //
 		},
 		{ //
-			{	+0.2439030, -0.0990959, -0.2326030}, //
-			{	-0.0990959, -0.4478410, +0.1878410}, //
-			{	-0.2326030, +0.1878410, +0.2039790}, //
+		{ +0.2439030, -0.0990959, -0.2326030 }, //
+		{ -0.0990959, -0.4478410, +0.1878410 }, //
+		{ -0.2326030, +0.1878410, +0.2039790 }, //
 		}, //
-	};
+		};
 	while (detector < GEO600) {
 		SAVE_FUNCTION_CALLER();
 		calcResponseMatrix(matrix, detectors[detector]);

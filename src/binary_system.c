@@ -8,7 +8,6 @@
 
 #include "test.h"
 #include <assert.h>
-#include "util_math.h"
 #include "binary_system.h"
 
 /// @name Generation functions
@@ -57,7 +56,7 @@ void printBinarySystemParameters(FILE *file, BinarySystem *system, OutputFormat 
 
 ///@}
 
-//#ifdef TEST
+#ifdef TEST
 #include <math.h>
 /// @name Testing functions
 ///@{
@@ -135,4 +134,4 @@ bool areBinarySystemFunctionsGood(void) {
 }
 
 ///@}
-//#endif	// TEST
+#endif	// TEST

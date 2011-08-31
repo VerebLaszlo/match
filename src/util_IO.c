@@ -9,6 +9,7 @@
 #include "test.h"
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include "util_IO.h"
 #ifndef NDEBUG
 #include <assert.h>
@@ -40,6 +41,7 @@ FILE *safelyOpenFile(const char *fileName, const char *mode) {
 			fprintf(stderr, "%s: Couldn't open file %s; %s\n", program_invocation_short_name,
 				fileName, strerror(errno));
 		}
+		fflush(stderr);
 		exit(EXIT_FAILURE);
 	} else {
 		return stream;
@@ -176,7 +178,7 @@ void setFormatEnd(char formatString[], const ushort number, OutputFormat *format
 
 static bool isOK_setFormatForOneNumber(void) {
 	OutputFormat format;
-	nameString result[2] = {"%- 10.5lg", "% 10.5lg"};
+	nameString result[2] = { "%- 10.5lg", "% 10.5lg" };
 	format.leftJustified = true;
 	format.precision = 5;
 	format.width = 10;
@@ -208,14 +210,14 @@ static bool isOK_setOutputFormat(void) {
 	OutputFormat format;
 	char separator = '%';
 	ushort code = 0;
-	nameString name[6] = {"ab", "bd", "cf", "dh", "ej", "fl"};
+	nameString name[6] = { "ab", "bd", "cf", "dh", "ej", "fl" };
 	ushort precision = 2 * SPECIAL_CHARACTER_LENGTH;
 	bool leftJusfified = false;
 	ushort width;
 	for (ushort i = 0; i < 2; i++, neg(&leftJusfified)) {
-		width = (ushort)(precision - 2 * SPECIAL_CHARACTER_LENGTH);
+		width = (ushort) (precision - 2 * SPECIAL_CHARACTER_LENGTH);
 		for (ushort j = 0; j < 3; j++, code++) {
-			ushort k = (ushort)(3 * i + j);
+			ushort k = (ushort) (3 * i + j);
 			SAVE_FUNCTION_CALLER();
 			setOutputFormat(&format, precision, width, separator, leftJusfified, name[k], code);
 			if (format.precision != precision) {
@@ -234,7 +236,7 @@ static bool isOK_setOutputFormat(void) {
 				PRINT_ERROR();
 				return false;
 			}
-			width = (ushort)(width + 2 * SPECIAL_CHARACTER_LENGTH);
+			width = (ushort) (width + 2 * SPECIAL_CHARACTER_LENGTH);
 		}
 	}
 	/// @todo a hibás bemenet nincs leellenőrizve!!!
@@ -247,15 +249,15 @@ static bool isOK_setFormat(void) {
 		return false;
 	}
 	OutputFormat format;
-	char separator[] = {'%', 'X'};
+	char separator[] = { '%', 'X' };
 	ushort code = 1;
 	nameString name = "multiformat";
 	ushort precision = 5;
 	bool leftJusfified = false;
 	ushort width = 12;
 	nameString output;
-	nameString result[2][2] = { {"% 12.5lg", "% 12.5lg %% % 12.5lg"}, //
-		{	"% 12.5lg", "% 12.5lg X % 12.5lg"}};
+	nameString result[2][2] = { { "% 12.5lg", "% 12.5lg %% % 12.5lg" }, //
+		{ "% 12.5lg", "% 12.5lg X % 12.5lg" } };
 	for (ushort i = 0; i < 2; i++) {
 		setOutputFormat(&format, precision, width, separator[i], leftJusfified, name, code);
 		SAVE_FUNCTION_CALLER();

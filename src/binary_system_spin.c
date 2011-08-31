@@ -14,7 +14,6 @@
 #include <math.h>
 #include <string.h>
 #include <assert.h>
-#include "util_math.h"
 #include "binary_system.h"
 
 /** Returns the magnitude of the spins.
@@ -306,16 +305,16 @@ static bool isOK_isSpinBetweenLimits(void) {
 	limits[MAX].magnitude = mult * (limits[MIN].magnitude = 0.9);
 	for (ushort coordinate = 0; coordinate < COORDINATE_CONVENTIONS; coordinate++) {
 		limits[MAX].azimuth[coordinate] = mult
-		* (limits[MIN].azimuth[coordinate] = 0.3 + (double) coordinate);
+			* (limits[MIN].azimuth[coordinate] = 0.3 + (double) coordinate);
 		limits[MAX].inclination[coordinate] = mult
-		* (limits[MIN].inclination[coordinate] = 0.3 + (double) coordinate);
+			* (limits[MIN].inclination[coordinate] = 0.3 + (double) coordinate);
 		limits[MAX].elevation[coordinate] = mult
-		* (limits[MIN].elevation[coordinate] = 0.3 + (double) coordinate);
+			* (limits[MIN].elevation[coordinate] = 0.3 + (double) coordinate);
 		for (ushort dim = 0; dim < DIMENSION; dim++) {
 			limits[MAX].component[coordinate][dim] = mult
-			* (limits[MIN].component[coordinate][dim] = 0.3 + (double) (coordinate + dim));
+				* (limits[MIN].component[coordinate][dim] = 0.3 + (double) (coordinate + dim));
 			limits[MAX].unity[coordinate][dim] = mult
-			* (limits[MIN].unity[coordinate][dim] = 0.1 + (double) (coordinate + dim));
+				* (limits[MIN].unity[coordinate][dim] = 0.1 + (double) (coordinate + dim));
 		}
 	}
 	for (ushort i = 1; i < mult; i++) {
@@ -326,7 +325,7 @@ static bool isOK_isSpinBetweenLimits(void) {
 			spin.elevation[coordinate] = limits[MAX].elevation[coordinate] / (double) i;
 			for (ushort dim = 0; dim < DIMENSION; dim++) {
 				spin.component[coordinate][dim] = limits[MAX].component[coordinate][dim]
-				/ (double) i;
+					/ (double) i;
 				spin.unity[coordinate][dim] = limits[MAX].unity[coordinate][dim] / (double) i;
 			}
 		}
@@ -344,7 +343,7 @@ static bool isOK_isSpinBetweenLimits(void) {
 		spin.elevation[coordinate] = limits[MAX].elevation[coordinate] / (double) multMod;
 		for (ushort dim = 0; dim < DIMENSION; dim++) {
 			spin.component[coordinate][dim] = limits[MAX].component[coordinate][dim]
-			/ (double) multMod;
+				/ (double) multMod;
 			spin.unity[coordinate][dim] = limits[MAX].unity[coordinate][dim] / (double) multMod;
 		}
 	}
@@ -381,11 +380,15 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 	const ushort AZIM = 0;
 	const ushort INCL = 1;
 	const ushort ELEV = 2;
-	double result[19][3] = { {-135.0, 90.0, 0.0}, {180.0, 135.0, -45.0}, {180.0, 90.0, 0.0}, {
-			180.0, 45.0, 45.0}, {135.0, 90.0, 0.0}, {-90.0, 135.0, -45.0}, {-90.0, 90.0, 0.0}, {
-			-90.0, 45.0, 45.0}, {NAN, 180.0, -90.0}, {NAN, NAN, NAN}, {NAN, 0.0, 90.0}, {90.0,
-			135.0, -45.0}, {90.0, 90.0, 0.0}, {90.0, 45.0, 45.0}, {-45.0, 90.0, 0.0}, {0.0,
-			135.0, -45.0}, {0.0, 90.0, 0.0}, {0.0, 45.0, 45.0}, {45.0, 90.0, 0.0}};
+	double result[19][3] = { { -135.0, 90.0, 0.0 }, { 180.0, 135.0, -45.0 }, { 180.0, 90.0, 0.0 }, {
+		180.0, 45.0, 45.0 },
+								{ 135.0, 90.0, 0.0 }, { -90.0, 135.0, -45.0 }, { -90.0, 90.0, 0.0 },
+								{ -90.0, 45.0, 45.0 }, { NAN, 180.0, -90.0 }, { NAN, NAN, NAN }, {
+									NAN, 0.0, 90.0 },
+								{ 90.0, 135.0, -45.0 }, { 90.0, 90.0, 0.0 }, { 90.0, 45.0, 45.0 }, {
+									-45.0, 90.0, 0.0 },
+								{ 0.0, 135.0, -45.0 }, { 0.0, 90.0, 0.0 }, { 0.0, 45.0, 45.0 }, {
+									45.0, 90.0, 0.0 } };
 	memset(&spin, 0, sizeof(spinParameters));
 	ushort testing = 0;
 	ushort convention = FIXED;
@@ -407,15 +410,15 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 						return false;
 					}
 				} else if (!isNear(radianFromDegree(result[testing][AZIM]),
-						spin.azimuth[convention], EPSILON)) {
+					spin.azimuth[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
 				} else if (!isNear(radianFromDegree(result[testing][INCL]),
-						spin.inclination[convention], EPSILON)) {
+					spin.inclination[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
 				} else if (!isNear(radianFromDegree(result[testing][ELEV]),
-						spin.elevation[convention], EPSILON)) {
+					spin.elevation[convention], EPSILON)) {
 					PRINT_ERROR();
 					return false;
 				}
@@ -427,9 +430,9 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 	double ele1 = M_PI_2 - inc1;
 	double inc2 = acos(-1.0 / sqrt(3.0));
 	double ele2 = M_PI_2 - inc2;
-	double result2[8][3] = { {-135.0, inc2, ele2}, {-135.0, inc1, ele1}, {135.0, inc2, ele2},
-		{	135.0, inc1, ele1}, {-45.0, inc2, ele2}, {-45.0, inc1, ele1}, {45.0, inc2, ele2}, {
-			45.0, inc1, ele1}};
+	double result2[8][3] = { { -135.0, inc2, ele2 }, { -135.0, inc1, ele1 }, { 135.0, inc2, ele2 },
+								{ 135.0, inc1, ele1 }, { -45.0, inc2, ele2 }, { -45.0, inc1, ele1 },
+								{ 45.0, inc2, ele2 }, { 45.0, inc1, ele1 } };
 	testing = 0;
 	for (short x = -1; x <= 1; x++) {
 		spin.component[convention][X] = (double) x;
@@ -444,7 +447,7 @@ static bool isOK_convertSpinFromXyzToAngles(void) {
 				SAVE_FUNCTION_CALLER();
 				convertSpinFromXyzToAngles(&spin, convention);
 				if (!isNear(radianFromDegree(result2[testing][AZIM]), spin.azimuth[convention],
-						EPSILON)) {
+					EPSILON)) {
 					PRINT_ERROR();
 					return false;
 				} else if (!isNear(result2[testing][INCL], spin.inclination[convention], EPSILON)) {
@@ -550,7 +553,7 @@ static bool isOK_convertSpinFromFixedFrame(void) {
 			}
 		}
 		incl += M_PI_4;
-	}while (incl <= M_PI);
+	} while (incl <= M_PI);
 	PRINT_OK();
 	return true;
 }
@@ -572,7 +575,7 @@ static bool isOK_convertSpinFromPrecessionFrame(void) {
 					SAVE_FUNCTION_CALLER();
 					convertSpinFromFixedFrame(&spin, incl);
 					spin.component[FIXED][X] = spin.component[FIXED][Y] = spin.component[FIXED][Z] =
-					0.0;
+						0.0;
 					SAVE_FUNCTION_CALLER();
 					convertSpinFromPrecessingFrame(&spin, incl);
 					if (spin.component[FIXED][X] != (double) x
@@ -586,7 +589,7 @@ static bool isOK_convertSpinFromPrecessionFrame(void) {
 			}
 		}
 		incl += M_PI_4;
-	}while (incl <= M_PI);
+	} while (incl <= M_PI);
 	PRINT_OK();
 	return true;
 }
@@ -639,7 +642,8 @@ static bool isOK_generateSpin(void) {
 	limits[MAX].azimuth[FIXED] = 10000.0 * (limits[MIN].azimuth[FIXED] = 0.000314);
 	limits[MAX].azimuth[PRECESSING] = 10000.0 * (limits[MIN].azimuth[PRECESSING] = 0.000314);
 	limits[MAX].inclination[FIXED] = 10000.0 * (limits[MIN].inclination[FIXED] = 0.000314);
-	limits[MAX].inclination[PRECESSING] = 10000.0 * (limits[MIN].inclination[PRECESSING] = 0.000314);
+	limits[MAX].inclination[PRECESSING] = 10000.0
+		* (limits[MIN].inclination[PRECESSING] = 0.000314);
 	limits[MAX].elevation[FIXED] = M_PI + (limits[MIN].elevation[FIXED] = -M_PI_2);
 	limits[MAX].elevation[PRECESSING] = M_PI + (limits[MIN].elevation[PRECESSING] = -M_PI_4);
 	limits[MAX].component[FIXED][X] = 10.0 * (limits[MIN].component[FIXED][X] = 1.0);

@@ -9,7 +9,6 @@
 #include "test.h"
 #include <math.h>
 #include <assert.h>
-#include "util_math.h"
 #include "binary_system.h"
 
 /** Calculates \f$\nu, m_1, m_2\f$ from \f$\eta, M\f$.
