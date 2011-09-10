@@ -147,6 +147,8 @@ void printBinarySystemParameters(FILE *file, BinarySystem *system, OutputFormat 
 
 #ifdef TEST
 
+void convertSpinGlobal(spinParameters spin[2]);
+
 bool areBinarySystemMassFunctionsGood(void);
 
 bool areBinarySystemSpinFunctionsGood(void);

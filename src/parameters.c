@@ -9,6 +9,7 @@
 #include "parameters.h"
 
 void readExactParameters(FILE *file, SystemParameter *params) {
+	memset(params, 0, sizeof(SystemParameter));
 	char stringFormat[] = "%25s ";
 	for (ushort i = 0; i < NUMBER_OF_SYSTEMS; i++) {
 		fscanf(file, stringFormat, params->name[i]);
@@ -45,6 +46,7 @@ void readExactParameters(FILE *file, SystemParameter *params) {
 }
 
 void readSystemParameters(FILE *file, SystemParameter *params) {
+	memset(params, 0, sizeof(SystemParameter));
 	short length = 100;
 	char line[length];
 	fgets(line, length, file);
@@ -69,6 +71,7 @@ void readSystemParameters(FILE *file, SystemParameter *params) {
 void readProgramParameters(FILE *file, ProgramParameter *params) {
 	assert(file);
 	assert(params);
+	memset(params, 0, sizeof(ProgramParameter));
 	short length = 100;
 	char line[length];
 	fgets(line, length, file);

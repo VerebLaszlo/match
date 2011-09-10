@@ -12,7 +12,7 @@
 #include "util_IO.h"
 
 typedef enum {
-	H1P, H1C, H2P, H2C, NUMBER_OF_SIGNALS_COMPONENTS, NUMBER_OF_SIGNALS = 2, H1 = 0, H2,
+	H1P, H1C, H2P, H2C, NUMBER_OF_SIGNALS_COMPONENTS, H1 = 0, H2, NUMBER_OF_SIGNALS,
 } SignalComponentCodes;
 
 /**	Structure containing the signals.

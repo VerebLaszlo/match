@@ -135,64 +135,23 @@ static void setSignalsFromH(double *signal[], size_t length, CoherentGW *wavefor
  * @param lal
  */
 static void createSignalStructFromLAL(SignalStruct *signal, LALParameters *lal) {
+	signal->size = (size_t) fmax(lal->ppnParams[0].length, lal->ppnParams[1].length);
+	createSignal(signal, signal->size);
+	signal->length[0] = lal->ppnParams[0].length;
+	signal->length[1] = lal->ppnParams[1].length;
 	for (ushort i = 0; i < NUMBER_OF_SYSTEMS; i++) {
 		switch (lal->approx[i]) {
 		case SpinQuadTaylor:
-		case SpinTaylorFrameless:
-		case SpinTaylor:
-			signal->length[i] = lal->ppnParams[i].length;
-			break;
-		case TaylorT1:
-		case TaylorT2:
-		case TaylorT3:
-		case TaylorF1:
-		case TaylorF2:
-		case PadeT1:
-		case PadeF1:
-		case EOB:
-		case BCV:
-		case BCVSpin:
-		case SpinTaylorT3:
-		case PhenSpinTaylorRD:
-		case PhenSpinTaylorRDF:
-		case FindChirpSP:
-		case FindChirpPTF:
-		case GeneratePPN:
-		case BCVC:
-		case FrameFile:
-		case AmpCorPPN:
-		case NumRel:
-		case Eccentricity:
-		case EOBNR:
-		case EOBNRv2:
-		case EOBNRv2HM:
-		case IMRPhenomA:
-		case IMRPhenomB:
-		case IMRPhenomFA:
-		case IMRPhenomFB:
-		case TaylorEt:
-		case TaylorT4:
-		case TaylorN:
-		case NumApproximants:
-		default:
-			break;
-		}
-	}
-	signal->size = (size_t) fmax(signal->length[0], signal->length[1]);
-	create_Signal_Struct(signal, signal->size);
-	for (ushort i = 0; i < NUMBER_OF_SYSTEMS; i++) {
-		switch (lal->approx[i]) {
-		case SpinQuadTaylor:
-			setSignalFromA1A2(&signal->componentsInTime[H1P + NUMBER_OF_SIGNALS * i],
-				lal->length[i], &lal->waveform[i]);
+			setSignalsFromH(&signal->componentsInTime[H1P + NUMBER_OF_SIGNALS * i],
+				signal->length[i], &lal->waveform[i]);
 			break;
 		case SpinTaylorFrameless:
-			setSignalsFromH(&signal->componentsInTime[H1P + NUMBER_OF_SIGNALS * i], lal->length[i],
-				&lal->waveform[i]);
+			setSignalsFromH(&signal->componentsInTime[H1P + NUMBER_OF_SIGNALS * i],
+				signal->length[i], &lal->waveform[i]);
 			break;
 		case SpinTaylor:
 			setSignalFromA1A2(&signal->componentsInTime[H1P + NUMBER_OF_SIGNALS * i],
-				lal->length[i], &lal->waveform[i]);
+				signal->length[i], &lal->waveform[i]);
 			break;
 		case TaylorT1:
 		case TaylorT2:
@@ -253,6 +212,7 @@ int generateWaveformPair(SystemParameter *parameters, SignalStruct *signal) {
 		createSignalStructFromLAL(signal, &lalparams);
 		createPSD(signal->powerSpectrumDensity, &lalparams);
 		parameters->samplingFrequency = 1. / (lalparams.ppnParams[0].deltaT * signal->size);
+		signal->samplingTime = parameters->samplingTime;
 	}
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[0]);
 	XLALSQTPNDestroyCoherentGW(&lalparams.waveform[1]);

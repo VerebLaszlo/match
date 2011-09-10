@@ -275,6 +275,11 @@ void printSpinParameters(FILE *file, spinParameters *spin, OutputFormat *format)
 }
 
 #ifdef TEST
+
+void convertSpinGlobal(spinParameters spin[2]) {
+	convertSpinFromAnglesToXyz(&spin[0], FIXED);
+	convertSpinFromAnglesToXyz(&spin[1], FIXED);
+}
 /// @name Testing functions
 ///@{
 

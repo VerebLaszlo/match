@@ -73,7 +73,7 @@ $(objdir)/%.o : %.h
 
 $(objdir)/%.o : %.c | $(objdir)
 	@echo -e '\e[36mBuilding file: $<\e[0m'
-	$(hide_echo)$(CC) $(CFLAGS) $(CPPFLAGS) $(includes) $(macros) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
+	$(hide_echo)$(CC) $(CFLAGS) $(CPPFLAGS) $(includes) $(macros) $(lal_libraries) -c -MMD -MF$(@:%.o=%.d) -MT$(@:%.o=%.d) $< -o $@
 	@echo -e '\e[35mFinished building: $<\e[0m'
 	@echo ' '
 
