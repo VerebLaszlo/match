@@ -36,15 +36,18 @@ typedef struct LALParameters {
  * @return
  */
 static INT4 convertAmplitudeOrderFromString(const char *amplitudeOrder) {
-	INT4 amplitudeCode;
-	if (!strstr(amplitudeOrder, "00PN")) {
-		amplitudeCode = 0;
-	} else if (!strstr(amplitudeOrder, "05PN")) {
-		amplitudeCode = 1;
-	} else if (!strstr(amplitudeOrder, "10PN")) {
-		amplitudeCode = 2;
-	} else {
-		amplitudeCode = -1;
+	INT4 amplitudeCode = LAL_PNORDER_NEWTONIAN;
+	if (strstr(amplitudeOrder, "100") || strstr(amplitudeOrder, "110")
+		|| strstr(amplitudeOrder, "101") || strstr(amplitudeOrder, "111")) {
+		amplitudeCode |= LAL_PNORDER_NEWTONIAN;
+	}
+	if (strstr(amplitudeOrder, "010") || strstr(amplitudeOrder, "110")
+		|| strstr(amplitudeOrder, "011") || strstr(amplitudeOrder, "111")) {
+		amplitudeCode |= LAL_PNORDER_HALF;
+	}
+	if (strstr(amplitudeOrder, "001") || strstr(amplitudeOrder, "101")
+		|| strstr(amplitudeOrder, "011") || strstr(amplitudeOrder, "111")) {
+		amplitudeCode |= LAL_PNORDER_ONE;
 	}
 	return amplitudeCode;
 }
@@ -59,7 +62,7 @@ static void initLALParameters(LALParameters *lalparams, SystemParameter *paramet
 	memset(lalparams, 0, sizeof(LALParameters));
 	for (short i = 0; i < 2; i++) {
 		lalparams->injParams[i].mass1 = (REAL4) parameters->system[i].mass.mass[0];
-		lalparams->injParams[i].mass2 = (REAL4) parameters->system[i].mass.mass[0];
+		lalparams->injParams[i].mass2 = (REAL4) parameters->system[i].mass.mass[1];
 		lalparams->injParams[i].spin1x = (REAL4) parameters->system[i].spin[0].component[FIXED][X];
 		lalparams->injParams[i].spin1y = (REAL4) parameters->system[i].spin[0].component[FIXED][Y];
 		lalparams->injParams[i].spin1z = (REAL4) parameters->system[i].spin[0].component[FIXED][Z];
@@ -72,8 +75,9 @@ static void initLALParameters(LALParameters *lalparams, SystemParameter *paramet
 		lalparams->ppnParams[i].deltaT = 1. / parameters->samplingFrequency;
 		lalparams->injParams[i].amp_order = convertAmplitudeOrderFromString(
 			parameters->amplitude[i]);
-		snprintf(lalparams->injParams[i].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "%s%s%s",
-			parameters->approximant[i], parameters->phase[i], parameters->spin[i]);
+		snprintf(lalparams->injParams[i].waveform, LIGOMETA_WAVEFORM_MAX * sizeof(CHAR), "%s%s%s%s",
+			parameters->approximant[i], parameters->phase[i], parameters->spin[i],
+			parameters->amplitude[i]);
 		if (strstr(parameters->approximant[i], "SpinQuadTaylor")) {
 			lalparams->approx[i] = SpinQuadTaylor;
 		} else if (strstr(parameters->approximant[i], "SpinTaylorFrameless")) {
@@ -137,6 +141,7 @@ static void setSignalsFromH(double *signal[], size_t length, CoherentGW *wavefor
 static void createSignalStructFromLAL(SignalStruct *signal, LALParameters *lal) {
 	signal->size = (size_t) fmax(lal->ppnParams[0].length, lal->ppnParams[1].length);
 	createSignal(signal, signal->size);
+	signal->samplingTime = lal->ppnParams[0].deltaT;
 	signal->length[0] = lal->ppnParams[0].length;
 	signal->length[1] = lal->ppnParams[1].length;
 	for (ushort i = 0; i < NUMBER_OF_SYSTEMS; i++) {
