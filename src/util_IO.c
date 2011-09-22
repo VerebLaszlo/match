@@ -67,7 +67,7 @@ FILE *safelyOpenForAppend(const char *fileName) {
 /// @name Output formatting functions and types
 ///@{
 
-OutputFormat _defaultFormat = { 3, 6, 9, ' ', true, "%- 6.3lg", "%6s", "default", 0 };
+OutputFormat _defaultFormat = { 5, 6, 11, '%', true, "%- 11.5lg", "%11s", "default", 0 };
 OutputFormat *defaultFormat = &_defaultFormat;
 
 /**	Sets the format string for one number.
