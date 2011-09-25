@@ -9,6 +9,7 @@
 #include <time.h>
 #include <math.h>
 #include "lal_wrapper.h"
+#include "match.h"
 
 int main(int argc, char *argv[]) {
 	printf("%d: %s\n", argc, argv[0]);
@@ -46,6 +47,10 @@ int main(int argc, char *argv[]) {
 	sprintf(fileName, "%s/%s", program.outputDirectory, "proba.dat");
 	file = safelyOpenForWriting(fileName);
 	printTwoSignals(file, &signal, defaultFormat);
+	double type, minimax, best;
+	long min = 1, max = signal.length[0];
+	calc_Matches(&signal, min, max, &type, &best, &minimax);
+	printf("%lg %lg %lg\n", minimax, type, best);
 	puts("\nOK");
 	return 0;
 }

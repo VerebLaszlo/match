@@ -14,12 +14,10 @@ void createSignal(SignalStruct *signal, size_t size) {
 	memset(signal, 0, sizeof(SignalStruct));
 	signal->size = size;
 	for (ushort i = 0; i < NUMBER_OF_SIGNALS; i++) {
-		signal->inTime[i] = malloc(signal->size * sizeof(double));
-		memset(signal->inTime[i], 0, signal->size * sizeof(double));
+		signal->inTime[i] = calloc(signal->size, sizeof(double));
 	}
 	for (ushort i = 0; i < NUMBER_OF_SIGNALS_COMPONENTS; i++) {
-		signal->componentsInTime[i] = malloc(signal->size * sizeof(double));
-		memset(signal->componentsInTime[i], 0, signal->size * sizeof(double));
+		signal->componentsInTime[i] = calloc(signal->size, sizeof(double));
 	}
 }
 

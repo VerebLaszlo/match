@@ -7,7 +7,7 @@
 #ifndef MATCH_H
 #define MATCH_H
 
-#include "lal_wrapper.h"
+#include "signals.h"
 
 /**
  * Formulae given.
@@ -25,7 +25,7 @@
  * @param best
  * @param minimax
  */
-void calc_Matches(signalStruct *in, long min_Index, long max_Index, double *typ, double *best,
+void calc_Matches(SignalStruct *in, long min_Index, long max_Index, double *typ, double *best,
 	double *minimax);
 
 #endif
