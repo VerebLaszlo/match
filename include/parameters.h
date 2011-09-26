@@ -23,6 +23,7 @@ typedef struct SystemParameter_ {
 	double samplingFrequency;
 	double samplingTime;
 	double initialFrequency;
+	double endingFrequency;
 	char name[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];
 	char approximant[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];
 	char phase[NUMBER_OF_SYSTEMS][LENGTH_OF_STRING];

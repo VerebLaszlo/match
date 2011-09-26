@@ -28,4 +28,7 @@
 void calc_Matches(SignalStruct *in, long min_Index, long max_Index, double *typ, double *best,
 	double *minimax);
 
+void calculateIndexBoundariesFromFrequencies(double min, double max, double step,
+	size_t *startingIndex, size_t *endingIndex);
+
 #endif

@@ -179,3 +179,17 @@ void calc_Matches(SignalStruct *in, long min_Index, long max_Index, double *typ,
 	fftw_free(product);
 	calc_Timemaximised_Matches(in, typ, best, minimax);
 }
+
+void calculateIndexBoundariesFromFrequencies(double min, double max, double step,
+	size_t *startingIndex, size_t *endingIndex) {
+	*startingIndex = *endingIndex = 0;
+	double fr = 0.;
+	while (fr < min) {
+		fr += step;
+		*endingIndex = ++(*startingIndex);
+	}
+	while (fr < max) {
+		fr += step;
+		(*endingIndex)++;
+	}
+}

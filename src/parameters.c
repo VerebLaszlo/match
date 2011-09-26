@@ -35,6 +35,7 @@ void readExactParameters(FILE *file, SystemParameter *params) {
 		fscanf(file, "%lg ", &params->samplingFrequency);
 		params->samplingTime = 1.0 / params->samplingFrequency;
 		fscanf(file, "%lg ", &params->initialFrequency);
+		fscanf(file, "%lg ", &params->endingFrequency);
 		fscanf(file, stringFormat, params->approximant[i]);
 		fscanf(file, stringFormat, params->phase[i]);
 		fscanf(file, stringFormat, params->spin[i]);
@@ -51,6 +52,8 @@ void readSystemParameters(FILE *file, SystemParameter *params) {
 	char line[length];
 	fgets(line, length, file);
 	sscanf(line, "%lg\n", &params->initialFrequency);
+	fgets(line, length, file);
+	sscanf(line, "%lg\n", &params->endingFrequency);
 	fgets(line, length, file);
 	sscanf(line, "%lg\n", &params->samplingFrequency);
 	params->samplingTime = 1. / params->samplingFrequency;
@@ -99,6 +102,7 @@ void printProgramParameters(FILE *file, ProgramParameter *params) {
 
 void printSystemParameters(FILE *file, SystemParameter *params, OutputFormat *format) {
 	fprintf(file, "%10s %10.4lg\n", "freq_I", params->initialFrequency);
+	fprintf(file, "%10s %10.4lg\n", "freq_E", params->endingFrequency);
 	fprintf(file, "%10s %10.4lg\n", "freq_S", params->samplingFrequency);
 	fprintf(file, "%10s %10.4lg\n", "time_S", params->samplingTime);
 	for (ushort i = 0; i < NUMBER_OF_SYSTEMS; i++) {

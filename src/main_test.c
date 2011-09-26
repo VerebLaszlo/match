@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
 	//printSystemParameters(stdout, &system, defaultFormat);
 	fclose(file);
 	SignalStruct signal;
+	setSignalExistanceFunctions(true);
 	generateWaveformPair(&system, &signal);
 	for (size_t i = 0; i < signal.size; i++) {
 		signal.inTime[H1][i] = M_SQRT1_2
@@ -48,7 +49,9 @@ int main(int argc, char *argv[]) {
 	file = safelyOpenForWriting(fileName);
 	printTwoSignals(file, &signal, defaultFormat);
 	double type, minimax, best;
-	long min = 1, max = signal.length[0];
+	size_t min, max;
+	calculateIndexBoundariesFromFrequencies(system.initialFrequency, system.endingFrequency,
+		system.samplingFrequency, &min, &max);
 	calc_Matches(&signal, min, max, &type, &best, &minimax);
 	printf("%lg %lg %lg\n", minimax, type, best);
 	puts("\nOK");
