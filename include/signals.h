@@ -29,16 +29,25 @@ typedef struct {
 	double samplingTime;
 } SignalStruct;
 
+extern void (*createSignal)(SignalStruct *signal, size_t size);
+extern void (*destroySignal)(SignalStruct *signal);
+
 /**	Creates the signal structure.
  * @param[out] signal : the allocated memory for the signals
  * @param[in]  size	  : the size of the allocated memories
  */
-void createSignal(SignalStruct *signal, size_t size);
+void createSignalWithoutmatch(SignalStruct *signal, size_t size);
 
 /**	Destroys the signal structure.
  * @param[in] signal :
  */
-void destroySignal(SignalStruct *signal);
+void destroySignalWithoutMatch(SignalStruct *signal);
+
+void createSignalForMatch(SignalStruct *signal, size_t size);
+
+void setSignalExistanceFunctions(bool calculateMatch);
+
+void destroySignalForMatch(SignalStruct *signal);
 
 /**	Prints two signals.
  * @param[in] file	 : output stream

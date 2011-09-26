@@ -8,7 +8,7 @@
 #include "signals.h"
 #include <limits.h>
 
-void createSignal(SignalStruct *signal, size_t size) {
+void createSignalWithoutmatch(SignalStruct *signal, size_t size) {
 	assert(signal);
 	assert(size);
 	memset(signal, 0, sizeof(SignalStruct));
@@ -21,7 +21,7 @@ void createSignal(SignalStruct *signal, size_t size) {
 	}
 }
 
-void destroySignal(SignalStruct *signal) {
+void destroySignalWithoutMatch(SignalStruct *signal) {
 	assert(signal);
 	signal->size = 0;
 	for (ushort i = 0; i < NUMBER_OF_SIGNALS; i++) {
@@ -79,6 +79,19 @@ void destroySignalForMatch(SignalStruct *signal) {
 	}
 	if (signal->powerSpectrumDensity) {
 		fftw_free(signal->powerSpectrumDensity);
+	}
+}
+
+void (*createSignal)(SignalStruct *signal, size_t size) = NULL;
+void (*destroySignal)(SignalStruct *signal) = NULL;
+
+void setSignalExistanceFunctions(bool calculateMatch) {
+	if (calculateMatch) {
+		createSignal = createSignalForMatch;
+		destroySignal = destroySignalForMatch;
+	} else {
+		createSignal = createSignalWithoutmatch;
+		destroySignal = destroySignalWithoutMatch;
 	}
 }
 

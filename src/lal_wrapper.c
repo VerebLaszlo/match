@@ -154,7 +154,12 @@ static void setSignalsFromH(double *signal[], size_t length, CoherentGW *wavefor
  */
 static void createSignalStructFromLAL(SignalStruct *signal, LALParameters *lal) {
 	signal->size = (size_t) fmax(lal->ppnParams[0].length, lal->ppnParams[1].length);
-	createSignal(signal, signal->size);
+	if (createSignal) {
+		createSignal(signal, signal->size);
+	} else {
+		fprintf(stderr, "You did not choose signal structure handling function with \"setSignalExistanceFunctions(bool)\" function.");
+		exit(EXIT_FAILURE);
+	}
 	signal->samplingTime = lal->ppnParams[0].deltaT;
 	signal->length[0] = lal->ppnParams[0].length;
 	signal->length[1] = lal->ppnParams[1].length;
