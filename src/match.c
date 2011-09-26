@@ -73,9 +73,9 @@ static void orthogonise(SignalStruct *in, long min_Index, long max_Index, Signal
 	assert(out);
 	assert(in->size >0 && out->size == in->size);
 	assert(0<min_Index && min_Index < max_Index);
-	double products[NUM_OF_SIGNALS][NUM_OF_SIGNALS];
-	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
-		for (short j = 0; j < NUM_OF_SIGNALS; j++) {
+	double products[NUMBER_OF_SIGNALS_COMPONENTS][NUMBER_OF_SIGNALS_COMPONENTS];
+	for (short i = 0; i < NUMBER_OF_SIGNALS_COMPONENTS; i++) {
+		for (short j = 0; j < NUMBER_OF_SIGNALS_COMPONENTS; j++) {
 			products[i][j] = inner_Product(in->componentsInFrequency[i],
 				in->componentsInFrequency[j], in->powerSpectrumDensity, min_Index, max_Index);
 		}
@@ -162,13 +162,13 @@ void calc_Matches(SignalStruct *in, long min_Index, long max_Index, double *typ,
 	assert(in);
 	assert(in->size);
 	assert(0<min_Index && min_Index< max_Index);
-	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
+	for (short i = 0; i < NUMBER_OF_SIGNALS_COMPONENTS; i++) {
 		fftw_execute(in->plan[i]);
 	}
 	orthonormalise(in, min_Index, max_Index, in);
 	fftw_complex *product = fftw_malloc(in->size * sizeof(fftw_complex));
 	fftw_plan iplan;
-	for (short i = 0; i < NUM_OF_SIGNALS; i++) {
+	for (short i = 0; i < NUMBER_OF_SIGNALS_COMPONENTS; i++) {
 		iplan = fftw_plan_dft_c2r_1d((int) in->size, product, in->product[i], FFTW_ESTIMATE);
 		memset(product, 0, in->size * sizeof(fftw_complex));
 		cross_Product(in->componentsInFrequency[i / 2], in->componentsInFrequency[i % 2 + 2],

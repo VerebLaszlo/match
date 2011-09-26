@@ -109,7 +109,9 @@ static void initLALParameters(LALParameters *lalparams, SystemParameter *paramet
 static void createPSD(double *psd_out, LALParameters *lalparams) {
 	assert(lalparams);
 	REAL8Vector psd;
-	psd.length = (UINT4) lalparams->length[!lalparams->firstShorter];
+	psd.length =
+		(UINT4) lalparams->ppnParams[0].length < lalparams->ppnParams[1].length ?
+			lalparams->ppnParams[0].length : lalparams->ppnParams[1].length;
 	double df = 1. / lalparams->ppnParams[0].deltaT / psd.length;
 	psd.data = (REAL8*) XLALCalloc(sizeof(REAL8), psd.length);
 	LALNoiseSpectralDensity(&lalparams->status, &psd, &LALLIGOIPsd, df);
