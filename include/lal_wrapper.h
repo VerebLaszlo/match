@@ -16,6 +16,6 @@
  * @param signal
  * @return
  */
-int generateWaveformPair(SystemParameter *parameters, SignalStruct *signal);
+int generateWaveformPair(SystemParameter *parameters, SignalStruct *signal, bool calculateMatches);
 
 #endif /* LAL_WRAPPER_H_ */

@@ -159,7 +159,9 @@ static void createSignalStructFromLAL(SignalStruct *signal, LALParameters *lal) 
 	if (createSignal) {
 		createSignal(signal, signal->size);
 	} else {
-		fprintf(stderr, "You did not choose signal structure handling function with \"setSignalExistanceFunctions(bool)\" function.");
+		fprintf(
+			stderr,
+			"You did not choose signal structure handling function with \"setSignalExistanceFunctions(bool)\" function.");
 		exit(EXIT_FAILURE);
 	}
 	signal->samplingTime = lal->ppnParams[0].deltaT;
@@ -217,7 +219,7 @@ static void createSignalStructFromLAL(SignalStruct *signal, LALParameters *lal) 
 	}
 }
 
-int generateWaveformPair(SystemParameter *parameters, SignalStruct *signal) {
+int generateWaveformPair(SystemParameter *parameters, SignalStruct *signal, bool calculateMatches) {
 	assert(parameters);
 	assert(signal);
 	static LALParameters lalparams;
@@ -236,7 +238,9 @@ int generateWaveformPair(SystemParameter *parameters, SignalStruct *signal) {
 	}
 	if (signal) {
 		createSignalStructFromLAL(signal, &lalparams);
-		createPSD(signal->powerSpectrumDensity, &lalparams);
+		if (calculateMatches) {
+			createPSD(signal->powerSpectrumDensity, &lalparams);
+		}
 		parameters->samplingFrequency = 1. / (lalparams.ppnParams[0].deltaT * signal->size);
 		signal->samplingTime = parameters->samplingTime;
 	}

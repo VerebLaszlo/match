@@ -40,7 +40,7 @@ objects += $(patsubst $(testdir)/%.c,$(objdir)/%.o,$(wildcard $(testdir)/*.c))
 makes += $(patsubst $(testdir)/%.c,$(objdir)/%.d,$(wildcard $(testdir)/*.c))
 includes := -I$(incdir) #-I/usr/include
 
-objs_test := main_test.o signals.o detector.o binary_system.o binary_system_mass.o
+objs_test := main_test.o signals.o detector.o binary_system.o binary_system_mass.o program_functions.o
 objs_test += binary_system_spin.o util_math.o util_IO.o util.o test.o parameters.o lal_wrapper.o
 
 vpath
