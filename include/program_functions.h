@@ -12,4 +12,6 @@
 
 void run(char *programFile, char *parametersFile, bool plot, bool calculateMatches);
 
+bool testingFunctions(void);
+
 #endif /* PROGRAM_FUNCTIONS_H_ */

@@ -53,3 +53,22 @@ void run(char *programFile, char *parametersFile, bool plot, bool calculateMatch
 	}
 	destroySignal(&signal);
 }
+
+bool testingFunctions(void) {
+	srand(86);
+	bool succes = true;
+	if (!areUtilMathFunctionsOK()) {
+		succes = false;
+	} else if (!areIOFunctionsGood()) {
+		succes = false;
+	} else if (!areBinarySystemMassFunctionsGood()) {
+		succes = false;
+	} else if (!areBinarySystemSpinFunctionsGood()) {
+		succes = false;
+	} else if (!areBinarySystemFunctionsGood()) {
+		succes = false;
+	} else if (!areDetectorFunctionsGood()) {
+		succes = false;
+	}
+	return succes;
+}

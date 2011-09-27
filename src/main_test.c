@@ -6,20 +6,12 @@
  * @brief
  */
 
-#include <time.h>
-#include <stdlib.h>
 #include "program_functions.h"
 
 int main(int argc, char *argv[]) {
 	printf("%d: %s\n", argc, argv[0]);
 #ifdef TEST
-	srand(86);
-	areUtilMathFunctionsOK();
-	areIOFunctionsGood();
-	areBinarySystemMassFunctionsGood();
-	areBinarySystemSpinFunctionsGood();
-	areBinarySystemFunctionsGood();
-	areDetectorFunctionsGood();
+	testingFunctions();
 #endif // TEST
 	run(argv[1], argv[2], true, false);
 	puts("\nOK");
